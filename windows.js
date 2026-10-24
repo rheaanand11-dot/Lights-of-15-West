@@ -107,7 +107,7 @@
         el.style.setProperty('--d', ((f - 1) * FACADE.rooms + p) * WINDOW_STEP_MS);
         if (isLit) {
           // Real windows glow in different whites and yellows
-          el.classList.add('is-lit', 'tone-' + Math.floor(random() * 3));
+          el.classList.add('is-lit', 'tone-' + pickTone(random()));
         }
         if (roomStories.length) {
           el.type = 'button';
@@ -297,6 +297,20 @@
       if (!res.ok) throw new Error(`${url}: ${res.status}`);
       return res.json();
     });
+  }
+
+  // Window light colors and how often each appears (out of 100), from the
+  // photo of 15 West at night. The colors themselves are in windows.css.
+  const TONES = [
+    ['cool', 32], ['amber', 22], ['cream', 14], ['dim', 11],
+    ['bright', 8], ['blinds', 8], ['purple', 3], ['blue', 2],
+  ];
+  function pickTone(r) {
+    let n = r * 100;
+    for (const [name, share] of TONES) {
+      if ((n -= share) < 0) return name;
+    }
+    return TONES[0][0];
   }
 
   // Floor 6, position 5 -> "605"

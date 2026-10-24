@@ -141,24 +141,53 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   transition: opacity 0.5s ease-out; /* lights linger a moment after the cursor passes */
 }
 
-/* Lit windows: warm light and a glow */
+/* Lit windows: a light and a glow. Each lit window gets one of the tones
+   below (picked by windows.js), matched to the photo of 15 West at night:
+   mostly cool white and warm amber, some dim lamps and half-drawn blinds,
+   and the odd purple or blue LED. --glow is the color of the halo. */
 .window.is-lit::after {
   background: linear-gradient(to bottom, var(--color-window-on-top), var(--color-window-on));
-  box-shadow: 0 0 14px 3px var(--color-window-glow);
+  box-shadow: 0 0 14px 3px var(--glow, var(--color-window-glow));
 }
 
-.window.is-lit.tone-1::after {
-  background: linear-gradient(to bottom, #fffaf0, #f4efe2);
+/* Cool fluorescent white, the most common */
+.window.tone-cool { --glow: rgba(215, 235, 228, 0.45); }
+.window.is-lit.tone-cool::after { background: linear-gradient(to bottom, #f3f8f1, #d6e2d9); }
+
+/* Warm amber lamp */
+.window.tone-amber { --glow: rgba(255, 165, 70, 0.5); }
+.window.is-lit.tone-amber::after { background: linear-gradient(to bottom, #ffd08c, #dc9442); }
+
+/* Soft cream */
+.window.tone-cream { --glow: rgba(255, 228, 180, 0.45); }
+.window.is-lit.tone-cream::after { background: linear-gradient(to bottom, #fff3da, #ecd6a8); }
+
+/* Dim desk lamp, low and brown */
+.window.tone-dim { --glow: rgba(190, 130, 60, 0.3); }
+.window.is-lit.tone-dim::after { background: linear-gradient(to bottom, #b88a4f, #6f5230); }
+
+/* Bright bare white */
+.window.tone-bright { --glow: rgba(255, 255, 255, 0.6); }
+.window.is-lit.tone-bright::after { background: linear-gradient(to bottom, #ffffff, #eef1f6); }
+
+/* Blinds half down: dark top, lit bottom */
+.window.tone-blinds { --glow: rgba(240, 225, 190, 0.35); }
+.window.is-lit.tone-blinds::after {
+  background: linear-gradient(to bottom, #2b2721 0%, #3a342a 42%, #f2e9d0 46%, #e6d7b0 100%);
 }
 
-.window.is-lit.tone-2::after {
-  background: linear-gradient(to bottom, #ffd79a, #f0a85a);
-}
+/* Purple LED strip */
+.window.tone-purple { --glow: rgba(140, 90, 255, 0.55); }
+.window.is-lit.tone-purple::after { background: linear-gradient(to bottom, #9a7bff, #5428d0); }
+
+/* Blue screen glow */
+.window.tone-blue { --glow: rgba(90, 110, 255, 0.5); }
+.window.is-lit.tone-blue::after { background: linear-gradient(to bottom, #7c90ff, #2c3cc4); }
 
 /* Windows with a story flicker clearly, like someone moving inside.
    --fd (set by windows.js) staggers them so they don't flicker in sync. */
 .window.has-story::after {
-  box-shadow: 0 0 18px 5px var(--color-window-glow);
+  box-shadow: 0 0 18px 5px var(--glow, var(--color-window-glow));
   animation: flicker 2.6s linear infinite;
   animation-delay: var(--fd, 0s);
 }
