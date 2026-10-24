@@ -1,5 +1,5 @@
 {
-  "note": "What was happening behind lit windows in 15 West. room = floor number + window number counted from the left, starting at 00 (room 605 = floor 6, 6th window). The facade has 19 windows per floor, so rooms past x18 need a \"column\" (1-19) saying which window to use. Several stories can share a room. color = the card's gradient: yellow, orange, cream, violet or dusk.",
+  "note": "What was happening behind lit windows in 15 West. room = floor number + position on that floor, left to right from 00 to 21 (room 605 = floor 6, position 05). Each story sits in the window with its room number. Rooms ending in 04, 08 and 16 are wall, not windows. Several stories can share a room. color = the card's gradient: yellow, orange, cream, violet or dusk.",
   "stories": [
     { "text": "Re-sewing a hem for the third time. Crit is at 9 a.m. and the seam keeps puckering.", "time": "9:40 PM", "floor": 6, "room": "605", "color": "yellow" },
     { "text": "Glazing test tiles. The kiln opens at 8 a.m.", "time": "9:40 PM", "floor": 5, "room": "514", "color": "orange" },
@@ -11,7 +11,7 @@
     { "text": "Re-exporting my PDF portfolio for the fourth time.", "time": "10:25 PM", "floor": 6, "room": "607", "color": "yellow" },
     { "text": "Listening to music and chilling.", "time": "10:30 PM", "floor": 5, "room": "511", "color": "violet" },
     { "text": "Making instant ramen in the kettle again.", "time": "10:33 PM", "floor": 3, "room": "312", "color": "orange" },
-    { "text": "Gluing foam core. Fumes are killing me.", "time": "10:41 PM", "floor": 5, "room": "521", "column": 19, "color": "cream" },
+    { "text": "Gluing foam core. Fumes are killing me.", "time": "10:41 PM", "floor": 5, "room": "521", "color": "cream" },
     { "text": "Kerning one headline for an hour.", "time": "10:48 PM", "floor": 6, "room": "615", "color": "yellow" },
     { "text": "Calling my friends back home.", "time": "10:50 PM", "floor": 5, "room": "510", "color": "dusk" },
     { "text": "My roommate’s asleep, so I’m drawing under my phone light.", "time": "11:02 PM", "floor": 4, "room": "418", "color": "violet" },
@@ -24,7 +24,7 @@
     { "text": "Calling my Mom.", "time": "12:01 AM", "floor": 4, "room": "409", "color": "yellow" },
     { "text": "Editing my short film. Third cut.", "time": "12:07 AM", "floor": 8, "room": "811", "color": "violet" },
     { "text": "Group chat says nobody’s done. Makes me feel better.", "time": "12:15 AM", "floor": 5, "room": "517", "color": "cream" },
-    { "text": "Photographing my work while the light’s even.", "time": "12:33 AM", "floor": 6, "room": "619", "column": 19, "color": "dusk" },
+    { "text": "Photographing my work while the light’s even.", "time": "12:33 AM", "floor": 6, "room": "619", "color": "dusk" },
     { "text": "Typing my artist statement. Deleting it. Typing again.", "time": "12:46 AM", "floor": 7, "room": "709", "color": "cream" },
     { "text": "Still weaving. 40 rows left.", "time": "1:18 AM", "floor": 5, "room": "503", "color": "orange" },
     { "text": "Finally done. Leaving the light on a bit longer.", "time": "1:37 AM", "floor": 6, "room": "611", "color": "yellow" },

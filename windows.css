@@ -33,7 +33,7 @@
 .facade {
   position: relative;
   /* As wide as possible while the whole building still fits on screen */
-  width: min(100%, 1100px, calc((100svh - 140px) * 1.2));
+  width: min(100%, 1100px, calc((100svh - 140px) * 1.35));
   padding: 0 4.5%;
   background: linear-gradient(to bottom, var(--color-building-top), var(--color-building));
   cursor: none; /* the flashlight is the cursor */
@@ -108,6 +108,9 @@
 }
 
 button.window { cursor: pointer; }
+
+/* Room positions that are solid wall (no window) */
+.window--wall { visibility: hidden; }
 
 /* Window frame: two vertical bars, one horizontal */
 .window::before {
@@ -301,17 +304,6 @@ button.window { cursor: pointer; }
   background:
     radial-gradient(60% 40% at 0% 0%, #eedca0 0%, transparent 75%),
     linear-gradient(150deg, #f4eedb 0%, #f2f0f5 45%, #b9a8ec 78%, #6c4ed8 100%);
-}
-
-/* Lit windows we don't have a story for */
-.story-card-panel--unknown {
-  background: linear-gradient(to bottom, #2a2730, #18161c);
-  color: var(--color-text);
-}
-
-.story-card-panel--unknown .story-card-close {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--color-text);
 }
 
 .windows-error {
