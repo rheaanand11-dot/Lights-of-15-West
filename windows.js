@@ -100,6 +100,7 @@
         }
         const room = roomNumber(f, p);
         const isLit = lit.has(room);
+        let tone = null; // the color of its light, if lit
         const roomStories = storyAt[room] || [];
         const el = document.createElement(roomStories.length ? 'button' : 'span');
         el.className = 'window';
@@ -107,7 +108,8 @@
         el.style.setProperty('--d', ((f - 1) * FACADE.rooms + p) * WINDOW_STEP_MS);
         if (isLit) {
           // Real windows glow in different whites and yellows
-          el.classList.add('is-lit', 'tone-' + pickTone(random()));
+          tone = pickTone(random());
+          el.classList.add('is-lit', 'tone-' + tone);
         }
         if (roomStories.length) {
           el.type = 'button';
@@ -116,7 +118,7 @@
           el.setAttribute('aria-label', `Lit window, floor ${f}, room ${room}`);
         }
         grid.appendChild(el);
-        windows.push({ el, floor: f, room, lit: isLit, stories: roomStories, x: 0, y: 0, light: 0 });
+        windows.push({ el, floor: f, room, lit: isLit, tone, stories: roomStories, x: 0, y: 0, light: 0 });
       }
     }
     // Street-level arches
@@ -258,7 +260,8 @@
     function openStory(w, index = 0) {
       current = { w, index };
       const s = w.stories[index];
-      panel.className = 'story-card-panel story-card-panel--' + s.color;
+      // The card is the same color as the window it came from
+      panel.className = 'story-card-panel story-card-panel--' + w.tone;
       panel.querySelector('.story-card-text').textContent = s.text;
       panel.querySelector('.story-card-meta').textContent =
         [s.time, `Floor ${w.floor}`, w.room].join(' · ');

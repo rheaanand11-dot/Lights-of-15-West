@@ -37,9 +37,10 @@ working late keep downtown lit and alive, while the offices go dark.
 - Build **one section at a time**. When a section is done, stop and ask for the
   next frame (link or screenshot) instead of inventing a design.
 - Visual language: black, magenta, orange and yellow; film grain texture;
-  Helvetica Neue for text; Degular Mono for small labels (DM Mono stands in).
-  Story cards are grainy gradient panels with the story in Helvetica and
-  "time · Floor · room" in mono underneath.
+  Helvetica Neue for text; Degular Mono (Adobe Fonts, linked in index.html) to
+  label data and statistics. Story cards are grainy gradient panels with the
+  story in Helvetica and "time · Floor · room" in mono underneath; each card is
+  the same color as the window it opens from.
 - All colors, fonts, type sizes and spacing come from CSS variables in
   `base.css`. Never hard-code a color or font in another file. If Figma
   uses a value that isn't a variable yet, add it to `base.css` (see shared files).
@@ -89,8 +90,7 @@ of windows lit. Each building lists its total windows (`null` = not counted yet)
 { "building": "15west", "day": "Monday", "time": "23:00", "lit": 110 }
 ```
 
-**`stories.json`**: one entry per story: text, time, floor, room, card color
-(`yellow`, `orange`, `cream`, `violet`, `dusk`). Each story sits in the lit
+**`stories.json`**: one entry per story: text, time, floor, room. Each story sits in the lit
 window with its exact room number: room 605 = floor 6, position 05.
 
 The facade has 10 floors with room positions 00-21 on each, left to right.

@@ -410,17 +410,18 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   outline-offset: 2px;
 }
 
-/* Card gradients, matched to the Illustrator panels */
-.story-card-panel--yellow {
+/* Card gradients, in the style of the Illustrator panels. The card takes the
+   color of the window it came from (the window's tone, see "Lit windows"). */
+.story-card-panel--cool {
   background:
-    radial-gradient(90% 70% at 100% 0%, #f7ee2e 0%, transparent 70%),
-    radial-gradient(70% 45% at 0% 100%, #dcd84a 0%, transparent 75%),
-    linear-gradient(160deg, #c9c98a 0%, #f2f1e3 50%, #fbfaf3 100%);
+    radial-gradient(80% 60% at 100% 0%, #e3efe6 0%, transparent 70%),
+    radial-gradient(70% 45% at 0% 100%, #b9cfc2 0%, transparent 75%),
+    linear-gradient(160deg, #cfdcd3 0%, #f1f5f0 50%, #fafcf9 100%);
 }
 
-.story-card-panel--orange {
+.story-card-panel--amber {
   background:
-    radial-gradient(60% 40% at 0% 80%, #e6e45a 0%, transparent 70%),
+    radial-gradient(60% 40% at 0% 80%, #f2c25a 0%, transparent 70%),
     linear-gradient(to bottom, #f6f3e6 0%, #f6e7a6 38%, #f5ae3c 72%, #e6720c 100%);
 }
 
@@ -430,16 +431,41 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
     linear-gradient(to bottom, #f7f2e2, #fbfaf3);
 }
 
-.story-card-panel--violet {
+.story-card-panel--dim {
+  background:
+    radial-gradient(70% 50% at 100% 0%, #e2b57a 0%, transparent 75%),
+    linear-gradient(to bottom, #e9d2ae 0%, #d3a76b 55%, #a67841 100%);
+}
+
+.story-card-panel--bright {
+  background:
+    radial-gradient(70% 50% at 0% 0%, #ffffff 0%, transparent 75%),
+    linear-gradient(160deg, #e9ecf2 0%, #fbfbfd 55%, #ffffff 100%);
+}
+
+/* Blinds half down: a dark band at the top, like the window */
+.story-card-panel--blinds {
+  background:
+    linear-gradient(to bottom, #2e2a23 0%, #3d362b 22%, transparent 26%),
+    radial-gradient(70% 40% at 0% 100%, #e8d39e 0%, transparent 75%),
+    linear-gradient(to bottom, #f4ecd6, #fbf7ec);
+}
+
+.story-card-panel--blinds .story-card-close {
+  background: rgba(255, 255, 255, 0.15);
+  color: #f4ecd6;
+}
+
+.story-card-panel--purple {
   background:
     radial-gradient(70% 45% at 100% 0%, #f1eef4 0%, transparent 75%),
     linear-gradient(165deg, #9a8ff2 0%, #3b2be6 40%, #4a20c8 62%, #7a1aa0 85%, #8e1a86 100%);
 }
 
-.story-card-panel--dusk {
+.story-card-panel--blue {
   background:
-    radial-gradient(60% 40% at 0% 0%, #eedca0 0%, transparent 75%),
-    linear-gradient(150deg, #f4eedb 0%, #f2f0f5 45%, #b9a8ec 78%, #6c4ed8 100%);
+    radial-gradient(70% 45% at 100% 0%, #eef0fb 0%, transparent 75%),
+    linear-gradient(165deg, #a9b6ff 0%, #5a6cf2 40%, #2c3cc4 75%, #1e2a8f 100%);
 }
 
 .windows-error {
