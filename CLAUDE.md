@@ -13,14 +13,18 @@ working late keep downtown lit and alive, while the offices go dark.
 - **Opening ("Where the Light Falls"):** the background to the story: downtown
   goes dark after work, empty offices, Jane Jacobs' "eyes upon the street", light
   and crime. Context, not a statistics page. Design: "ds3 data vis 1.ai" poster.
-- **Core experience (after the opening):** the 15 West facade, big (wider than
-  the screen is tall). When it scrolls into view it draws itself: outline first,
-  then the windows one by one from the bottom floor up, then the dark textured
-  wall fills in. The
-  cursor is a flashlight: moving it reveals which windows were lit. Tapping a lit
-  window that has a story (they flicker) opens one story card about what was happening in that room. One story at
-  a time. Every decision should serve that feeling of looking up at the building
-  at night.
+- **Core experience (after the opening):** 15 West, big, in the middle of its
+  street, with its neighbors either side (DarrowEverett, Textron, US Marshals,
+  Barton Gilman, Metropark, Merchants Bank; drawn from the Figma photos, with
+  their real window totals and lit counts). When the street scrolls into view
+  every building draws itself: outline first, then the windows one by one from
+  the bottom floor up, then the dark textured walls fill in. Lit windows then
+  glow, the neighbors dimmer than 15 West. The cursor is a flashlight over
+  15 West; tapping a lit window that has a story (they flicker) opens one story
+  card about that room. One story at a time. A switch (starts on) turns 15 West's
+  lights off: the street goes dark and the count drops from 197 to 87 lit
+  windows. Every decision should serve that feeling of looking up at the
+  building at night.
 
 ## Tech rules
 

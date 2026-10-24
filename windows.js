@@ -1,7 +1,9 @@
 // windows.js — owned by Person A.
-// The 15 West facade at night. Everything starts dark; the cursor is a flashlight
-// that reveals which windows were lit. Tap a window with a story to read what
-// was happening inside that room.
+// 15 West at night with the buildings around it. The buildings draw
+// themselves in, then their lit windows glow (the neighbors dimmer than
+// 15 West). The cursor is a flashlight over 15 West; tap a window with a story
+// to read what was happening inside that room. A switch turns 15 West's
+// lights off to show how much darker the block gets.
 
 (function () {
   // Which building and which observation the facade shows (see lights.json).
@@ -10,7 +12,26 @@
   // windows: 10 floors x (22 - 3) = the 190 windows we counted.
   const FACADE = {
     building: '15west', floors: 10, rooms: 22, walls: [4, 8, 16],
-    day: 'Monday', time: '23:00',
+    day: 'Monday', time: '23:00', label: 'Monday, 11 PM',
+  };
+  const MAIN_WIDTH = 52; // 15 West's share of the skyline's width, in %
+
+  // The buildings around 15 West, left to right on each side. Window totals
+  // and lit counts come from lights.json, at the same day and time as 15 West.
+  // floors x columns is the shape of the window grid; spare spots past the
+  // total are wall. width = share of the skyline's width, in %.
+  // window = a window's width / height. look = extra styling in windows.css.
+  const NEIGHBORS = {
+    left: [
+      { id: 'darroweverett', floors: 25, columns: 15, width: 8.5, window: '1 / 1.9', arches: 4, look: 'purple-wash' },
+      { id: 'textron', floors: 42, columns: 23, width: 8, window: '1 / 5', arches: 3 },
+      { id: 'usmarshals', floors: 2, columns: 13, width: 7.5, window: '1 / 3', arches: 5, look: 'floodlit' },
+    ],
+    right: [
+      { id: 'bartongilman', floors: 34, columns: 18, width: 8.5, window: '1 / 4.2', arches: 3, look: 'crown' },
+      { id: 'metropark', floors: 10, columns: 16, width: 8, window: '1 / 3', arches: 4, look: 'warm' },
+      { id: 'merchants', floors: 5, columns: 8, width: 7.5, window: '1 / 2', arches: 3 },
+    ],
   };
   const LIGHT_RADIUS = 110; // size of the flashlight, in pixels (matches .facade-light in windows.css)
   const MOUSE_SLOP = 14; // how near the cursor has to be to a story window to open it, in pixels
@@ -61,16 +82,30 @@
         <span class="hint-mouse">Shine your light across 15 West. Click a flickering window to look inside.</span>
         <span class="hint-touch">Tap 15 West to shine a light. Tap a flickering window to look inside.</span>
       </p>
-      <div class="facade" style="--columns: ${FACADE.rooms}">
-        <div class="facade-fill"></div>
-        <svg class="facade-outline" aria-hidden="true">
-          <rect x="0" y="0" width="100%" height="100%" pathLength="1"/>
-        </svg>
-        <div class="facade-cornice"></div>
-        <div class="facade-grid"></div>
-        <div class="facade-base"></div>
-        <div class="facade-light" aria-hidden="true"></div>
-        <div class="facade-cursor" aria-hidden="true"></div>
+      <div class="skyline">
+        <div class="skyline-glow" aria-hidden="true"></div>
+        <div class="skyline-row">
+          <div class="facade facade--main" role="group" aria-label="15 West"
+               style="--columns: ${FACADE.rooms}; width: ${MAIN_WIDTH}%">
+            <div class="facade-fill"></div>
+            <svg class="facade-outline" aria-hidden="true">
+              <rect x="0" y="0" width="100%" height="100%" pathLength="1"/>
+            </svg>
+            <div class="facade-cornice"></div>
+            <div class="facade-grid"></div>
+            <div class="facade-base"></div>
+            <div class="facade-light" aria-hidden="true"></div>
+            <div class="facade-cursor" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+      <div class="skyline-controls">
+        <label class="windows-switch">
+          <input type="checkbox" role="switch" checked aria-label="15 West lights">
+          <span class="windows-switch-track" aria-hidden="true"></span>
+          <span>15 West lights <strong>on</strong></span>
+        </label>
+        <p class="skyline-count" aria-live="polite"></p>
       </div>
       <dialog class="story-card" aria-label="Story from a lit window">
         <div class="story-card-panel">
@@ -81,9 +116,9 @@
         </div>
       </dialog>`;
 
-    const facade = root.querySelector('.facade');
-    const grid = root.querySelector('.facade-grid');
-    const base = root.querySelector('.facade-base');
+    const facade = root.querySelector('.facade--main');
+    const grid = facade.querySelector('.facade-grid');
+    const base = facade.querySelector('.facade-base');
     const dialog = root.querySelector('.story-card');
     const panel = root.querySelector('.story-card-panel');
 
@@ -123,6 +158,68 @@
     }
     // Street-level arches
     for (let i = 0; i < 10; i++) base.appendChild(document.createElement('span'));
+
+    // The neighbors, on either side of 15 West
+    const skylineRow = root.querySelector('.skyline-row');
+    let neighborsLit = 0;
+    NEIGHBORS.left.forEach((b) => skylineRow.insertBefore(buildNeighbor(b), facade));
+    NEIGHBORS.right.forEach((b) => skylineRow.appendChild(buildNeighbor(b)));
+
+    function buildNeighbor(b) {
+      const info = lights.buildings.find((x) => x.id === b.id);
+      const obs = lights.observations.find((o) =>
+        o.building === b.id && o.day === FACADE.day && o.time === FACADE.time);
+      const total = info.windows;
+      const litHere = obs ? obs.lit : 0;
+      neighborsLit += litHere;
+
+      const el = document.createElement('div');
+      el.className = 'facade facade--neighbor' + (b.look ? ' facade--' + b.look : '');
+      el.style.width = b.width + '%';
+      el.style.setProperty('--columns', b.columns);
+      el.style.setProperty('--window', b.window);
+      el.style.setProperty('--arches', b.arches);
+      el.setAttribute('role', 'img');
+      el.setAttribute('aria-label', `${info.name}: ${litHere} of ${total} windows lit`);
+      el.innerHTML = `
+        <div class="facade-fill"></div>
+        <svg class="facade-outline" aria-hidden="true">
+          <rect x="0" y="0" width="100%" height="100%" pathLength="1"/>
+        </svg>
+        <div class="facade-cornice"></div>
+        <div class="facade-grid"></div>
+        <div class="facade-base"></div>`;
+
+      // Which windows are lit: picked at random (seeded, so it's the same on
+      // every visit) until the number matches the count in the data
+      const pick = seeded(total * 7 + litHere);
+      const litWindows = new Set();
+      while (litWindows.size < Math.min(litHere, total)) {
+        litWindows.add(Math.floor(pick() * total));
+      }
+
+      // Windows, top floor first. They draw in at the same pace as 15 West,
+      // so every building finishes at the same moment.
+      const g = el.querySelector('.facade-grid');
+      const slots = b.floors * b.columns;
+      const spare = slots - total;
+      const step = (FACADE.floors * FACADE.rooms * WINDOW_STEP_MS) / slots;
+      for (let i = 0; i < slots; i++) {
+        const w = document.createElement('span');
+        if (i < spare) {
+          w.className = 'window window--wall';
+        } else {
+          w.className = 'window';
+          const fromBottom = b.floors - 1 - Math.floor(i / b.columns);
+          w.style.setProperty('--d', Math.round((fromBottom * b.columns + (i % b.columns)) * step));
+          if (litWindows.has(i - spare)) w.classList.add('is-lit', 'tone-' + pickTone(pick()));
+        }
+        g.appendChild(w);
+      }
+      const arches = el.querySelector('.facade-base');
+      for (let i = 0; i < b.arches; i++) arches.appendChild(document.createElement('span'));
+      return el;
+    }
 
     // Remember where each window's center is, relative to the facade
     function measure() {
@@ -196,7 +293,7 @@
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
         shine(p.x, p.y);
-        storyUnderCursor = nearestStory(p.x, p.y, MOUSE_SLOP);
+        storyUnderCursor = isDark() ? null : nearestStory(p.x, p.y, MOUSE_SLOP);
         facade.classList.toggle('is-on-story', !!storyUnderCursor);
       });
     });
@@ -207,6 +304,29 @@
       facade.classList.remove('is-on-story');
     });
 
+    // The 15 West lights switch. It starts on. Off, 15 West goes dark, the glow
+    // over the street fades, and the count shows how few windows are left lit.
+    const lightsSwitch = root.querySelector('.windows-switch input');
+    const switchWord = root.querySelector('.windows-switch strong');
+    const count = root.querySelector('.skyline-count');
+    function isDark() {
+      return root.classList.contains('is-dark');
+    }
+    function updateSwitch() {
+      const on = lightsSwitch.checked;
+      root.classList.toggle('is-dark', !on);
+      switchWord.textContent = on ? 'on' : 'off';
+      count.innerHTML = on
+        ? `<strong>${litCount + neighborsLit}</strong> windows lit on the block &middot; ${FACADE.label}`
+        : `<strong>${neighborsLit}</strong> windows lit without 15 West`;
+      if (!on) {
+        storyUnderCursor = null;
+        facade.classList.remove('is-on-story');
+      }
+    }
+    lightsSwitch.addEventListener('change', updateSwitch);
+    updateSwitch();
+
     // Phones have no hover, so a tap moves the light there. A tap only opens a
     // window that was already lit up by the flashlight, so the reveal comes first.
     let lastPointer = null;
@@ -215,12 +335,12 @@
       lastPointer = e.pointerType;
       if (!built || e.pointerType !== 'touch') return;
       const p = pointIn(e);
-      const near = nearestStory(p.x, p.y, TOUCH_SLOP);
+      const near = isDark() ? null : nearestStory(p.x, p.y, TOUCH_SLOP);
       tapTarget = near && near.light > 0.3 ? near : null;
       shine(p.x, p.y);
     });
     facade.addEventListener('click', (e) => {
-      if (!built) return;
+      if (!built || isDark()) return; // no stories while 15 West's lights are off
       let w;
       if (lastPointer === 'touch') {
         w = tapTarget;
