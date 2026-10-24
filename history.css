@@ -16,16 +16,16 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  min-height: 100svh;
+  min-height: 70vh;
+  min-height: 70svh; /* less than a full screen, so less black between figures */
   margin: 0;
-  padding: var(--space-5) 0;
+  padding: var(--space-4) 0;
 }
 
 /* The "right light" step is taller, so there is room to scroll the light up */
 .history-step--scrub {
   display: block;
-  min-height: 260svh;
+  min-height: 180svh;
   padding: 0;
 }
 
@@ -51,6 +51,8 @@
 
 .history-step--intro {
   align-items: flex-start;
+  min-height: 100vh;
+  min-height: 100svh; /* the title still gets the whole first screen */
 }
 
 .history-title {
