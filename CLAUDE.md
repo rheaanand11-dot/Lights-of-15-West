@@ -13,7 +13,10 @@ working late keep downtown lit and alive, while the offices go dark.
 - **Opening ("Where the Light Falls"):** the background to the story: downtown
   goes dark after work, empty offices, Jane Jacobs' "eyes upon the street", light
   and crime. Context, not a statistics page. Design: "ds3 data vis 1.ai" poster.
-- **Core experience (after the opening):** the 15 West facade, dark and textured. The
+- **Core experience (after the opening):** the 15 West facade, big (wider than
+  the screen is tall). When it scrolls into view it draws itself: outline first,
+  then the windows one by one from the bottom floor up, then the dark textured
+  wall fills in. The
   cursor is a flashlight: moving it reveals which windows were lit. Tapping a lit
   window that has a story (they flicker) opens one story card about what was happening in that room. One story at
   a time. Every decision should serve that feeling of looking up at the building

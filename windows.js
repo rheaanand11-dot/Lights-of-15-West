@@ -12,7 +12,9 @@
     building: '15west', floors: 10, rooms: 22, walls: [4, 8, 16],
     day: 'Monday', time: '23:00',
   };
-  const LIGHT_RADIUS = 150; // size of the flashlight, in pixels
+  const LIGHT_RADIUS = 190; // size of the flashlight, in pixels
+  const OUTLINE_MS = 1600; // how long the outline takes to draw
+  const WINDOW_STEP_MS = 7; // gap between one window appearing and the next
   const TOUCH_SLOP = 18; // how near a finger has to land to a window on phones, in pixels
 
   const root = document.getElementById('windows');
@@ -59,6 +61,10 @@
         <span class="hint-touch">Tap 15 West to shine a light. Tap a flickering window to look inside.</span>
       </p>
       <div class="facade" style="--columns: ${FACADE.rooms}">
+        <div class="facade-fill"></div>
+        <svg class="facade-outline" aria-hidden="true">
+          <rect x="0" y="0" width="100%" height="100%" pathLength="1"/>
+        </svg>
         <div class="facade-cornice"></div>
         <div class="facade-grid"></div>
         <div class="facade-base"></div>
@@ -95,6 +101,8 @@
         const roomStories = storyAt[room] || [];
         const el = document.createElement(roomStories.length ? 'button' : 'span');
         el.className = 'window';
+        // Drawing order: bottom floor first, left to right
+        el.style.setProperty('--d', ((f - 1) * FACADE.rooms + p) * WINDOW_STEP_MS);
         if (isLit) {
           // Real windows glow in different whites and yellows
           el.classList.add('is-lit', 'tone-' + Math.floor(random() * 3));
@@ -123,6 +131,33 @@
     measure();
     window.addEventListener('resize', measure);
 
+    // Drawing the building in: first its outline, then the windows one by one
+    // from the bottom floor up, then the wall fills in and the flashlight
+    // switches on. It plays once, when the building scrolls into view.
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let built = false;
+    function startDrawing() {
+      window.removeEventListener('scroll', checkInView);
+      if (reduceMotion) {
+        root.classList.add('is-outlining', 'is-windowing', 'is-built');
+        built = true;
+        return;
+      }
+      root.classList.add('is-outlining');
+      setTimeout(() => root.classList.add('is-windowing'), OUTLINE_MS);
+      const lastWindow = FACADE.floors * FACADE.rooms * WINDOW_STEP_MS;
+      setTimeout(() => {
+        root.classList.add('is-built');
+        built = true;
+      }, OUTLINE_MS + lastWindow + 300);
+    }
+    function checkInView() {
+      const box = facade.getBoundingClientRect();
+      if (box.top < window.innerHeight * 0.75 && box.bottom > 0) startDrawing();
+    }
+    window.addEventListener('scroll', checkInView, { passive: true });
+    checkInView();
+
     // The flashlight: windows close to (x, y) light up, fading out toward the edge
     function shine(x, y) {
       facade.classList.add('is-shining');
@@ -149,7 +184,7 @@
     // Mouse: the light follows the cursor
     let frame = null;
     facade.addEventListener('pointermove', (e) => {
-      if (e.pointerType === 'touch') return;
+      if (!built || e.pointerType === 'touch') return;
       const p = pointIn(e);
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => shine(p.x, p.y));
@@ -164,13 +199,14 @@
     let tapTarget = null;
     facade.addEventListener('pointerdown', (e) => {
       lastPointer = e.pointerType;
-      if (e.pointerType !== 'touch') return;
+      if (!built || e.pointerType !== 'touch') return;
       const p = pointIn(e);
       const near = nearestStory(p.x, p.y);
       tapTarget = near && near.light > 0.3 ? near : null;
       shine(p.x, p.y);
     });
     facade.addEventListener('click', (e) => {
+      if (!built) return;
       let w;
       if (lastPointer === 'touch') {
         w = tapTarget;
@@ -204,7 +240,6 @@
 
     // The story card, one at a time. It grows out of the window you tapped.
     // A room with several stories gets a button to step through them in order.
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const nextButton = root.querySelector('.story-card-next');
     let current = null;
     function openStory(w, index = 0) {
