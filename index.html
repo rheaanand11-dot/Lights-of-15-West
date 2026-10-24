@@ -6,10 +6,12 @@
   <title>How an Art School Keeps a City Awake</title>
   <meta name="description" content="Shine a light across RISD's 15 West at night and look inside the windows that keep downtown Providence awake.">
 
-  <!-- Mono font (stand-in for Degular Mono) -->
+  <!-- Mono font (stand-in for Degular Mono). Loaded without holding up the
+       first screen: the page shows straight away and the font swaps in. -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&display=swap"
+        media="print" onload="this.media='all'">
 
   <!-- Shared (both people): colors, fonts, spacing -->
   <link rel="stylesheet" href="base.css">
