@@ -71,9 +71,14 @@
         <p class="light-readout">Light <span>0</span>%</p>
         <figcaption>${HISTORY.rightLight}</figcaption>
       </div>
-    </figure>
+    </figure>`;
 
-    <p class="history-sources"><strong>Sources:</strong> ${HISTORY.sources.join(' · ')}</p>`;
+  // Sources go at the very bottom of the page, not here
+  const sources = document.getElementById('sources');
+  if (sources) {
+    sources.innerHTML =
+      `<p class="history-sources"><strong>Sources:</strong> ${HISTORY.sources.join(' · ')}</p>`;
+  }
 
   drawBlocks(root.querySelector('.blocks'));
   followScroll(root.querySelectorAll('.history-step'));
