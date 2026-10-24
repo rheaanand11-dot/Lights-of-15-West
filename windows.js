@@ -4,7 +4,7 @@
 // happening inside that room.
 
 (function () {
-  // Which building and which observation the facade shows (see data/lights.json).
+  // Which building and which observation the facade shows (see lights.json).
   // 10 floors x 19 windows = the 190 windows we counted.
   const FACADE = { building: '15west', floors: 10, columns: 19, day: 'Monday', time: '23:00' };
   const LIGHT_RADIUS = 150; // size of the flashlight, in pixels
@@ -13,7 +13,7 @@
   const root = document.getElementById('windows');
   if (!root) return;
 
-  Promise.all([getJSON('data/lights.json'), getJSON('data/stories.json')])
+  Promise.all([getJSON('lights.json'), getJSON('stories.json')])
     .then(([lights, stories]) => build(lights, stories.stories))
     .catch((err) => {
       root.innerHTML = '<p class="windows-error">Could not load the data files. ' +

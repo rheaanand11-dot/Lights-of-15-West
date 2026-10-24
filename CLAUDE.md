@@ -38,23 +38,27 @@ working late keep downtown lit and alive, while the offices go dark.
   Story cards are grainy gradient panels with the story in Helvetica and
   "time · Floor · room" in mono underneath.
 - All colors, fonts, type sizes and spacing come from CSS variables in
-  `styles/base.css`. Never hard-code a color or font in another file. If Figma
+  `base.css`. Never hard-code a color or font in another file. If Figma
   uses a value that isn't a variable yet, add it to `base.css` (see shared files).
 
 ## File structure and owners
 
+All files sit loose at the top level, with no folders, so they can be uploaded
+through the GitHub website (its upload button doesn't keep folders). Keep it
+that way.
+
 | File | What it is | Owner |
 |---|---|---|
 | `index.html` | Page shell: one empty container per section | Shared |
-| `styles/base.css` | Colors, fonts, spacing, grain as CSS variables | Shared |
-| `data/lights.json` | Lit-window counts per building | Shared |
-| `data/stories.json` | Stories behind lit 15 West windows | Shared |
-| `js/history.js` | Opening section, "Where the Light Falls" | Not assigned yet |
-| `styles/history.css` | Styles for the opening section | Not assigned yet |
-| `js/windows.js` | Facade, flashlight, story card | **Person A** |
-| `styles/windows.css` | Styles for the facade and story card | **Person A** |
-| `js/story.js` | Intro, narrative text, legend, credits | **Person B** |
-| `styles/story.css` | Styles for the story sections | **Person B** |
+| `base.css` | Colors, fonts, spacing, grain as CSS variables | Shared |
+| `lights.json` | Lit-window counts per building | Shared |
+| `stories.json` | Stories behind lit 15 West windows | Shared |
+| `history.js` | Opening section, "Where the Light Falls" | Not assigned yet |
+| `history.css` | Styles for the opening section | Not assigned yet |
+| `windows.js` | Facade, flashlight, story card | **Person A** |
+| `windows.css` | Styles for the facade and story card | **Person A** |
+| `story.js` | Intro, narrative text, legend, credits | **Person B** |
+| `story.css` | Styles for the story sections | **Person B** |
 
 Person A = [NAME A], Person B = [NAME B]. Replace these with real names.
 
@@ -62,7 +66,7 @@ Person A = [NAME A], Person B = [NAME B]. Replace these with real names.
 
 1. **Never edit files owned by the other person.** If a change is needed there,
    stop and tell the user what to ask their teammate for.
-2. **Shared files** (`index.html`, `base.css`, `data/*.json`): only small, focused
+2. **Shared files** (`index.html`, `base.css`, `lights.json`, `stories.json`): only small, focused
    changes, committed on their own with a clear message, so the teammate can
    review them. Tell the user to give their teammate a heads up.
 3. **Work on your own branch**, never directly on `main`. Name branches
@@ -74,7 +78,7 @@ Person A = [NAME A], Person B = [NAME B]. Replace these with real names.
 
 ## Data
 
-**`data/lights.json`**: real counts of lit windows, counted from photos taken on
+**`lights.json`**: real counts of lit windows, counted from photos taken on
 Westminster St. One entry per observation: building, day, time (24-hour), number
 of windows lit. Each building lists its total windows (`null` = not counted yet).
 
@@ -82,13 +86,13 @@ of windows lit. Each building lists its total windows (`null` = not counted yet)
 { "building": "15west", "day": "Monday", "time": "23:00", "lit": 110 }
 ```
 
-**`data/stories.json`**: one entry per story: text, time, floor, room, card color
+**`stories.json`**: one entry per story: text, time, floor, room, card color
 (`yellow`, `orange`, `cream`, `violet`, `dusk`). The room number places the story
 on the facade: room 605 = floor 6, 6th window from the left (window numbers start
 at 00).
 
 The facade is 10 floors x 19 windows = 190, and shows the Monday 11 PM count
-(`FACADE` at the top of `js/windows.js`). We only know *how many* windows were lit,
+(`FACADE` at the top of `windows.js`). We only know *how many* windows were lit,
 not exactly which ones, so story windows are always lit and the rest are spread
 out at random (the same way on every visit).
 
