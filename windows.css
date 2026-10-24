@@ -1,0 +1,320 @@
+/* windows.css — owned by Person A.
+   The dark 15 West facade, the flashlight, and the story card. */
+
+#windows {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: var(--space-5) var(--gutter);
+}
+
+.facade-hint {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.hint-touch { display: none; }
+
+@media (hover: none) {
+  .hint-mouse { display: none; }
+  .hint-touch { display: inline; }
+}
+
+/* ---------- The building ---------- */
+
+.facade {
+  position: relative;
+  /* As wide as possible while the whole building still fits on screen */
+  width: min(100%, 1100px, calc((100svh - 140px) * 1.2));
+  padding: 0 4.5%;
+  background: linear-gradient(to bottom, var(--color-building-top), var(--color-building));
+  cursor: none; /* the flashlight is the cursor */
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* Windows and ledges sit above the grain and the pool of light */
+.facade-cornice,
+.facade-grid,
+.facade-base {
+  position: relative;
+  z-index: 1;
+}
+
+/* Grain on the wall, like the Figma texture */
+.facade::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--grain);
+  mix-blend-mode: overlay;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Heights here use padding-top, which is a % of the facade's width,
+   so the building keeps its proportions at every screen size */
+.facade-cornice {
+  margin: 0 -4.5%;
+  padding-top: 3%;
+  background: linear-gradient(to bottom, var(--color-building-edge), var(--color-building-top));
+  border-bottom: 2px solid var(--color-building-edge);
+}
+
+.facade-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+  padding: 1% 0 2%;
+}
+
+.facade-base {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  margin: 0 -4.5%;
+  padding: 1.5% 5% 0;
+  border-top: 2px solid var(--color-building-edge);
+}
+
+/* Street-level arches */
+.facade-base span {
+  aspect-ratio: 3 / 4;
+  margin: 0 18%;
+  border-radius: 999px 999px 0 0;
+  background: var(--color-window-off);
+}
+
+/* ---------- Windows ---------- */
+
+.window {
+  --light: 0; /* 0 = flashlight far away, 1 = flashlight right on it; set by windows.js */
+  --mullion: rgba(20, 18, 24, 0.85);
+  position: relative;
+  display: block;
+  aspect-ratio: 5 / 8;
+  margin: 30% 20% 18%; /* % of one window bay's width: space between floors and between windows */
+  padding: 0;
+  border: 0;
+  border-radius: 1px;
+  background: var(--color-window-off);
+  font: inherit;
+}
+
+button.window { cursor: pointer; }
+
+/* Window frame: two vertical bars, one horizontal */
+.window::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(to right, transparent 31%, var(--mullion) 31% 36%, transparent 36% 64%, var(--mullion) 64% 69%, transparent 69%),
+    linear-gradient(to bottom, transparent 47%, var(--mullion) 47% 53%, transparent 53%);
+}
+
+/* What the flashlight reveals. Dark windows: a faint glint on the glass. */
+.window::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: var(--light);
+  background: var(--color-glass);
+  transition: opacity 0.5s ease-out; /* lights linger a moment after the cursor passes */
+}
+
+/* Lit windows: warm light and a glow */
+.window.is-lit::after {
+  background: linear-gradient(to bottom, var(--color-window-on-top), var(--color-window-on));
+  box-shadow: 0 0 14px 3px var(--color-window-glow);
+}
+
+.window.is-lit.tone-1::after {
+  background: linear-gradient(to bottom, #fffaf0, #f4efe2);
+}
+
+.window.is-lit.tone-2::after {
+  background: linear-gradient(to bottom, #ffd79a, #f0a85a);
+}
+
+/* Windows with a story flicker gently, like someone moving inside */
+.window.has-story::after {
+  animation: flicker 5s ease-in-out infinite;
+}
+
+@keyframes flicker {
+  0%, 100% { filter: brightness(1); }
+  45% { filter: brightness(1.18); }
+  50% { filter: brightness(0.9); }
+  55% { filter: brightness(1.12); }
+}
+
+.window:focus-visible {
+  outline: 2px solid var(--color-yellow);
+  outline-offset: 3px;
+}
+
+/* The soft pool of light around the cursor */
+.facade-light {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  background: radial-gradient(circle 150px at var(--x, 50%) var(--y, 50%),
+    rgba(255, 244, 220, 0.22) 0%, rgba(255, 236, 200, 0.08) 45%, transparent 100%);
+  mix-blend-mode: screen;
+  transition: opacity 0.4s ease;
+}
+
+.facade.is-shining .facade-light { opacity: 1; }
+
+/* ---------- The story card ---------- */
+
+.story-card {
+  max-width: none;
+  max-height: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: visible;
+}
+
+.story-card::backdrop {
+  background: rgba(4, 4, 6, 0.8);
+}
+
+.story-card-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: min(86vw, 440px, calc(86svh * 0.7));
+  aspect-ratio: 7 / 10;
+  padding: 10% 11% 22%;
+  overflow: hidden;
+  color: #111;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.6);
+}
+
+/* Grain on the card */
+.story-card-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--grain);
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.story-card-text {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 1.1em;
+  font-family: var(--font-body);
+  font-size: clamp(1.3rem, 5.4vw, 1.75rem);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.story-card-meta {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: clamp(0.95rem, 3.8vw, 1.15rem);
+  letter-spacing: 0.06em;
+}
+
+.story-card-next {
+  position: absolute;
+  bottom: 6%;
+  left: 11%;
+  z-index: 2;
+  padding: var(--space-2) 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.04em;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.story-card-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.08);
+  color: #111;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.story-card-close:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 2px;
+}
+
+/* Card gradients, matched to the Illustrator panels */
+.story-card-panel--yellow {
+  background:
+    radial-gradient(90% 70% at 100% 0%, #f7ee2e 0%, transparent 70%),
+    radial-gradient(70% 45% at 0% 100%, #dcd84a 0%, transparent 75%),
+    linear-gradient(160deg, #c9c98a 0%, #f2f1e3 50%, #fbfaf3 100%);
+}
+
+.story-card-panel--orange {
+  background:
+    radial-gradient(60% 40% at 0% 80%, #e6e45a 0%, transparent 70%),
+    linear-gradient(to bottom, #f6f3e6 0%, #f6e7a6 38%, #f5ae3c 72%, #e6720c 100%);
+}
+
+.story-card-panel--cream {
+  background:
+    radial-gradient(70% 50% at 0% 0%, #ecc87e 0%, transparent 75%),
+    linear-gradient(to bottom, #f7f2e2, #fbfaf3);
+}
+
+.story-card-panel--violet {
+  background:
+    radial-gradient(70% 45% at 100% 0%, #f1eef4 0%, transparent 75%),
+    linear-gradient(165deg, #9a8ff2 0%, #3b2be6 40%, #4a20c8 62%, #7a1aa0 85%, #8e1a86 100%);
+}
+
+.story-card-panel--dusk {
+  background:
+    radial-gradient(60% 40% at 0% 0%, #eedca0 0%, transparent 75%),
+    linear-gradient(150deg, #f4eedb 0%, #f2f0f5 45%, #b9a8ec 78%, #6c4ed8 100%);
+}
+
+/* Lit windows we don't have a story for */
+.story-card-panel--unknown {
+  background: linear-gradient(to bottom, #2a2730, #18161c);
+  color: var(--color-text);
+}
+
+.story-card-panel--unknown .story-card-close {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-text);
+}
+
+.windows-error {
+  color: var(--color-text-muted);
+  text-align: center;
+}

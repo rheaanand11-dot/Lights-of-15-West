@@ -1,0 +1,298 @@
+/* history.css — owner not assigned yet (see CLAUDE.md).
+   "Where the Light Falls" opening section, from the ds3 data vis 1 poster.
+   One step per screen: history.js shows the step in the middle of the
+   screen (.is-visible) and hides the others. */
+
+#history {
+  max-width: var(--wide-width);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+/* ---------- Steps ---------- */
+
+.history-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100svh;
+  margin: 0;
+  padding: var(--space-5) 0;
+}
+
+/* The "right light" step is taller, so there is room to scroll the light up */
+.history-step--scrub {
+  display: block;
+  min-height: 260svh;
+  padding: 0;
+}
+
+.history-sticky {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  height: 100svh;
+}
+
+.history-step figcaption {
+  margin-top: var(--space-4);
+  font-size: var(--text-lg);
+  text-align: center;
+  color: var(--color-text);
+}
+
+/* ---------- Intro ---------- */
+
+.history-step--intro {
+  align-items: flex-start;
+}
+
+.history-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 8.6vw, 6.4rem);
+  font-weight: 800;
+  font-stretch: condensed;
+  line-height: 0.92;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--color-lime);
+}
+
+.history-lede {
+  max-width: 48ch;
+  margin: var(--space-4) 0 0;
+  font-size: clamp(1.05rem, 2.1vw, 1.4rem);
+  font-style: italic;
+  line-height: 1.35;
+  color: var(--color-lime);
+}
+
+.history-lede span {
+  display: block;
+}
+
+.history-scroll-hint {
+  margin: var(--space-6) 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+}
+
+/* ---------- 1 in 5 offices: five circles, one lit ---------- */
+
+.offices {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  justify-items: center;
+  gap: var(--space-3);
+  width: min(100%, 860px);
+}
+
+.office {
+  width: min(100%, 150px);
+  aspect-ratio: 1;
+  border: 2px solid var(--color-pale-yellow);
+  border-radius: 50%;
+}
+
+.office--lit {
+  border-color: transparent;
+  background: radial-gradient(circle, var(--color-orange) 0%, #ffb14d 30%, #fff1d2 85%);
+  box-shadow: 0 0 40px 4px rgba(255, 170, 70, 0.35);
+}
+
+/* ---------- Better lighting, less crime: three rings ---------- */
+
+.rings {
+  position: relative;
+  width: min(100%, 560px, 68svh);
+  aspect-ratio: 1;
+}
+
+.ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.ring span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  font-family: var(--font-mono);
+  font-size: clamp(0.65rem, 1.6vw, 0.85rem);
+  text-align: center;
+  color: #23232e;
+}
+
+.ring--1 {
+  width: 100%;
+  height: 100%;
+  background: conic-gradient(from 300deg, #0b1626 0deg, #2a7fbd 50deg, #9fdcf7 90deg, #ffffff 130deg,
+    #f7d2c4 175deg, #ef8a76 215deg, #b23f3a 260deg, #2a1418 310deg, #0b1626 360deg);
+}
+
+.ring--1 span { top: 4%; }
+
+.ring--2 {
+  width: 78%;
+  height: 78%;
+  background: conic-gradient(from 300deg, #6f6e66 0deg, #e9e7dc 60deg, #ffffff 100deg, #7cc3ee 140deg,
+    #1f2ba0 190deg, #11135e 230deg, #9a9890 300deg, #6f6e66 360deg);
+}
+
+.ring--2 span { top: 4.5%; }
+
+.ring--3 {
+  width: 62%;
+  height: 62%;
+  background:
+    radial-gradient(circle at 45% 68%, #ffffff 0%, #c8ecfb 18%, rgba(140, 210, 245, 0) 45%),
+    radial-gradient(circle at 30% 20%, #f2826e 0%, #9a3a78 35%, #3a1a6a 60%, #1a0d3a 80%);
+  box-shadow: 0 0 0 1px rgba(80, 90, 255, 0.6);
+}
+
+.ring--3 span {
+  top: 7%;
+  color: rgba(35, 35, 46, 0.6);
+}
+
+/* ---------- Crime moves to darker blocks ---------- */
+
+.blocks {
+  display: block;
+  width: min(100%, 380px, 55svh);
+  overflow: visible;
+}
+
+.lit-dot {
+  filter: drop-shadow(0 0 2px rgba(255, 160, 60, 0.7));
+}
+
+.dark-dot {
+  fill: #3324d8;
+  opacity: 0.85;
+}
+
+.drop {
+  stroke: #b8642a;
+  stroke-width: 0.4;
+}
+
+/* ---------- The right light, not the brightest ---------- */
+
+.light-frame {
+  width: min(86%, 440px);
+  padding: 12px;
+  background: linear-gradient(to bottom, #1c1c1c, #a3a3a3);
+}
+
+/* --light goes from 0 to 1 as you scroll (set by history.js) */
+.light-panel {
+  --light: 0;
+  aspect-ratio: 1.75;
+  background: #fff;
+  opacity: var(--light);
+  box-shadow: 0 0 calc(var(--light) * 70px) calc(var(--light) * 14px) rgba(255, 255, 255, 0.3);
+}
+
+.light-readout {
+  margin: var(--space-4) 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.history-sources {
+  max-width: 90ch;
+  margin: 0;
+  padding: var(--space-6) 0 var(--space-7);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+}
+
+/* ---------- Fading steps in and out ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  .history-step > * {
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+
+  .history-step.is-visible > * {
+    opacity: 1;
+  }
+
+  .history-lede span {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    transition-delay: calc(var(--i) * 0.35s);
+  }
+
+  .office {
+    opacity: 0;
+    transition: opacity 0.5s ease calc(var(--i) * 0.12s);
+  }
+
+  /* The lit office switches on after the others appear */
+  .office--lit {
+    filter: brightness(0.15);
+    transition: opacity 0.5s ease, filter 0.8s ease 0.9s;
+  }
+
+  .ring {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    transition-delay: calc(var(--i) * 0.25s);
+  }
+
+  .lit-dot {
+    opacity: 0;
+    transition: opacity 0.3s ease calc(var(--i) * 0.03s);
+  }
+
+  .drop {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 0.9s ease calc(0.9s + var(--i) * 0.15s);
+  }
+
+  .dark-dot {
+    opacity: 0;
+    transition: opacity 0.6s ease calc(1.6s + var(--i) * 0.04s);
+  }
+
+  .is-visible .history-lede span,
+  .is-visible .office,
+  .is-visible .lit-dot {
+    opacity: 1;
+    transform: none;
+  }
+
+  .is-visible .office--lit { filter: none; }
+  .is-visible .ring { opacity: 1; transform: translate(-50%, -50%); }
+  .is-visible .drop { stroke-dashoffset: 0; }
+  .is-visible .dark-dot { opacity: 0.85; }
+}
+
+/* ---------- Phones ---------- */
+
+@media (max-width: 600px) {
+  .offices { gap: var(--space-2); }
+  .history-step figcaption { font-size: var(--text-md); }
+}

@@ -1,0 +1,53 @@
+{
+  "note": "Lit-window counts, counted from photos taken on Westminster St. windows = total windows on the side we photographed (null = not counted yet).",
+  "buildings": [
+    { "id": "15west", "name": "15 West", "windows": 190 },
+    { "id": "darroweverett", "name": "DarrowEverett LLP", "windows": 370 },
+    { "id": "textron", "name": "Textron Financial Corporation", "windows": 966 },
+    { "id": "usmarshals", "name": "US Marshals Service", "windows": 26 },
+    { "id": "bartongilman", "name": "Barton Gilman LLP", "windows": 606 },
+    { "id": "metropark", "name": "Metropark Ltd", "windows": 160 },
+    { "id": "merchants", "name": "Merchants Bank", "windows": 39 },
+    { "id": "homewood", "name": "Homewood Suites", "windows": null }
+  ],
+  "observations": [
+    { "building": "15west", "day": "Friday", "time": "20:00", "lit": 122 },
+    { "building": "15west", "day": "Saturday", "time": "21:00", "lit": 107 },
+    { "building": "15west", "day": "Sunday", "time": "19:00", "lit": 87 },
+    { "building": "15west", "day": "Sunday", "time": "21:00", "lit": 124 },
+    { "building": "15west", "day": "Monday", "time": "23:00", "lit": 110 },
+
+    { "building": "darroweverett", "day": "Friday", "time": "20:00", "lit": 33 },
+    { "building": "darroweverett", "day": "Saturday", "time": "21:00", "lit": 10 },
+    { "building": "darroweverett", "day": "Sunday", "time": "21:00", "lit": 14 },
+    { "building": "darroweverett", "day": "Monday", "time": "23:00", "lit": 13 },
+
+    { "building": "textron", "day": "Friday", "time": "20:00", "lit": 60 },
+    { "building": "textron", "day": "Saturday", "time": "21:00", "lit": 6 },
+    { "building": "textron", "day": "Sunday", "time": "21:00", "lit": 33 },
+    { "building": "textron", "day": "Monday", "time": "23:00", "lit": 17 },
+
+    { "building": "usmarshals", "day": "Friday", "time": "20:00", "lit": 5 },
+    { "building": "usmarshals", "day": "Saturday", "time": "21:00", "lit": 5 },
+    { "building": "usmarshals", "day": "Sunday", "time": "21:00", "lit": 5 },
+    { "building": "usmarshals", "day": "Monday", "time": "23:00", "lit": 5 },
+
+    { "building": "bartongilman", "day": "Friday", "time": "20:00", "lit": 81 },
+    { "building": "bartongilman", "day": "Saturday", "time": "21:00", "lit": 36 },
+    { "building": "bartongilman", "day": "Sunday", "time": "21:00", "lit": 38 },
+    { "building": "bartongilman", "day": "Monday", "time": "23:00", "lit": 29 },
+
+    { "building": "metropark", "day": "Friday", "time": "20:00", "lit": 29 },
+    { "building": "metropark", "day": "Saturday", "time": "21:00", "lit": 23 },
+    { "building": "metropark", "day": "Sunday", "time": "21:00", "lit": 22 },
+    { "building": "metropark", "day": "Monday", "time": "23:00", "lit": 11 },
+
+    { "building": "merchants", "day": "Friday", "time": "20:00", "lit": 21 },
+    { "building": "merchants", "day": "Saturday", "time": "21:00", "lit": 22 },
+    { "building": "merchants", "day": "Sunday", "time": "21:00", "lit": 27 },
+    { "building": "merchants", "day": "Monday", "time": "23:00", "lit": 12 },
+
+    { "building": "homewood", "day": "Saturday", "time": "21:00", "lit": 40 },
+    { "building": "homewood", "day": "Sunday", "time": "21:00", "lit": 54 }
+  ]
+}

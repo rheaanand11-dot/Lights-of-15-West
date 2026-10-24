@@ -1,0 +1,82 @@
+/* =========================================================
+   base.css — SHARED by both people.
+   Design tokens from Figma ("Potential Visual Language?")
+   live here as CSS variables. Colors are matched by eye from
+   screenshots; swap in exact hex codes from Figma when known.
+   ========================================================= */
+
+:root {
+  /* Palette from the Figma swatches: black, magenta, orange, yellow */
+  --color-black: #111111;
+  --color-magenta: #d4009b;
+  --color-orange: #ff6b00;
+  --color-yellow: #ffe000;
+  --color-lime: #dcec00;          /* "Where the Light Falls" title and intro text */
+  --color-pale-yellow: #efe7a4;   /* thin outlines */
+
+  /* Night and building */
+  --color-night: #08080a;         /* page background */
+  --color-building: #121115;      /* facade, lower */
+  --color-building-top: #1a191e;  /* facade, upper */
+  --color-building-edge: #25232a; /* cornice and ledges */
+
+  /* Windows */
+  --color-window-off: #0a090c;            /* dark window */
+  --color-glass: rgba(150, 160, 190, 0.16); /* dark window under the flashlight */
+  --color-window-on-top: #fff1cf;         /* lit window, top */
+  --color-window-on: #ffd88c;             /* lit window, bottom */
+  --color-window-glow: rgba(255, 214, 140, 0.55);
+
+  /* Text */
+  --color-text: #f2efe8;
+  --color-text-muted: #8f8d99;
+  --color-accent: var(--color-yellow);
+
+  /* Fonts: Helvetica Neue for text. Degular Mono is the Figma mono;
+     DM Mono (free, loaded in index.html) stands in until we have a license. */
+  --font-display: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-body: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: "Degular Mono", "DM Mono", ui-monospace, Menlo, monospace;
+
+  /* Type sizes */
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: clamp(2rem, 6vw, 4rem);
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 40px;
+  --space-6: 64px;
+  --space-7: 120px;
+
+  /* Layout */
+  --content-width: 720px;
+  --wide-width: 1200px;
+  --gutter: 16px;                 /* side padding on phones */
+
+  /* Film-grain texture (the noise in the Figma building and story cards) */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (min-width: 768px) {
+  :root { --gutter: 40px; }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+body {
+  background: var(--color-night);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+img, svg { max-width: 100%; display: block; }

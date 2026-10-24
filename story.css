@@ -1,0 +1,72 @@
+/* story.css — owned by Person B.
+   Placeholder look until the Figma frames for these sections arrive. */
+
+.story-section {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: var(--space-5) var(--gutter);
+}
+
+#intro {
+  padding-top: var(--space-7);
+  text-align: center;
+}
+
+.story-kicker {
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-sm);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.story-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: normal;
+  line-height: 1.1;
+}
+
+.story-dek {
+  margin: var(--space-4) 0 0;
+  font-size: var(--text-lg);
+  color: var(--color-text-muted);
+}
+
+#narrative p {
+  font-size: var(--text-lg);
+}
+
+.legend-list {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.legend-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.legend-swatch {
+  width: 12px;
+  height: 18px;
+}
+
+.legend-swatch--on { background: var(--color-window-on); }
+.legend-swatch--off { background: var(--color-window-off); }
+
+#credits {
+  padding-bottom: var(--space-6);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+#credits p { margin: 0 0 var(--space-1); }

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How an Art School Keeps a City Awake</title>
+  <meta name="description" content="Shine a light across RISD's 15 West at night and look inside the windows that keep downtown Providence awake.">
+
+  <!-- Mono font (stand-in for Degular Mono) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&display=swap">
+
+  <!-- Shared (both people): colors, fonts, spacing -->
+  <link rel="stylesheet" href="styles/base.css">
+  <!-- Owned by Person B -->
+  <link rel="stylesheet" href="styles/story.css">
+  <!-- Owned by Person A -->
+  <link rel="stylesheet" href="styles/windows.css">
+  <!-- Owner not assigned yet -->
+  <link rel="stylesheet" href="styles/history.css">
+</head>
+<body>
+  <main>
+    <!-- Opening: "Where the Light Falls", the background to the story -->
+    <section id="history" aria-label="Where the light falls"></section>
+
+    <!-- Person A: the dark 15 West facade, flashlight and window stories -->
+    <section id="windows" aria-label="15 West at night"></section>
+
+    <!-- Person B: intro -->
+    <header id="intro" class="story-section"></header>
+
+    <!-- Person B: narrative text -->
+    <section id="narrative" class="story-section"></section>
+
+    <!-- Person B: legend -->
+    <section id="legend" class="story-section"></section>
+  </main>
+
+  <!-- Person B: credits -->
+  <footer id="credits" class="story-section"></footer>
+
+  <script src="js/history.js" defer></script>
+  <script src="js/story.js" defer></script>
+  <script src="js/windows.js" defer></script>
+</body>
+</html>
