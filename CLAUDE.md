@@ -15,7 +15,7 @@ working late keep downtown lit and alive, while the offices go dark.
   and crime. Context, not a statistics page. Design: "ds3 data vis 1.ai" poster.
 - **Core experience (after the opening):** the 15 West facade, dark and textured. The
   cursor is a flashlight: moving it reveals which windows were lit. Tapping a lit
-  window opens one story card about what was happening in that room. One story at
+  window that has a story (they flicker) opens one story card about what was happening in that room. One story at
   a time. Every decision should serve that feeling of looking up at the building
   at night.
 
@@ -87,14 +87,16 @@ of windows lit. Each building lists its total windows (`null` = not counted yet)
 ```
 
 **`stories.json`**: one entry per story: text, time, floor, room, card color
-(`yellow`, `orange`, `cream`, `violet`, `dusk`). The room number places the story
-on the facade: room 605 = floor 6, 6th window from the left (window numbers start
-at 00).
+(`yellow`, `orange`, `cream`, `violet`, `dusk`). Each story sits in the lit
+window with its exact room number: room 605 = floor 6, position 05.
 
-The facade is 10 floors x 19 windows = 190, and shows the Monday 11 PM count
-(`FACADE` at the top of `windows.js`). We only know *how many* windows were lit,
-not exactly which ones, so story windows are always lit and the rest are spread
-out at random (the same way on every visit).
+The facade has 10 floors with room positions 00-21 on each, left to right.
+Positions 04, 08 and 16 are solid wall, so 10 x 19 = 190 windows, matching our
+count. It shows the Monday 11 PM count (`FACADE` at the top of `windows.js`). We
+only know *how many* windows were lit, not exactly which ones, so story windows
+are always lit and the rest are spread out at random (the same way on every
+visit). Only story windows can be tapped; they flicker so people find them. Never
+show placeholder text for windows without a story.
 
 ## Running it locally
 
