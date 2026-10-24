@@ -12,7 +12,8 @@
     building: '15west', floors: 10, rooms: 22, walls: [4, 8, 16],
     day: 'Monday', time: '23:00',
   };
-  const LIGHT_RADIUS = 190; // size of the flashlight, in pixels
+  const LIGHT_RADIUS = 110; // size of the flashlight, in pixels (matches .facade-light in windows.css)
+  const MOUSE_SLOP = 14; // how near the cursor has to be to a story window to open it, in pixels
   const OUTLINE_MS = 1600; // how long the outline takes to draw
   const WINDOW_STEP_MS = 7; // gap between one window appearing and the next
   const TOUCH_SLOP = 18; // how near a finger has to land to a window on phones, in pixels
@@ -69,6 +70,7 @@
         <div class="facade-grid"></div>
         <div class="facade-base"></div>
         <div class="facade-light" aria-hidden="true"></div>
+        <div class="facade-cursor" aria-hidden="true"></div>
       </div>
       <dialog class="story-card" aria-label="Story from a lit window">
         <div class="story-card-panel">
@@ -110,6 +112,7 @@
         if (roomStories.length) {
           el.type = 'button';
           el.classList.add('has-story');
+          el.style.setProperty('--fd', (-random() * 2.6).toFixed(2) + 's'); // flicker out of sync
           el.setAttribute('aria-label', `Lit window, floor ${f}, room ${room}`);
         }
         grid.appendChild(el);
@@ -181,16 +184,25 @@
       return { x: e.clientX - box.left, y: e.clientY - box.top };
     }
 
-    // Mouse: the light follows the cursor
+    // Mouse: the light follows the cursor. The story window under (or right
+    // next to) the cursor is remembered, and the cursor ring shows it.
     let frame = null;
+    let storyUnderCursor = null;
     facade.addEventListener('pointermove', (e) => {
       if (!built || e.pointerType === 'touch') return;
       const p = pointIn(e);
       cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => shine(p.x, p.y));
+      frame = requestAnimationFrame(() => {
+        shine(p.x, p.y);
+        storyUnderCursor = nearestStory(p.x, p.y, MOUSE_SLOP);
+        facade.classList.toggle('is-on-story', !!storyUnderCursor);
+      });
     });
     facade.addEventListener('pointerleave', (e) => {
-      if (e.pointerType !== 'touch') darken();
+      if (e.pointerType === 'touch') return;
+      darken();
+      storyUnderCursor = null;
+      facade.classList.remove('is-on-story');
     });
 
     // Phones have no hover, so a tap moves the light there. A tap only opens a
@@ -201,7 +213,7 @@
       lastPointer = e.pointerType;
       if (!built || e.pointerType !== 'touch') return;
       const p = pointIn(e);
-      const near = nearestStory(p.x, p.y);
+      const near = nearestStory(p.x, p.y, TOUCH_SLOP);
       tapTarget = near && near.light > 0.3 ? near : null;
       shine(p.x, p.y);
     });
@@ -212,13 +224,13 @@
         w = tapTarget;
       } else {
         const el = e.target.closest('.window.has-story');
-        w = el && windows.find((x) => x.el === el);
+        w = (el && windows.find((x) => x.el === el)) || storyUnderCursor;
       }
       lastPointer = null;
       tapTarget = null;
       if (w) openStory(w);
     });
-    function nearestStory(x, y) {
+    function nearestStory(x, y, slop) {
       let best = null;
       let bestDistance = Infinity;
       windows.forEach((w) => {
@@ -229,7 +241,8 @@
           bestDistance = d;
         }
       });
-      return best && bestDistance <= Math.max(TOUCH_SLOP, best.el.offsetWidth) ? best : null;
+      // Close enough if within half a window of its center, plus the slop
+      return best && bestDistance <= best.el.offsetHeight / 2 + slop ? best : null;
     }
 
     // Keyboard: tabbing to a story window shines the light on it
