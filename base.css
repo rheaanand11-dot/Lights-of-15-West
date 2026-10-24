@@ -33,12 +33,13 @@
   --color-accent: var(--color-yellow);
 
   /* Fonts: Helvetica Neue for text (built into Macs and iPhones; other devices
-     fall back to Arial). Degular Mono is the Figma mono: "degular-mono" is its
-     name on Adobe Fonts, and it switches on once the Adobe Fonts link is in
-     index.html. Until then DM Mono (free, Google Fonts) stands in. */
+     fall back to Arial). Degular Mono, from Adobe Fonts (link in index.html),
+     labels data and statistics, as in the Figma and Illustrator designs:
+     the crime ring labels, the story card's "time · Floor · room", the light
+     readout and the small hints. */
   --font-display: "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-body: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-mono: "degular-mono", "Degular Mono", "DM Mono", ui-monospace, Menlo, monospace;
+  --font-mono: "degular-mono", ui-monospace, Menlo, monospace;
 
   /* Type sizes */
   --text-sm: 0.875rem;
