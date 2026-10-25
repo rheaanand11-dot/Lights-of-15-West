@@ -1,5 +1,5 @@
 {
-  "note": "Lit-window counts, counted from photos taken on Westminster St. windows = total windows on the side we photographed (null = not counted yet).",
+  "note": "Lit-window counts, counted from photos taken on Westminster St. windows = total windows on the side we photographed (null = not counted yet). estimatedWindows = a rough estimate from a photo, used until the real count is in.",
   "buildings": [
     { "id": "15west", "name": "15 West", "windows": 190 },
     { "id": "darroweverett", "name": "DarrowEverett LLP", "windows": 370 },
@@ -8,7 +8,7 @@
     { "id": "bartongilman", "name": "Barton Gilman LLP", "windows": 606 },
     { "id": "metropark", "name": "Metropark Ltd", "windows": 160 },
     { "id": "merchants", "name": "Merchants Bank", "windows": 39 },
-    { "id": "homewood", "name": "Homewood Suites", "windows": null }
+    { "id": "homewood", "name": "Homewood Suites", "windows": null, "estimatedWindows": 120 }
   ],
   "observations": [
     { "building": "15west", "day": "Friday", "time": "20:00", "lit": 122 },

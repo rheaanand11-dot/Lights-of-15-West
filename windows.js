@@ -14,12 +14,14 @@
     building: '15west', floors: 10, rooms: 22, walls: [4, 8, 16],
     day: 'Monday', time: '23:00', label: 'Monday, 11 PM',
   };
-  const MAIN_WIDTH = 52; // 15 West's share of the skyline's width, in %
+  const MAIN_WIDTH = 50; // 15 West's share of the skyline's width, in %
 
   // The buildings around 15 West, left to right on each side. Window totals
-  // and lit counts come from lights.json, at the same day and time as 15 West.
+  // and lit counts come from lights.json, at the same day and time as 15 West
+  // unless "when" says otherwise (those stay out of the block total).
   // floors x columns is the shape of the window grid; spare spots past the
-  // total are wall. width = share of the skyline's width, in %.
+  // total are wall. width = share of the skyline's width, in % (keep both
+  // sides adding up to about the same, so 15 West stays in the middle).
   // window = a window's width / height. look = extra styling in windows.css.
   const NEIGHBORS = {
     left: [
@@ -28,9 +30,13 @@
       { id: 'usmarshals', floors: 2, columns: 13, width: 7.5, window: '1 / 3', arches: 5, look: 'floodlit' },
     ],
     right: [
-      { id: 'bartongilman', floors: 34, columns: 18, width: 8.5, window: '1 / 4.2', arches: 3, look: 'crown' },
-      { id: 'metropark', floors: 10, columns: 16, width: 8, window: '1 / 3', arches: 4, look: 'warm' },
-      { id: 'merchants', floors: 5, columns: 8, width: 7.5, window: '1 / 2', arches: 3 },
+      { id: 'bartongilman', floors: 34, columns: 18, width: 7.5, window: '1 / 4.6', arches: 3, look: 'crown' },
+      { id: 'metropark', floors: 10, columns: 16, width: 6.5, window: '1 / 3', arches: 4, look: 'warm' },
+      // Homewood Suites: no Monday 11 PM count yet, so it shows Sunday 9 PM.
+      // Its total window count is an estimate (estimatedWindows in lights.json).
+      { id: 'homewood', floors: 15, columns: 8, width: 5.5, window: '1 / 2.4', arches: 2,
+        when: { day: 'Sunday', time: '21:00', label: 'Sunday, 9 PM' } },
+      { id: 'merchants', floors: 5, columns: 8, width: 5, window: '1 / 2', arches: 3 },
     ],
   };
   const LIGHT_RADIUS = 110; // size of the flashlight, in pixels (matches .facade-light in windows.css)
@@ -167,11 +173,13 @@
 
     function buildNeighbor(b) {
       const info = lights.buildings.find((x) => x.id === b.id);
+      const when = b.when || FACADE;
       const obs = lights.observations.find((o) =>
-        o.building === b.id && o.day === FACADE.day && o.time === FACADE.time);
-      const total = info.windows;
+        o.building === b.id && o.day === when.day && o.time === when.time);
+      const total = info.windows || info.estimatedWindows;
       const litHere = obs ? obs.lit : 0;
-      neighborsLit += litHere;
+      // Only counts from the same moment as 15 West go into the block total
+      if (!b.when) neighborsLit += litHere;
 
       const el = document.createElement('div');
       el.className = 'facade facade--neighbor' + (b.look ? ' facade--' + b.look : '');
@@ -180,7 +188,8 @@
       el.style.setProperty('--window', b.window);
       el.style.setProperty('--arches', b.arches);
       el.setAttribute('role', 'img');
-      el.setAttribute('aria-label', `${info.name}: ${litHere} of ${total} windows lit`);
+      el.setAttribute('aria-label', `${info.name}: ${litHere} of ${info.windows ? '' : 'about '}${total} windows lit` +
+        (b.when ? ` (${b.when.label})` : ''));
       el.innerHTML = `
         <div class="facade-fill"></div>
         <svg class="facade-outline" aria-hidden="true">
