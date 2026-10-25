@@ -430,7 +430,9 @@
       requestAnimationFrame(stepZoom);
     }
     function stepZoom() {
-      const ease = reduceMotion ? 1 : 0.07; // share of the remaining distance covered each frame
+      // Share of the remaining distance covered each frame: zooming out is
+      // quicker than zooming in (about half a second)
+      const ease = reduceMotion ? 1 : zoom.target < zoom.scale ? 0.14 : 0.07;
       const fx = zoom.focusX ?? zoom.fx;
       const fy = zoom.focusY ?? zoom.fy;
       zoom.scale += (zoom.target - zoom.scale) * ease;
@@ -513,8 +515,9 @@
       zoomTo(ZOOM_IN);
     });
 
-    // Trackpad: pinching with two fingers zooms in and out where the fingers
-    // are. While zoomed in, a plain two-finger swipe slides the view (no need
+    // Trackpad: pinching two fingers apart zooms in where the fingers are,
+    // step by step. Pinching them together zooms all the way back out in one
+    // go, so one small pinch is enough. While zoomed in, a plain two-finger swipe slides the view (no need
     // to press). Once the view reaches the street's top or bottom edge, a
     // swipe up or down scrolls the page again, so nobody gets stuck.
     skylineRow.addEventListener('wheel', (e) => {
@@ -527,6 +530,10 @@
         return;
       }
       e.preventDefault();
+      if (e.deltaY > 1) { // pinching in: straight back to normal
+        if (zoom.target > 1) zoomTo(1);
+        return;
+      }
       const p = pointIn(e);
       lookAt(p);
       const target = Math.min(MAX_ZOOM, Math.max(1, zoom.target * Math.exp(-e.deltaY * 0.01)));
