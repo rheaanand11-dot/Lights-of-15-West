@@ -430,15 +430,14 @@
       requestAnimationFrame(stepZoom);
     }
     function stepZoom() {
-      // Share of the remaining distance covered each frame. Zooming in (button
-      // or pinch) takes about 0.3 seconds, so the magnifier feels as quick as
-      // the trackpad; zooming out is a snap, about 0.2 seconds.
-      const ease = reduceMotion ? 1 : zoom.target < zoom.scale ? 0.3 : 0.2;
+      // Share of the remaining distance covered each frame: zooming in and out
+      // both take about 0.2 seconds, for the button and the trackpad alike
+      const ease = reduceMotion ? 1 : 0.3;
       const fx = zoom.focusX ?? zoom.fx;
       const fy = zoom.focusY ?? zoom.fy;
       zoom.scale += (zoom.target - zoom.scale) * ease;
-      zoom.fx += (fx - zoom.fx) * (reduceMotion ? 1 : 0.15);
-      zoom.fy += (fy - zoom.fy) * (reduceMotion ? 1 : 0.15);
+      zoom.fx += (fx - zoom.fx) * ease;
+      zoom.fy += (fy - zoom.fy) * ease;
       const done = Math.abs(zoom.target - zoom.scale) < 0.002 &&
         Math.abs(fx - zoom.fx) < 0.5 && Math.abs(fy - zoom.fy) < 0.5;
       if (done) {
@@ -545,7 +544,8 @@
       if (performance.now() - pinchOutAt < 500) return;
       const p = pointIn(e);
       lookAt(p);
-      const target = Math.min(MAX_ZOOM, Math.max(1, zoom.target * Math.exp(-e.deltaY * 0.01)));
+      // 0.03 = how strongly the fingers zoom: a short pinch is enough to get close
+      const target = Math.min(MAX_ZOOM, Math.max(1, zoom.target * Math.exp(-e.deltaY * 0.03)));
       zoomTo(target < 1.02 ? 1 : target);
     }, { passive: false });
 
