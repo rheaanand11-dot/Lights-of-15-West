@@ -363,6 +363,10 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
    spill into the names row (where 15 West's switch sits) */
 .skyline.is-scaled { clip-path: inset(0 0 3em 0); }
 
+/* While zoomed, a finger swipe on the street slides the view instead of
+   scrolling the page */
+.skyline.is-zoomed .skyline-row { touch-action: none; }
+
 #windows:not(.is-built) .skyline-zoom {
   opacity: 0;
   pointer-events: none;
@@ -574,11 +578,11 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
    outer buildings get cropped at the edges */
 @media (max-width: 700px) {
   .skyline-row { width: 130%; }
-  /* The switch and count get the full screen width, below the names, so
-     they're easy to read and tap */
+  /* The switch and count get the full screen width so they're easy to read
+     and tap. They still sit up in the names row, right under the building
+     (15 West covers the middle, so the other names stay clear at the sides). */
   .skyline-controls {
     width: 100%;
-    margin-top: 0;
     gap: var(--space-3);
   }
 }

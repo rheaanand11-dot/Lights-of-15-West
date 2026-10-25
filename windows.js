@@ -265,9 +265,9 @@
 
     // Zooming in. The buildings (.skyline-row) are scaled up inside the street's
     // frame, which crops them. "scale" is how far in we are (1 = normal) and
-    // "focus" is the spot we zoom toward; it follows the cursor, so moving the
-    // mouse around looks around the zoomed-in street. Both glide toward their
-    // targets a little every frame, so zooming in and out is gradual.
+    // "focus" is the spot we zoom toward. Zooming glides a little every frame,
+    // so it's gradual. Once zoomed in, the view stays still until you drag it
+    // (mouse or finger) to look somewhere else.
     //
     // Two kinds of position are used below: "screen" = where something shows
     // inside the street's frame right now, and "street" = where it would be
@@ -399,7 +399,6 @@
     skylineRow.addEventListener('pointermove', (e) => {
       if (!built || e.pointerType === 'touch') return;
       pointer = pointIn(e);
-      lookAt(pointer);
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => follow(pointer));
     });
@@ -412,7 +411,7 @@
       skyline.classList.remove('is-on-story');
     });
 
-    // While zoomed in, the view follows the cursor (or a tap on phones)
+    // Point the zoom at a spot in the street's frame
     function lookAt(p) {
       zoom.focusX = p.x;
       zoom.focusY = p.y;
@@ -444,13 +443,57 @@
         zoom.fx = fx;
         zoom.fy = fy;
       }
+      applyZoom();
+      zoom.moving = !done;
+      if (!done) requestAnimationFrame(stepZoom);
+    }
+    function applyZoom() {
       const t = shift();
       skylineRow.style.transform = zoom.scale === 1 ? '' :
         `translate(${t.x}px, ${t.y}px) scale(${zoom.scale})`;
       skyline.classList.toggle('is-scaled', zoom.scale !== 1);
       if (pointer) follow(pointer); // keep the light on whatever is under the cursor
-      zoom.moving = !done;
-      if (!done) requestAnimationFrame(stepZoom);
+    }
+
+    // Dragging while zoomed in (press and move the mouse, or swipe a finger)
+    // slides the view, like moving a photo around
+    let drag = null;
+    let dragged = false; // true right after a drag, so letting go doesn't open a story
+    skylineRow.addEventListener('pointerdown', (e) => {
+      dragged = false;
+      if (!built || zoom.target <= 1.01) return;
+      drag = { x: e.clientX, y: e.clientY, distance: 0 };
+      skylineRow.setPointerCapture(e.pointerId);
+    });
+    skylineRow.addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      const dx = e.clientX - drag.x;
+      const dy = e.clientY - drag.y;
+      drag.x = e.clientX;
+      drag.y = e.clientY;
+      drag.distance += Math.abs(dx) + Math.abs(dy);
+      if (drag.distance > 6) {
+        dragged = true;
+        skyline.classList.add('is-dragging');
+        slideBy(dx, dy);
+      }
+    });
+    function endDrag() {
+      drag = null;
+      skyline.classList.remove('is-dragging');
+    }
+    skylineRow.addEventListener('pointerup', endDrag);
+    skylineRow.addEventListener('pointercancel', endDrag);
+
+    // Move the view by (dx, dy) pixels, without sliding past the street's edges
+    function slideBy(dx, dy) {
+      if (zoom.scale <= 1) return;
+      const o = rowOrigin();
+      const fx = Math.min(o.x + skylineRow.offsetWidth, Math.max(o.x, zoom.fx - dx / (zoom.scale - 1)));
+      const fy = Math.min(o.y + skylineRow.offsetHeight, Math.max(o.y, zoom.fy - dy / (zoom.scale - 1)));
+      zoom.fx = zoom.focusX = fx;
+      zoom.fy = zoom.focusY = fy;
+      applyZoom();
     }
     function zoomTo(target) {
       zoom.target = target;
@@ -513,10 +556,15 @@
       const near = isDark() ? null : nearestStory(p.x, p.y, TOUCH_SLOP);
       tapTarget = near && near.light > 0.3 ? near : null;
       shine(p.x, p.y);
-      lookAt(tap);
     });
     skylineRow.addEventListener('click', (e) => {
       if (!built || isDark()) return; // no stories while 15 West's lights are off
+      if (dragged) { // that was the end of a drag, not a click
+        dragged = false;
+        lastPointer = null;
+        tapTarget = null;
+        return;
+      }
       let w;
       if (lastPointer === 'touch') {
         w = tapTarget;
