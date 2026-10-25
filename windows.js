@@ -513,9 +513,19 @@
       zoomTo(ZOOM_IN);
     });
 
-    // Trackpad: pinching with two fingers zooms in and out where the fingers are
+    // Trackpad: pinching with two fingers zooms in and out where the fingers
+    // are. While zoomed in, a plain two-finger swipe slides the view (no need
+    // to press). Once the view reaches the street's top or bottom edge, a
+    // swipe up or down scrolls the page again, so nobody gets stuck.
     skylineRow.addEventListener('wheel', (e) => {
-      if (!e.ctrlKey || !built) return; // a plain two-finger scroll still scrolls the page
+      if (!built) return;
+      if (!e.ctrlKey) {
+        if (zoom.target <= 1.01 || zoom.scale <= 1) return; // not zoomed: scroll the page as usual
+        const before = { x: zoom.fx, y: zoom.fy };
+        slideBy(-e.deltaX, -e.deltaY);
+        if (zoom.fx !== before.x || zoom.fy !== before.y) e.preventDefault();
+        return;
+      }
       e.preventDefault();
       const p = pointIn(e);
       lookAt(p);
