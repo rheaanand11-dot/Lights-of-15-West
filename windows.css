@@ -74,7 +74,9 @@
   overflow: hidden; /* on phones the outer buildings get cropped, never scrolled */
 }
 
+/* windows.js scales this row up to zoom in; the street's frame crops it */
 .skyline-row {
+  transform-origin: 0 0;
   display: flex;
   flex: 0 0 auto;
   align-items: flex-end;
@@ -313,6 +315,59 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   background: rgba(255, 224, 0, 0.25);
 }
 
+/* ---------- Zoom (magnifier) button ----------
+   Top right of the street. A plus inside the lens zooms in; once zoomed in,
+   the plus turns into a minus to zoom back out. */
+.skyline-zoom {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--color-building-edge);
+  border-radius: 50%;
+  background: rgba(8, 8, 10, 0.7);
+  color: var(--color-text);
+  cursor: pointer;
+  opacity: 0.75;
+  transition: opacity 0.4s ease, border-color 0.2s ease;
+}
+
+.skyline-zoom:hover,
+.skyline.is-zoomed .skyline-zoom {
+  opacity: 1;
+  border-color: var(--color-pale-yellow);
+}
+
+.skyline-zoom:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.skyline-zoom svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.skyline.is-zoomed .skyline-zoom-plus { display: none; }
+
+/* While zoomed, crop the view at the street line so the buildings don't
+   spill into the names row (where 15 West's switch sits) */
+.skyline.is-scaled { clip-path: inset(0 0 3em 0); }
+
+#windows:not(.is-built) .skyline-zoom {
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* ---------- The neighbors ----------
    Same parts as 15 West, but darker walls, plainer windows and dimmer light */
 
@@ -401,12 +456,20 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   animation: none;
 }
 
+/* Under 15 West, as wide as the building, in two rows: its name with the
+   lights switch (level with the other buildings' names), then the count.
+   --main-width is 15 West's width, set by windows.js. */
 .skyline-controls {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: var(--space-3) var(--space-5);
+  gap: var(--space-2);
+  width: var(--main-width, 50%);
+  /* Pull up into the names row under the street (the street leaves 3em for
+     names, they start one --space-3 below the ground, and #windows puts a
+     --space-4 gap between the street and this) */
+  margin-top: calc(var(--space-3) - 3em - var(--space-4));
+  text-align: center;
   transition: opacity 1.2s ease;
 }
 
@@ -416,6 +479,8 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  font-size: var(--text-md);
+  line-height: 1.2;
   cursor: pointer;
 }
 
@@ -474,21 +539,15 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
 }
 
 /* Lights on: the count shines like a lit window: warm yellow letters with a
-   strong halo, and a soft pool of light behind the line, pulsing gently */
-.skyline-count {
-  padding: var(--space-2) var(--space-4);
-  border-radius: 999px;
-  transition: color 0.8s ease, text-shadow 0.8s ease, background-color 0.8s ease, box-shadow 0.8s ease;
-}
-
+   strong halo, pulsing gently. Only the letters glow, so the line takes up
+   the same space whether the lights are on or off. */
+.skyline-count,
 .skyline-count strong {
   transition: color 0.8s ease, text-shadow 0.8s ease;
 }
 
 #windows:not(.is-dark) .skyline-count {
   color: var(--color-window-on);
-  background: rgba(255, 214, 140, 0.08);
-  box-shadow: 0 0 40px 10px rgba(255, 214, 140, 0.12);
   text-shadow:
     0 0 4px rgba(255, 214, 140, 0.9),
     0 0 12px rgba(255, 190, 90, 0.75),
@@ -515,7 +574,13 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
    outer buildings get cropped at the edges */
 @media (max-width: 700px) {
   .skyline-row { width: 130%; }
-  .skyline-count { text-align: center; }
+  /* The switch and count get the full screen width, below the names, so
+     they're easy to read and tap */
+  .skyline-controls {
+    width: 100%;
+    margin-top: 0;
+    gap: var(--space-3);
+  }
 }
 
 /* ---------- Drawing the building in ----------
