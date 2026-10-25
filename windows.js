@@ -430,9 +430,10 @@
       requestAnimationFrame(stepZoom);
     }
     function stepZoom() {
-      // Share of the remaining distance covered each frame: zooming out is
-      // much quicker than zooming in (a quick snap, about 0.2 seconds)
-      const ease = reduceMotion ? 1 : zoom.target < zoom.scale ? 0.3 : 0.07;
+      // Share of the remaining distance covered each frame. Zooming in (button
+      // or pinch) takes about 0.3 seconds, so the magnifier feels as quick as
+      // the trackpad; zooming out is a snap, about 0.2 seconds.
+      const ease = reduceMotion ? 1 : zoom.target < zoom.scale ? 0.3 : 0.2;
       const fx = zoom.focusX ?? zoom.fx;
       const fy = zoom.focusY ?? zoom.fy;
       zoom.scale += (zoom.target - zoom.scale) * ease;
