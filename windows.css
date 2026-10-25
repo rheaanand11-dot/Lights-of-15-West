@@ -27,6 +27,20 @@
   text-wrap: balance;
 }
 
+/* Fades and grows in like the crime rings (windows.js adds is-visible) */
+@media (prefers-reduced-motion: no-preference) {
+  .windows-heading {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .windows-heading.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .facade-hint {
   margin: 0;
   font-family: var(--font-mono);

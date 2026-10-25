@@ -124,6 +124,18 @@
         </div>
       </dialog>`;
 
+    // The heading fades and grows in as it scrolls onto the screen, and fades
+    // back out as it leaves, like the crime rings in the opening section
+    const heading = root.querySelector('.windows-heading');
+    function fadeHeading() {
+      const box = heading.getBoundingClientRect();
+      const h = window.innerHeight;
+      heading.classList.toggle('is-visible', box.top < h * 0.88 && box.bottom > h * 0.12);
+    }
+    window.addEventListener('scroll', fadeHeading, { passive: true });
+    window.addEventListener('resize', fadeHeading);
+    fadeHeading();
+
     const facade = root.querySelector('.facade--main');
     const grid = facade.querySelector('.facade-grid');
     const base = facade.querySelector('.facade-base');
