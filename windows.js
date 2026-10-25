@@ -520,6 +520,7 @@
     // go, so one small pinch is enough. While zoomed in, a plain two-finger swipe slides the view (no need
     // to press). Once the view reaches the street's top or bottom edge, a
     // swipe up or down scrolls the page again, so nobody gets stuck.
+    let pinchOutAt = 0; // when the last pinch zoomed back out
     skylineRow.addEventListener('wheel', (e) => {
       if (!built) return;
       if (!e.ctrlKey) {
@@ -530,10 +531,17 @@
         return;
       }
       e.preventDefault();
-      if (e.deltaY > 1) { // pinching in: straight back to normal
-        if (zoom.target > 1) zoomTo(1);
+      // Pinching in: straight back to normal, as quickly as the magnifier
+      // button. (A trackpad sends tiny amounts, so any amount counts.)
+      if (e.deltaY > 0) {
+        if (zoom.target > 1) {
+          zoomTo(1);
+          pinchOutAt = performance.now();
+        }
         return;
       }
+      // Ignore the last flutters of that pinch, so it doesn't zoom back in
+      if (performance.now() - pinchOutAt < 500) return;
       const p = pointIn(e);
       lookAt(p);
       const target = Math.min(MAX_ZOOM, Math.max(1, zoom.target * Math.exp(-e.deltaY * 0.01)));
