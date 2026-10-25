@@ -9,14 +9,47 @@
   gap: var(--space-4);
   min-height: 100vh;
   min-height: 100svh;
-  padding: var(--space-5) var(--gutter);
+  /* Little room on top: the "right light" step above already ends in space */
+  padding: var(--space-3) var(--gutter) var(--space-5);
 }
 
+/* "Lit Windows by Building..." heading, Helvetica Bold in chartreuse */
+.windows-heading {
+  max-width: 22ch;
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  color: var(--color-chartreuse);
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* Fades and grows in like the crime rings (windows.js adds is-visible) */
+@media (prefers-reduced-motion: no-preference) {
+  .windows-heading {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .windows-heading.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Sub-heading under the heading: Helvetica Light Oblique, as in the
+   Visual System's sub-heading style */
 .facade-hint {
   margin: 0;
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  letter-spacing: 0.04em;
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.35;
   color: var(--color-text-muted);
   text-align: center;
 }
@@ -37,6 +70,7 @@
   display: flex;
   justify-content: center;
   width: 100%;
+  padding-bottom: 3em; /* room for the building names under the street */
   overflow: hidden; /* on phones the outer buildings get cropped, never scrolled */
 }
 
@@ -44,15 +78,16 @@
   display: flex;
   flex: 0 0 auto;
   align-items: flex-end;
-  gap: 0.5%;
+  gap: 0.2%; /* small, so all the buildings (98.5% wide together) fit on screen */
   width: 100%;
   border-bottom: 2px solid var(--color-building-edge);
+  cursor: none; /* the flashlight is the cursor, over every building */
 }
 
 /* Warm haze over the street from all the lit windows */
 .skyline-glow {
   position: absolute;
-  inset: 15% -10% 0;
+  inset: 15% -10% 3em; /* stops at the street, above the building names */
   background: radial-gradient(ellipse 45% 70% at 50% 100%, rgba(255, 196, 120, 0.2), transparent 75%);
   opacity: 0;
   pointer-events: none;
@@ -64,10 +99,6 @@
   flex: 0 0 auto;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
-}
-
-.facade--main {
-  cursor: none; /* the flashlight is the cursor */
 }
 
 /* Windows and ledges sit above the grain and the pool of light */
@@ -254,11 +285,11 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   transition: opacity 0.4s ease;
 }
 
-.facade.is-shining .facade-light { opacity: 1; }
+.skyline.is-shining .facade-light { opacity: 1; }
 
-/* A small ring at the exact point you'll click. It grows and turns yellow
-   when you're on a window with a story. */
-.facade-cursor {
+/* A small ring at the exact point you'll click. It follows the cursor over
+   the whole street, and grows and turns yellow on a window with a story. */
+.skyline-cursor {
   position: absolute;
   top: var(--y, 50%);
   left: var(--x, 50%);
@@ -273,9 +304,9 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   transition: width 0.15s ease, height 0.15s ease, background-color 0.15s ease, opacity 0.2s ease;
 }
 
-.facade.is-shining .facade-cursor { opacity: 1; }
+.skyline.is-shining .skyline-cursor { opacity: 1; }
 
-.facade.is-on-story .facade-cursor {
+.skyline.is-on-story .skyline-cursor {
   width: 22px;
   height: 22px;
   border-color: var(--color-yellow);
@@ -294,6 +325,36 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
 }
 
 .facade--neighbor .window::before { display: none; } /* too small for window frames */
+
+/* Each neighbor's name, under the street like the poster's labels */
+.facade-label {
+  position: absolute;
+  top: calc(100% + var(--space-3));
+  left: 50%;
+  width: 100%; /* as wide as the building, so long names wrap onto two lines */
+  margin: 0;
+  transform: translateX(-50%);
+  font-family: var(--font-body);
+  font-size: clamp(0.6rem, 1vw, 0.85rem);
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--color-text);
+  text-align: center;
+  pointer-events: none;
+  transition: opacity 1.2s ease;
+}
+
+/* The last building sits at the screen's edge, so its name lines up with its
+   right side instead of spilling off the edge */
+.facade:last-child .facade-label {
+  left: auto;
+  right: 0;
+  width: min-content; /* one word per line */
+  transform: none;
+  text-align: right;
+}
+
+#windows:not(.is-built) .facade-label { opacity: 0; }
 
 .facade--neighbor .window.is-lit::after {
   filter: brightness(0.75) saturate(0.85);
@@ -410,6 +471,44 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   font-size: var(--text-lg);
   font-weight: 400;
   color: var(--color-text);
+}
+
+/* Lights on: the count shines like a lit window: warm yellow letters with a
+   strong halo, and a soft pool of light behind the line, pulsing gently */
+.skyline-count {
+  padding: var(--space-2) var(--space-4);
+  border-radius: 999px;
+  transition: color 0.8s ease, text-shadow 0.8s ease, background-color 0.8s ease, box-shadow 0.8s ease;
+}
+
+.skyline-count strong {
+  transition: color 0.8s ease, text-shadow 0.8s ease;
+}
+
+#windows:not(.is-dark) .skyline-count {
+  color: var(--color-window-on);
+  background: rgba(255, 214, 140, 0.08);
+  box-shadow: 0 0 40px 10px rgba(255, 214, 140, 0.12);
+  text-shadow:
+    0 0 4px rgba(255, 214, 140, 0.9),
+    0 0 12px rgba(255, 190, 90, 0.75),
+    0 0 28px rgba(255, 170, 60, 0.55);
+}
+
+#windows:not(.is-dark) .skyline-count strong {
+  color: var(--color-window-on-top);
+  text-shadow: inherit;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  #windows.is-built:not(.is-dark) .skyline-count {
+    animation: count-shine 2.6s ease-in-out infinite;
+  }
+}
+
+@keyframes count-shine {
+  0%, 100% { filter: brightness(0.9); }
+  50% { filter: brightness(1.4); }
 }
 
 /* Phones: 15 West stays big, so the street is wider than the screen and the

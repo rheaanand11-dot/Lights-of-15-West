@@ -1,7 +1,7 @@
 // windows.js — owned by Person A.
 // 15 West at night with the buildings around it. The buildings draw
 // themselves in, then their lit windows glow (the neighbors dimmer than
-// 15 West). The cursor is a flashlight over 15 West; tap a window with a story
+// 15 West). The cursor is a flashlight over the whole street; tap a 15 West window with a story
 // to read what was happening inside that room. A switch turns 15 West's
 // lights off to show how much darker the block gets.
 
@@ -23,20 +23,21 @@
   // total are wall. width = share of the skyline's width, in % (keep both
   // sides adding up to about the same, so 15 West stays in the middle).
   // window = a window's width / height. look = extra styling in windows.css.
+  // label = the short name written under the building.
   const NEIGHBORS = {
     left: [
-      { id: 'darroweverett', floors: 25, columns: 15, width: 8.5, window: '1 / 1.9', arches: 4, look: 'purple-wash' },
-      { id: 'textron', floors: 42, columns: 23, width: 8, window: '1 / 5', arches: 3 },
-      { id: 'usmarshals', floors: 2, columns: 13, width: 7.5, window: '1 / 3', arches: 5, look: 'floodlit' },
+      { id: 'darroweverett', label: 'DarrowEverett', floors: 25, columns: 15, width: 8.5, window: '1 / 1.9', arches: 4, look: 'purple-wash' },
+      { id: 'textron', label: 'Textron Tower', floors: 42, columns: 23, width: 8, window: '1 / 5', arches: 3 },
+      { id: 'usmarshals', label: 'US Marshals', floors: 2, columns: 13, width: 7.5, window: '1 / 3', arches: 5, look: 'floodlit' },
     ],
     right: [
-      { id: 'bartongilman', floors: 34, columns: 18, width: 7.5, window: '1 / 4.6', arches: 3, look: 'crown' },
-      { id: 'metropark', floors: 10, columns: 16, width: 6.5, window: '1 / 3', arches: 4, look: 'warm' },
+      { id: 'bartongilman', label: 'Barton Gilman', floors: 34, columns: 18, width: 7.5, window: '1 / 4.6', arches: 3, look: 'crown' },
+      { id: 'metropark', label: 'Metropark', floors: 10, columns: 16, width: 6.5, window: '1 / 3', arches: 4, look: 'warm' },
       // Homewood Suites: no Monday 11 PM count yet, so it shows Sunday 9 PM.
       // Its total window count is an estimate (estimatedWindows in lights.json).
-      { id: 'homewood', floors: 15, columns: 8, width: 5.5, window: '1 / 2.4', arches: 2,
+      { id: 'homewood', label: 'Homewood Suites', floors: 15, columns: 8, width: 5.5, window: '1 / 2.4', arches: 2,
         when: { day: 'Sunday', time: '21:00', label: 'Sunday, 9 PM' } },
-      { id: 'merchants', floors: 5, columns: 8, width: 5, window: '1 / 2', arches: 3 },
+      { id: 'merchants', label: 'Merchants Bank', floors: 5, columns: 8, width: 5, window: '1 / 2', arches: 3 },
     ],
   };
   const LIGHT_RADIUS = 110; // size of the flashlight, in pixels (matches .facade-light in windows.css)
@@ -84,12 +85,14 @@
     }
 
     root.innerHTML = `
+      <h2 class="windows-heading">Lit Windows by Building in Downtown Providence at Night</h2>
       <p class="facade-hint">
-        <span class="hint-mouse">Shine your light across 15 West. Click a flickering window to look inside.</span>
-        <span class="hint-touch">Tap 15 West to shine a light. Tap a flickering window to look inside.</span>
+        <span class="hint-mouse">Shine your light across the street. Click a flickering window on 15 West to look inside.</span>
+        <span class="hint-touch">Tap a building to shine a light. Tap a flickering window on 15 West to look inside.</span>
       </p>
       <div class="skyline">
         <div class="skyline-glow" aria-hidden="true"></div>
+        <div class="skyline-cursor" aria-hidden="true"></div>
         <div class="skyline-row">
           <div class="facade facade--main" role="group" aria-label="15 West"
                style="--columns: ${FACADE.rooms}; width: ${MAIN_WIDTH}%">
@@ -101,7 +104,6 @@
             <div class="facade-grid"></div>
             <div class="facade-base"></div>
             <div class="facade-light" aria-hidden="true"></div>
-            <div class="facade-cursor" aria-hidden="true"></div>
           </div>
         </div>
       </div>
@@ -121,6 +123,18 @@
           <button type="button" class="story-card-next" hidden>Later in this room &rarr;</button>
         </div>
       </dialog>`;
+
+    // The heading fades and grows in as it scrolls onto the screen, and fades
+    // back out as it leaves, like the crime rings in the opening section
+    const heading = root.querySelector('.windows-heading');
+    function fadeHeading() {
+      const box = heading.getBoundingClientRect();
+      const h = window.innerHeight;
+      heading.classList.toggle('is-visible', box.top < h * 0.88 && box.bottom > h * 0.12);
+    }
+    window.addEventListener('scroll', fadeHeading, { passive: true });
+    window.addEventListener('resize', fadeHeading);
+    fadeHeading();
 
     const facade = root.querySelector('.facade--main');
     const grid = facade.querySelector('.facade-grid');
@@ -166,7 +180,9 @@
     for (let i = 0; i < 10; i++) base.appendChild(document.createElement('span'));
 
     // The neighbors, on either side of 15 West
+    const skyline = root.querySelector('.skyline');
     const skylineRow = root.querySelector('.skyline-row');
+    const neighborWindows = []; // every neighbor window, for the flashlight
     let neighborsLit = 0;
     NEIGHBORS.left.forEach((b) => skylineRow.insertBefore(buildNeighbor(b), facade));
     NEIGHBORS.right.forEach((b) => skylineRow.appendChild(buildNeighbor(b)));
@@ -197,7 +213,9 @@
         </svg>
         <div class="facade-cornice"></div>
         <div class="facade-grid"></div>
-        <div class="facade-base"></div>`;
+        <div class="facade-base"></div>
+        <div class="facade-light" aria-hidden="true"></div>
+        <p class="facade-label" aria-hidden="true">${b.label}</p>`;
 
       // Which windows are lit: picked at random (seeded, so it's the same on
       // every visit) until the number matches the count in the data
@@ -222,6 +240,7 @@
           const fromBottom = b.floors - 1 - Math.floor(i / b.columns);
           w.style.setProperty('--d', Math.round((fromBottom * b.columns + (i % b.columns)) * step));
           if (litWindows.has(i - spare)) w.classList.add('is-lit', 'tone-' + pickTone(pick()));
+          neighborWindows.push({ el: w, x: 0, y: 0, light: 0 });
         }
         g.appendChild(w);
       }
@@ -230,13 +249,23 @@
       return el;
     }
 
-    // Remember where each window's center is, relative to the facade
+    // Every window on the street, 15 West's and the neighbors', for the flashlight
+    const allWindows = windows.concat(neighborWindows);
+    const facades = [...root.querySelectorAll('.facade')].map((el) => ({ el, x: 0, y: 0 }));
+
+    // Remember where each window's center is, and where each building's corner
+    // is, relative to the street
     function measure() {
-      const box = facade.getBoundingClientRect();
-      windows.forEach((w) => {
+      const box = skyline.getBoundingClientRect();
+      allWindows.forEach((w) => {
         const r = w.el.getBoundingClientRect();
         w.x = r.left - box.left + r.width / 2;
         w.y = r.top - box.top + r.height / 2;
+      });
+      facades.forEach((f) => {
+        const r = f.el.getBoundingClientRect();
+        f.x = r.left - box.left;
+        f.y = r.top - box.top;
       });
     }
     measure();
@@ -260,6 +289,7 @@
       setTimeout(() => {
         root.classList.add('is-built');
         built = true;
+        measure(); // in case the layout shifted while it drew in
       }, OUTLINE_MS + lastWindow + 300);
     }
     function checkInView() {
@@ -269,48 +299,59 @@
     window.addEventListener('scroll', checkInView, { passive: true });
     checkInView();
 
-    // The flashlight: windows close to (x, y) light up, fading out toward the edge
+    // The flashlight: windows on any building close to (x, y) light up, fading
+    // out toward the edge. (x, y) is measured from the street's top-left corner.
     function shine(x, y) {
-      facade.classList.add('is-shining');
-      facade.style.setProperty('--x', x + 'px');
-      facade.style.setProperty('--y', y + 'px');
-      windows.forEach((w) => {
+      skyline.classList.add('is-shining');
+      skyline.style.setProperty('--x', x + 'px');
+      skyline.style.setProperty('--y', y + 'px');
+      // Each building's pool of light is placed from its own corner
+      facades.forEach((f) => {
+        f.el.style.setProperty('--x', x - f.x + 'px');
+        f.el.style.setProperty('--y', y - f.y + 'px');
+      });
+      allWindows.forEach((w) => {
         const t = Math.max(0, 1 - Math.hypot(w.x - x, w.y - y) / LIGHT_RADIUS);
-        w.light = t * t * (3 - 2 * t); // soft edge
-        w.el.style.setProperty('--light', w.light.toFixed(2));
+        const light = t * t * (3 - 2 * t); // soft edge
+        if (light === 0 && w.light === 0) return; // far away and already dark: skip it
+        w.light = light;
+        w.el.style.setProperty('--light', light.toFixed(2));
       });
     }
     function darken() {
-      facade.classList.remove('is-shining');
-      windows.forEach((w) => {
+      skyline.classList.remove('is-shining');
+      allWindows.forEach((w) => {
+        if (w.light === 0) return;
         w.light = 0;
         w.el.style.setProperty('--light', 0);
       });
     }
     function pointIn(e) {
-      const box = facade.getBoundingClientRect();
+      const box = skyline.getBoundingClientRect();
       return { x: e.clientX - box.left, y: e.clientY - box.top };
     }
 
-    // Mouse: the light follows the cursor. The story window under (or right
-    // next to) the cursor is remembered, and the cursor ring shows it.
+    // Mouse: the light follows the cursor anywhere over the buildings. The
+    // 15 West story window under (or right next to) the cursor is remembered,
+    // and the cursor ring shows it.
     let frame = null;
     let storyUnderCursor = null;
-    facade.addEventListener('pointermove', (e) => {
+    skylineRow.addEventListener('pointermove', (e) => {
       if (!built || e.pointerType === 'touch') return;
       const p = pointIn(e);
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
         shine(p.x, p.y);
         storyUnderCursor = isDark() ? null : nearestStory(p.x, p.y, MOUSE_SLOP);
-        facade.classList.toggle('is-on-story', !!storyUnderCursor);
+        skyline.classList.toggle('is-on-story', !!storyUnderCursor);
       });
     });
-    facade.addEventListener('pointerleave', (e) => {
+    skylineRow.addEventListener('pointerleave', (e) => {
       if (e.pointerType === 'touch') return;
+      cancelAnimationFrame(frame);
       darken();
       storyUnderCursor = null;
-      facade.classList.remove('is-on-story');
+      skyline.classList.remove('is-on-story');
     });
 
     // The 15 West lights switch. It starts on. Off, 15 West goes dark, the glow
@@ -330,7 +371,7 @@
         : `<strong>${neighborsLit}</strong> windows lit without 15 West`;
       if (!on) {
         storyUnderCursor = null;
-        facade.classList.remove('is-on-story');
+        skyline.classList.remove('is-on-story');
       }
     }
     lightsSwitch.addEventListener('change', updateSwitch);
@@ -340,7 +381,7 @@
     // window that was already lit up by the flashlight, so the reveal comes first.
     let lastPointer = null;
     let tapTarget = null;
-    facade.addEventListener('pointerdown', (e) => {
+    skylineRow.addEventListener('pointerdown', (e) => {
       lastPointer = e.pointerType;
       if (!built || e.pointerType !== 'touch') return;
       const p = pointIn(e);
@@ -348,7 +389,7 @@
       tapTarget = near && near.light > 0.3 ? near : null;
       shine(p.x, p.y);
     });
-    facade.addEventListener('click', (e) => {
+    skylineRow.addEventListener('click', (e) => {
       if (!built || isDark()) return; // no stories while 15 West's lights are off
       let w;
       if (lastPointer === 'touch') {
