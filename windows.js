@@ -431,8 +431,8 @@
     }
     function stepZoom() {
       // Share of the remaining distance covered each frame: zooming out is
-      // quicker than zooming in (about half a second)
-      const ease = reduceMotion ? 1 : zoom.target < zoom.scale ? 0.14 : 0.07;
+      // much quicker than zooming in (a quick snap, about 0.2 seconds)
+      const ease = reduceMotion ? 1 : zoom.target < zoom.scale ? 0.3 : 0.07;
       const fx = zoom.focusX ?? zoom.fx;
       const fy = zoom.focusY ?? zoom.fy;
       zoom.scale += (zoom.target - zoom.scale) * ease;
