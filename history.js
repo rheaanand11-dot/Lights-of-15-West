@@ -83,8 +83,33 @@
   drawBlocks(root.querySelector('.blocks'));
   followScroll(root.querySelectorAll('.history-step'));
 
-  // The title's last word ("falls") flickers like a light switching on when
-  // the title appears (the flicker itself is in history.css)
+  // The title's last word ("falls") flickers like a light switching on: once
+  // the page has loaded and its fonts are in (so you see it happen, not a
+  // half-drawn page), and again whenever the title comes back into view.
+  // The flicker itself is in history.css.
+  const flicker = root.querySelector('.history-title-flicker');
+  const intro = root.querySelector('.history-step--intro');
+  function flickerOn() {
+    flicker.classList.remove('is-flickering');
+    void flicker.offsetWidth; // let the browser notice, so the flicker restarts
+    flicker.classList.add('is-flickering');
+  }
+  const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
+  const pageLoaded = new Promise((done) => {
+    if (document.readyState === 'complete') done();
+    else window.addEventListener('load', done);
+  });
+  Promise.all([fontsReady, pageLoaded]).then(() => {
+    if (intro.classList.contains('is-visible')) flickerOn();
+    // From then on, flicker each time the title scrolls back into view
+    new MutationObserver(() => {
+      const visible = intro.classList.contains('is-visible');
+      if (visible && !intro.dataset.wasVisible) flickerOn();
+      intro.dataset.wasVisible = visible ? 'yes' : '';
+    }).observe(intro, { attributes: true, attributeFilter: ['class'] });
+    intro.dataset.wasVisible = intro.classList.contains('is-visible') ? 'yes' : '';
+  });
+
   function titleWithFlicker(title) {
     const words = title.split(' ');
     const last = words.pop();

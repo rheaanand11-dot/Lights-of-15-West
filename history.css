@@ -71,10 +71,11 @@
     0 0 28px color-mix(in srgb, var(--color-lime) 35%, transparent);
 }
 
-/* "FALLS" flickers for about 2 seconds each time the title comes into view,
-   then stays lit (history.js wraps the word in this span) */
+/* "FALLS" flickers for about 2 seconds, then stays lit. history.js wraps the
+   word in this span and adds is-flickering once the page has loaded (and its
+   fonts are in), and again each time you scroll back up to the title. */
 @media (prefers-reduced-motion: no-preference) {
-  .history-step--intro.is-visible .history-title-flicker {
+  .history-title-flicker.is-flickering {
     animation: title-flicker 2s linear both;
   }
 }
