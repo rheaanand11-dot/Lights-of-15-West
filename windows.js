@@ -147,6 +147,29 @@
     window.addEventListener('resize', fadeHeading);
     fadeHeading();
 
+    // Space above the heading: the same as above the street-light section's
+    // heading (the legend's bottom padding plus that section's top padding).
+    // "The right light, not the brightest" sits in the middle of a full-screen
+    // step, so the space under it changes with the screen's height; the
+    // padding here makes up the rest, so the gap is the same on every screen.
+    function spaceAboveHeading() {
+      const caption = document.querySelector('.history-sticky figcaption');
+      const sticky = document.querySelector('.history-sticky');
+      const legend = document.getElementById('legend');
+      const nextSection = document.getElementById('streetlights');
+      if (!caption || !sticky || !legend || !nextSection) return;
+      const gap = parseFloat(getComputedStyle(legend).paddingBottom) +
+        parseFloat(getComputedStyle(nextSection).paddingTop);
+      const below = sticky.getBoundingClientRect().bottom - caption.getBoundingClientRect().bottom;
+      const space = gap - below;
+      // On tall screens the step already leaves more than enough empty space
+      // under the caption, so this section tucks up into it instead
+      root.style.paddingTop = Math.max(16, space) + 'px';
+      root.style.marginTop = Math.min(0, space - 16) + 'px';
+    }
+    window.addEventListener('resize', spaceAboveHeading);
+    spaceAboveHeading();
+
     const facade = root.querySelector('.facade--main');
     const grid = facade.querySelector('.facade-grid');
     const base = facade.querySelector('.facade-base');
