@@ -462,16 +462,16 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   animation: none;
 }
 
-/* While the switch is turning off (windows.js adds is-switching-off for a few
-   seconds), the windows go out one by one, each slowly fading: --off is each
-   window's own short wait, set by windows.js. The haze over the street fades
-   with them. Turning back on is quick. */
+/* While the switch is turning off (windows.js adds is-switching-off for a
+   moment), the windows go out in a quick ripple, 0.3 seconds in all: each
+   fades for 0.2s after its own tiny wait (--off, up to 0.1s, set by
+   windows.js). The haze over the street fades with them. */
 #windows.is-switching-off .facade--main .window.is-lit::after {
-  transition: opacity 2.4s ease-in var(--off, 0s);
+  transition: opacity 0.2s ease-in var(--off, 0s);
 }
 
 #windows.is-switching-off .skyline-glow {
-  transition-duration: 3.5s;
+  transition-duration: 0.3s;
 }
 
 /* Under 15 West, as wide as the building, in two rows: its name with the
