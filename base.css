@@ -28,23 +28,25 @@
   --color-indigo: #454097;
 
   /* Street-light gradients, one per night we counted */
-  --day-friday-1: var(--color-red);
-  --day-friday-2: var(--color-coral);
-  --day-friday-3: var(--color-tangerine);
+  --day-friday-1: var(--color-mist);
+  --day-friday-2: var(--color-sky);
+  --day-friday-3: var(--color-orchid);
   --day-saturday-1: var(--color-tangerine);
   --day-saturday-2: var(--color-lemon);
   --day-saturday-3: var(--color-chartreuse);
-  --day-sunday-1: var(--color-mist);
-  --day-sunday-2: var(--color-sky);
-  --day-sunday-3: var(--color-orchid);
+  --day-sunday-1: var(--color-red);
+  --day-sunday-2: var(--color-coral);
+  --day-sunday-3: var(--color-tangerine);
   --day-monday-1: var(--color-orchid);
   --day-monday-2: var(--color-violet);
   --day-monday-3: var(--color-indigo);
 
-  /* The street lamp's static greys (pole, arm) and dark ground tiles */
-  --color-lamp-light: #e4e4e4;
-  --color-lamp: #5a5a5a;
-  --color-lamp-dark: #2c2c2e;
+  /* The street lamp (from "street lamp 2.svg"): static shading from the white
+     lamp head to the dark pole, the magenta bulb, and dark ground squares */
+  --color-lamp-light: #ffffff;
+  --color-lamp: #5c5a5a;
+  --color-lamp-dark: #231f20;
+  --color-bulb: #ec008c;
   --color-ground: #1b1a1f;
 
   /* Night and building */
