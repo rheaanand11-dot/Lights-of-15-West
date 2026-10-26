@@ -31,13 +31,10 @@
       { id: 'usmarshals', label: 'Federal Building', floors: 2, columns: 13, width: 7.5, window: '1 / 3', arches: 5, look: 'floodlit' },
     ],
     right: [
-      { id: 'bartongilman', label: 'One Financial Plaza', floors: 34, columns: 18, width: 7.5, window: '1 / 4.6', arches: 3, look: 'crown' },
-      { id: 'metropark', label: 'Banigan Building', floors: 10, columns: 16, width: 6.5, window: '1 / 3', arches: 4, look: 'warm' },
-      // Homewood Suites: no Monday 11 PM count yet, so it shows Sunday 9 PM.
-      // Its total window count is an estimate (estimatedWindows in lights.json).
-      { id: 'homewood', label: 'Homewood Suites', floors: 15, columns: 8, width: 5.5, window: '1 / 2.4', arches: 2,
-        when: { day: 'Sunday', time: '21:00', label: 'Sunday, 9 PM' } },
-      { id: 'merchants', label: 'Merchants Bank', floors: 5, columns: 8, width: 5, window: '1 / 2', arches: 3 },
+      // (Homewood Suites is left out; these three widen to fill its space)
+      { id: 'bartongilman', label: 'One Financial Plaza', floors: 34, columns: 18, width: 9.5, window: '1 / 4.6', arches: 3, look: 'crown' },
+      { id: 'metropark', label: 'Banigan Building', floors: 10, columns: 16, width: 8, window: '1 / 3', arches: 4, look: 'warm' },
+      { id: 'merchants', label: 'Merchants Bank', floors: 5, columns: 8, width: 6.5, window: '1 / 2', arches: 3 },
     ],
   };
   const LIGHT_RADIUS = 110; // size of the flashlight, in pixels (matches .facade-light in windows.css)
