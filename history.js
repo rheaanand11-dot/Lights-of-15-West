@@ -13,7 +13,7 @@
       'Research links light to lower crime, but darkness only moves elsewhere.',
       'Who keeps the street lit now?',
     ],
-    offices: '1 in 5 offices empty',
+    offices: 'Only 1 in 5 empty offices is lit at night',
     crime: {
       caption: 'Better lighting is linked to less crime',
       rings: ['36% less crime', '21% less crime', '14% less crime'], // outer to inner
@@ -36,7 +36,7 @@
   // shown; scrolling fades it out and brings in the next one.
   root.innerHTML = `
     <div class="history-step history-step--intro">
-      <h1 class="history-title">${HISTORY.title}</h1>
+      <h1 class="history-title">${titleWithFlicker(HISTORY.title)}</h1>
       <p class="history-lede">
         ${HISTORY.lede.map((line, i) => `<span style="--i: ${i}">${line}</span>`).join('')}
       </p>
@@ -82,6 +82,39 @@
 
   drawBlocks(root.querySelector('.blocks'));
   followScroll(root.querySelectorAll('.history-step'));
+
+  // The title's last word ("falls") flickers like a light switching on: once
+  // the page has loaded and its fonts are in (so you see it happen, not a
+  // half-drawn page), and again whenever the title comes back into view.
+  // The flicker itself is in history.css.
+  const flicker = root.querySelector('.history-title-flicker');
+  const intro = root.querySelector('.history-step--intro');
+  function flickerOn() {
+    flicker.classList.remove('is-flickering');
+    void flicker.offsetWidth; // let the browser notice, so the flicker restarts
+    flicker.classList.add('is-flickering');
+  }
+  const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
+  const pageLoaded = new Promise((done) => {
+    if (document.readyState === 'complete') done();
+    else window.addEventListener('load', done);
+  });
+  Promise.all([fontsReady, pageLoaded]).then(() => {
+    if (intro.classList.contains('is-visible')) flickerOn();
+    // From then on, flicker each time the title scrolls back into view
+    new MutationObserver(() => {
+      const visible = intro.classList.contains('is-visible');
+      if (visible && !intro.dataset.wasVisible) flickerOn();
+      intro.dataset.wasVisible = visible ? 'yes' : '';
+    }).observe(intro, { attributes: true, attributeFilter: ['class'] });
+    intro.dataset.wasVisible = intro.classList.contains('is-visible') ? 'yes' : '';
+  });
+
+  function titleWithFlicker(title) {
+    const words = title.split(' ');
+    const last = words.pop();
+    return `${words.join(' ')} <span class="history-title-flicker">${last}</span>`;
+  }
 
   // Lit (orange) blocks above, lines dropping to dark (purple) blocks below.
   // Positions are [column, row] on a 10-unit grid, traced from the poster.

@@ -1,0 +1,264 @@
+/* streetlights.css — owned by Anna.
+   "Buildings' Windows Light in Street Light Equivalent": a lamp per building
+   whose triangle of light falls on a row of pavement squares, one per street
+   light, in the gradient of the night picked with the buttons. Colors come
+   from base.css. Spacing and type match the street section (windows.css). */
+
+#streetlights {
+  max-width: var(--wide-width);
+  margin: 0 auto;
+  /* The same gap above the heading as between "The right light, not the
+     brightest" and the "Lit Windows by Building" heading (the legend above
+     already ends in --space-5), and the same again below, before Sources */
+  --section-gap: calc(var(--space-7) + var(--space-6) + var(--space-3));
+  padding: var(--section-gap) var(--gutter);
+  text-align: center;
+}
+
+/* The night's gradient: --sl-1 at the bulb, --sl-3 on the street.
+   streetlights.js puts is-friday, is-saturday ... on the section. */
+#streetlights.is-friday { --sl-1: var(--day-friday-1); --sl-2: var(--day-friday-2); --sl-3: var(--day-friday-3); }
+#streetlights.is-saturday { --sl-1: var(--day-saturday-1); --sl-2: var(--day-saturday-2); --sl-3: var(--day-saturday-3); }
+#streetlights.is-sunday { --sl-1: var(--day-sunday-1); --sl-2: var(--day-sunday-2); --sl-3: var(--day-sunday-3); }
+#streetlights.is-monday { --sl-1: var(--day-monday-1); --sl-2: var(--day-monday-2); --sl-3: var(--day-monday-3); }
+
+/* ---------- Heading and key ----------
+   Same as the street section: heading, then the sub-heading in Helvetica
+   Light Oblique, with the same gaps between them */
+
+.streetlights-heading {
+  max-width: 22ch;
+  margin: 0 auto var(--space-6);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  color: var(--color-chartreuse);
+  text-wrap: balance;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .streetlights-heading {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .streetlights-heading.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* "= 1 street light ≈ ...": the sub-heading, like "Shine your light across the street" */
+.streetlights-key {
+  margin: 0 0 var(--space-5);
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.35;
+  color: var(--color-text-muted);
+}
+
+/* The square stands for one lit pavement square, in tonight's color */
+.streetlights-key-swatch {
+  display: inline-block;
+  width: 0.8em;
+  height: 0.8em;
+  margin-right: 0.15em;
+  vertical-align: -0.05em;
+  background: var(--sl-3);
+  box-shadow: 0 0 8px var(--sl-3);
+  transition: background-color 0.6s ease, box-shadow 0.6s ease;
+}
+
+/* ---------- Night buttons ---------- */
+
+.streetlights-nights {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-7);
+}
+
+.streetlights-night {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-building-edge);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+}
+
+.streetlights-night:hover { color: var(--color-text); }
+
+.streetlights-night:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* The picked night wears its own gradient */
+.streetlights-night[aria-pressed="true"] {
+  border-color: transparent;
+  /* Start the gradient at the button's outer edge, so it doesn't repeat a
+     sliver of its last color under the (invisible) border */
+  background-origin: border-box;
+  color: var(--color-black);
+}
+
+.streetlights-night--friday[aria-pressed="true"] { background-image: linear-gradient(90deg, var(--day-friday-1), var(--day-friday-3)); }
+.streetlights-night--saturday[aria-pressed="true"] { background-image: linear-gradient(90deg, var(--day-saturday-1), var(--day-saturday-3)); }
+.streetlights-night--sunday[aria-pressed="true"] { background-image: linear-gradient(90deg, var(--day-sunday-1), var(--day-sunday-3)); }
+.streetlights-night--monday[aria-pressed="true"] { background-image: linear-gradient(90deg, var(--day-monday-1), var(--day-monday-3)); color: var(--color-text); }
+
+/* ---------- The lamps ---------- */
+
+/* Holds the shared gradients and filters; takes no space */
+.streetlights-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.sl-stop-1 { stop-color: var(--sl-1); }
+.sl-stop-2 { stop-color: var(--sl-2); }
+.sl-stop-3 { stop-color: var(--sl-3); }
+.sl-lamp-light { stop-color: var(--color-lamp-light); }
+.sl-lamp { stop-color: var(--color-lamp); }
+.sl-lamp-dark { stop-color: var(--color-lamp-dark); }
+
+/* Two lamps side by side; one on phones */
+.streetlights-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6) var(--space-6);
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+/* An odd lamp out at the end sits in the middle of its row */
+.streetlight:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: calc(50% - var(--space-6) / 2);
+}
+
+@media (max-width: 640px) {
+  .streetlights-grid { grid-template-columns: 1fr; }
+  .streetlight:last-child:nth-child(odd) { width: 100%; }
+}
+
+.streetlight svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* The lamp itself keeps its own static shading */
+path.sl-lamp { fill: url(#sl-lamp); }
+
+.sl-bulb { fill: var(--color-bulb); }
+
+/* The bulb glows like the lit-window count in the street section */
+.sl-bulb-glow {
+  fill: var(--color-bulb);
+  opacity: 0.9;
+}
+
+.sl-beam {
+  fill: url(#sl-beam);
+}
+
+/* Pavement squares: dark, or lit and glowing for each street light */
+.sl-square {
+  fill: var(--color-ground);
+  transition: fill 0.6s ease;
+}
+
+.sl-square.is-lit { fill: var(--sl-3); }
+
+.sl-squares-glow {
+  fill: var(--sl-3);
+  opacity: 0.9;
+}
+
+/* Meters of lit street, under the light, in Degular Mono with a glow */
+.sl-meters,
+.sl-meters-glow {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  letter-spacing: 0.04em;
+}
+
+.sl-meters { fill: var(--color-window-on-top); }
+
+.sl-meters-glow {
+  fill: var(--sl-2);
+  opacity: 0.9;
+}
+
+.streetlight-caption {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-lg);
+  line-height: 1.35;
+  color: var(--color-text);
+}
+
+/* ---------- Switching the lamps on ----------
+   They switch on when they scroll into view (is-on), and again each time a
+   night is picked, since streetlights.js redraws them. */
+
+@media (prefers-reduced-motion: no-preference) {
+  #streetlights:not(.is-on) .sl-beam,
+  #streetlights:not(.is-on) .sl-bulb-glow,
+  #streetlights:not(.is-on) .sl-squares-glow,
+  #streetlights:not(.is-on) .sl-meters,
+  #streetlights:not(.is-on) .sl-meters-glow { opacity: 0; }
+
+  #streetlights:not(.is-on) .sl-square.is-lit { fill: var(--color-ground); }
+
+  #streetlights.is-on .sl-beam {
+    animation: sl-fade-in 1.2s ease both;
+  }
+
+  #streetlights.is-on .sl-square.is-lit {
+    animation: sl-square-on 0.4s ease both;
+    animation-delay: calc(0.3s + var(--i) * 0.07s);
+  }
+
+  #streetlights.is-on .sl-squares-glow,
+  #streetlights.is-on .sl-meters,
+  #streetlights.is-on .sl-meters-glow {
+    animation: sl-fade-in 0.8s ease 0.8s both;
+  }
+
+  #streetlights.is-on .sl-bulb-glow {
+    animation: sl-fade-in 0.6s ease both, sl-shine 2.6s ease-in-out 0.6s infinite;
+  }
+
+  #streetlights.is-on .sl-meters-glow {
+    animation: sl-fade-in 0.8s ease 0.8s both, sl-shine 2.6s ease-in-out 1.6s infinite;
+  }
+}
+
+@keyframes sl-fade-in {
+  from { opacity: 0; }
+}
+
+@keyframes sl-square-on {
+  from { fill: var(--color-ground); }
+}
+
+@keyframes sl-shine {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
