@@ -13,7 +13,7 @@
       'Research links light to lower crime, but darkness only moves elsewhere.',
       'Who keeps the street lit now?',
     ],
-    offices: '1 in 5 offices empty',
+    offices: 'Only 1 in 5 empty offices is lit at night',
     crime: {
       caption: 'Better lighting is linked to less crime',
       rings: ['36% less crime', '21% less crime', '14% less crime'], // outer to inner
