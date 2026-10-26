@@ -1,8 +1,10 @@
 // streetlights.js — owned by Anna.
 // "Buildings' Windows Light in Street Light Equivalent": each building's lit
 // windows turned into street lights (1 street light ≈ 10 lit windows ≈ 25 m
-// of lit street), drawn as a lamp lighting up squares of pavement. Buttons
-// switch between the four nights we counted, each with its own gradient.
+// of lit street). Each building gets a lamp whose triangle of light falls on
+// a row of 12 pavement squares, one per street light (25 m each): the more
+// lights, the wider the triangle. Buttons switch between the four nights we
+// counted, each with its own gradient.
 
 (function () {
   // The nights we counted (see lights.json), each with its gradient in base.css
@@ -20,9 +22,14 @@
   };
   const WINDOWS_PER_LIGHT = 10; // 1 street light ≈ 10 lit windows
   const METERS_PER_LIGHT = 25; // ≈ 25 m of lit street
-  // The pavement under each lamp: 4 x 3 squares, one per street light
-  const COLUMNS = 4;
-  const ROWS = 3;
+  const SQUARES = 12; // pavement squares under each lamp: one per street light
+
+  // Where things sit in each drawing (its viewBox is 420 x 330). The lamp is
+  // Anna's "street lamp 2.svg", shrunk to LAMP.scale and placed at LAMP.x/y.
+  const LAMP = { x: 300, y: 18, scale: 0.215 };
+  const BULB = { x: LAMP.x + 146 * LAMP.scale, y: LAMP.y + 59.5 * LAMP.scale }; // the light comes from here
+  const GROUND = LAMP.y + 1164 * LAMP.scale; // the street, level with the lamp's foot
+  const SQUARE = (BULB.x - 12) / SQUARES; // width of one pavement square
 
   const root = document.getElementById('streetlights');
   if (!root) return;
@@ -38,46 +45,42 @@
   function build(lights) {
     root.innerHTML = `
       <h2 class="streetlights-heading">Buildings’ Windows Light in Street Light Equivalent</h2>
+      <p class="streetlights-key">
+        <span class="streetlights-key-swatch" aria-hidden="true"></span>
+        = 1&nbsp;street light ≈ 10&nbsp;lit windows ≈ 25&nbsp;m of lit street
+      </p>
       <div class="streetlights-nights" role="group" aria-label="Night">
         ${NIGHTS.map((n) => `
           <button type="button" class="streetlights-night streetlights-night--${n.id}" data-night="${n.id}" aria-pressed="false">${n.label}</button>`).join('')}
       </div>
       <svg class="streetlights-defs" aria-hidden="true" focusable="false">
         <defs>
-          <!-- The light: the night's gradient, from the bulb down to the pavement -->
-          <linearGradient id="sl-beam" gradientUnits="userSpaceOnUse" x1="0" y1="30" x2="0" y2="300">
+          <!-- The light: the night's gradient, from the bulb down to the street -->
+          <linearGradient id="sl-beam" gradientUnits="userSpaceOnUse" x1="0" y1="${BULB.y}" x2="0" y2="${GROUND}">
             <stop offset="0" class="sl-stop-1"/>
-            <stop offset="0.5" class="sl-stop-2" stop-opacity="0.85"/>
-            <stop offset="1" class="sl-stop-3" stop-opacity="0.95"/>
+            <stop offset="0.5" class="sl-stop-2"/>
+            <stop offset="1" class="sl-stop-3"/>
           </linearGradient>
-          <!-- The lamp's static shading -->
-          <linearGradient id="sl-pole" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0" class="sl-lamp-dark"/>
-            <stop offset="0.45" class="sl-lamp"/>
-            <stop offset="1" class="sl-lamp-dark"/>
+          <!-- The lamp's static shading, from "street lamp 2.svg" -->
+          <linearGradient id="sl-lamp" gradientUnits="userSpaceOnUse" x1="111.65" y1="582" x2="604.29" y2="582">
+            <stop offset="0.22" class="sl-lamp-light"/>
+            <stop offset="0.56" class="sl-lamp"/>
+            <stop offset="0.97" class="sl-lamp-dark"/>
           </linearGradient>
-          <linearGradient id="sl-arm" gradientUnits="userSpaceOnUse" x1="262" y1="0" x2="352" y2="0">
-            <stop offset="0" class="sl-lamp-light" stop-opacity="0.15"/>
-            <stop offset="0.4" class="sl-lamp-light"/>
-            <stop offset="1" class="sl-lamp"/>
-          </linearGradient>
-          <!-- Soft edges plus film grain inside the light, like the poster reference -->
-          <filter id="sl-soft" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="soft"/>
+          <!-- Film grain inside the light, like the poster reference -->
+          <filter id="sl-grain" x="-5%" y="-5%" width="110%" height="110%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="soft"/>
             <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" result="noise"/>
             <feColorMatrix in="noise" type="saturate" values="0" result="grain"/>
             <feComposite in="soft" in2="grain" operator="arithmetic" k1="1.1" k2="0.5" k3="0" k4="0"/>
           </filter>
-          <filter id="sl-glow" x="-100%" y="-300%" width="300%" height="700%">
-            <feGaussianBlur stdDeviation="5"/>
+          <!-- A soft halo for the bulb, the lit squares and the meters -->
+          <filter id="sl-glow" x="-50%" y="-200%" width="200%" height="500%">
+            <feGaussianBlur stdDeviation="4"/>
           </filter>
         </defs>
       </svg>
-      <ul class="streetlights-grid"></ul>
-      <p class="streetlights-key">
-        <span class="streetlights-key-swatch" aria-hidden="true"></span>
-        = 1 street light ≈ 10 lit windows ≈ 25 m of lit street
-      </p>`;
+      <ul class="streetlights-grid"></ul>`;
 
     const grid = root.querySelector('.streetlights-grid');
     const buttons = [...root.querySelectorAll('.streetlights-night')];
@@ -114,73 +117,51 @@
     onScroll();
   }
 
-  // One building: the lamp, its light, the pavement squares it lights up,
-  // the length of street that equals, and a caption
+  // One building: the lamp, its triangle of light, the row of pavement
+  // squares (lit ones highlighted), the meters of lit street, and a caption
   function card(b) {
-    const streetLights = Math.min(COLUMNS * ROWS, Math.round(b.lit / WINDOWS_PER_LIGHT));
+    const streetLights = Math.max(1, Math.min(SQUARES, Math.round(b.lit / WINDOWS_PER_LIGHT)));
     const meters = Math.round((b.lit / WINDOWS_PER_LIGHT) * METERS_PER_LIGHT);
     const name = NAMES[b.id] || b.id;
+    const reach = streetLights * SQUARE; // how far the light spreads along the street
 
-    // The squares: lit from the column nearest the lamp outward
+    // Pavement squares, right to left from under the bulb; the lit ones are
+    // the building's street lights
     let squares = '';
-    for (let c = 0; c < COLUMNS; c++) {
-      for (let r = 0; r < ROWS; r++) {
-        const order = (COLUMNS - 1 - c) * ROWS + r; // nearest column first
-        const lit = order < streetLights;
-        squares += `<polygon class="sl-square${lit ? ' is-lit' : ''}" style="--i: ${order}"
-          points="${square(c, r)}"/>`;
-      }
+    for (let i = 0; i < SQUARES; i++) {
+      const x = BULB.x - (i + 1) * SQUARE + 1;
+      const lit = i < streetLights;
+      squares += `<rect class="sl-square${lit ? ' is-lit' : ''}" style="--i: ${i}"
+        x="${x.toFixed(1)}" y="${GROUND + 3}" width="${(SQUARE - 2).toFixed(1)}" height="9"/>`;
     }
+    const litRow = `<rect class="sl-squares-glow" filter="url(#sl-glow)"
+      x="${(BULB.x - reach).toFixed(1)}" y="${GROUND + 3}" width="${reach.toFixed(1)}" height="9"/>`;
 
-    // The beam: from the bulb down over the lit squares
-    let beam = '';
-    if (streetLights > 0) {
-      const from = 1 - Math.ceil(streetLights / ROWS) / COLUMNS;
-      const pts = [[226, 30], [258, 30], ground(1, 0, 6), ground(1, 1, 4), ground(from, 1), ground(from, 0)];
-      beam = `<polygon class="sl-beam" filter="url(#sl-soft)" points="${pts.map((p) => p.join(',')).join(' ')}"/>`;
-    }
+    // The triangle of light: straight down from the bulb, out to the last lit square
+    const beam = [[BULB.x, BULB.y], [BULB.x, GROUND], [BULB.x - reach, GROUND]]
+      .map((p) => p.map((n) => n.toFixed(1)).join(',')).join(' ');
 
-    // The length of street, along the pavement's left edge
-    const a = ground(0, 1, -16);
-    const z = ground(0, 0, -16);
-    const angle = (Math.atan2(z[1] - a[1], z[0] - a[0]) * 180) / Math.PI;
-    const mid = [(a[0] + z[0]) / 2 - 8, (a[1] + z[1]) / 2 - 2];
+    // The meters, centered under the light
+    const metersX = (BULB.x - reach / 2).toFixed(1);
+    const metersY = GROUND + 42;
 
     const plural = streetLights === 1 ? 'street light' : 'street lights';
     return `
       <li class="streetlight">
-        <div class="streetlight-art">
-          <svg viewBox="0 0 400 320" role="img"
-               aria-label="${name}: ${b.lit} lit windows, about ${streetLights} ${plural} or ${meters} m of lit street">
-            ${squares}
-            ${beam}
-            <line class="sl-edge" x1="${a[0]}" y1="${a[1]}" x2="${z[0]}" y2="${z[1]}"/>
-            <text class="sl-meters" transform="translate(${mid[0]} ${mid[1]}) rotate(${angle})" text-anchor="middle">${meters} m</text>
-            <rect class="sl-pole" x="343" y="30" width="10" height="236" fill="url(#sl-pole)"/>
-            <rect class="sl-base" x="337" y="258" width="22" height="44" rx="2" fill="url(#sl-pole)"/>
-            <path class="sl-arm" d="M348 34 C 340 24, 320 22, 262 24" stroke="url(#sl-arm)"/>
-            <rect class="sl-bulb-glow" x="218" y="20" width="46" height="12" rx="6" filter="url(#sl-glow)"/>
-            <rect class="sl-bulb" x="222" y="22" width="40" height="8" rx="4"/>
-          </svg>
-        </div>
+        <svg viewBox="0 0 420 ${metersY + 12}" role="img"
+             aria-label="${name}: ${b.lit} lit windows, about ${streetLights} ${plural} or ${meters} m of lit street">
+          <polygon class="sl-beam" filter="url(#sl-grain)" points="${beam}"/>
+          ${litRow}
+          ${squares}
+          <text class="sl-meters-glow" x="${metersX}" y="${metersY}" text-anchor="middle" filter="url(#sl-glow)">${meters} m</text>
+          <text class="sl-meters" x="${metersX}" y="${metersY}" text-anchor="middle">${meters} m</text>
+          <g transform="translate(${LAMP.x} ${LAMP.y}) scale(${LAMP.scale})">
+            <rect class="sl-bulb-glow" x="5.5" y="34.46" width="145.11" height="24.99" rx="1.28" filter="url(#sl-glow)"/>
+            <rect class="sl-bulb" x="5.5" y="34.46" width="145.11" height="24.99" rx="1.28"/>
+            <path class="sl-lamp" d="M450.6,1026.44V27.55c0-7.17-5.86-13.03-13.03-13.03-3.58,0-6.84,1.47-9.2,3.83-3.72,3.72-3.83,8.32-3.83,9.2,0,7.28,0,14.57,0,21.85l-69.42-29.45c-4.88-2.07-10.1-3.24-15.4-3.44l-185.06-7.16c-.5-1.13-.97-2.02-1.18-2.34C149.21.39,142.67.03,141.73,0H14.79C6.66,0,0,8.02,0,17.83s6.66,17.83,14.79,17.83h126.94c5.36,0,10.03-3.51,12.62-8.69l180.93,7.74c7.5.32,14.87,1.97,21.79,4.87l67.45,28.29c-.01,319.52-.01,639.04,0,958.56h-19.59v137.58h69.23v-137.58h-23.57Z"/>
+          </g>
+        </svg>
         <p class="streetlight-caption">${name} replaces ${streetLights} ${plural}</p>
       </li>`;
-  }
-
-  // A point on the pavement: u goes left (0) to right (1), v goes back (0) to
-  // front (1). The pavement leans back to the right, like the sketch.
-  function ground(u, v, dx = 0) {
-    return [Math.round(75 + 240 * u - 45 * v + dx), Math.round(236 + 64 * v)];
-  }
-
-  // The corners of one pavement square, with a small gap around it
-  function square(c, r) {
-    const gap = 0.02;
-    const u0 = c / COLUMNS + gap;
-    const u1 = (c + 1) / COLUMNS - gap;
-    const v0 = r / ROWS + gap * 1.5;
-    const v1 = (r + 1) / ROWS - gap * 1.5;
-    return [ground(u0, v0), ground(u1, v0), ground(u1, v1), ground(u0, v1)]
-      .map((p) => p.join(',')).join(' ');
   }
 })();
