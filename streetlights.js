@@ -14,11 +14,12 @@
     { id: 'sunday', day: 'Sunday', time: '21:00', label: 'Sunday, 9 PM' },
     { id: 'monday', day: 'Monday', time: '23:00', label: 'Monday, 11 PM' },
   ];
-  // Short names, as written under the buildings in the street section
+  // Short names, as written under the buildings in the street section. Only
+  // these buildings get a lamp (Homewood Suites is left out of this section).
   const NAMES = {
-    '15west': '15 West', darroweverett: 'DarrowEverett', textron: 'Textron Tower',
-    usmarshals: 'US Marshals', bartongilman: 'Barton Gilman', metropark: 'Metropark',
-    merchants: 'Merchants Bank', homewood: 'Homewood Suites',
+    '15west': '15 West', darroweverett: 'Turks Head Building', textron: 'Textron Tower',
+    usmarshals: 'Federal Building', bartongilman: 'One Financial Plaza', metropark: 'Banigan Building',
+    merchants: 'Merchants Bank',
   };
   const WINDOWS_PER_LIGHT = 10; // 1 street light ≈ 10 lit windows
   const METERS_PER_LIGHT = 25; // ≈ 25 m of lit street
@@ -91,7 +92,7 @@
       NIGHTS.forEach((n) => root.classList.toggle('is-' + n.id, n === night));
       buttons.forEach((b) => b.setAttribute('aria-pressed', b.dataset.night === night.id));
       const buildings = lights.observations
-        .filter((o) => o.day === night.day && o.time === night.time)
+        .filter((o) => o.day === night.day && o.time === night.time && NAMES[o.building])
         .map((o) => ({ id: o.building, lit: o.lit }))
         .sort((a, b) => b.lit - a.lit);
       grid.innerHTML = buildings.map(card).join('');

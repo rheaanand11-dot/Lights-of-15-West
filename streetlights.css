@@ -145,8 +145,16 @@
   list-style: none;
 }
 
+/* An odd lamp out at the end sits in the middle of its row */
+.streetlight:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: calc(50% - var(--space-6) / 2);
+}
+
 @media (max-width: 640px) {
   .streetlights-grid { grid-template-columns: 1fr; }
+  .streetlight:last-child:nth-child(odd) { width: 100%; }
 }
 
 .streetlight svg {

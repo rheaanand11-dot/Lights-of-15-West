@@ -26,13 +26,13 @@
   // label = the short name written under the building.
   const NEIGHBORS = {
     left: [
-      { id: 'darroweverett', label: 'DarrowEverett', floors: 25, columns: 15, width: 8.5, window: '1 / 1.9', arches: 4, look: 'purple-wash' },
+      { id: 'darroweverett', label: 'Turks Head Building', floors: 25, columns: 15, width: 8.5, window: '1 / 1.9', arches: 4, look: 'purple-wash' },
       { id: 'textron', label: 'Textron Tower', floors: 42, columns: 23, width: 8, window: '1 / 5', arches: 3 },
-      { id: 'usmarshals', label: 'US Marshals', floors: 2, columns: 13, width: 7.5, window: '1 / 3', arches: 5, look: 'floodlit' },
+      { id: 'usmarshals', label: 'Federal Building', floors: 2, columns: 13, width: 7.5, window: '1 / 3', arches: 5, look: 'floodlit' },
     ],
     right: [
-      { id: 'bartongilman', label: 'Barton Gilman', floors: 34, columns: 18, width: 7.5, window: '1 / 4.6', arches: 3, look: 'crown' },
-      { id: 'metropark', label: 'Metropark', floors: 10, columns: 16, width: 6.5, window: '1 / 3', arches: 4, look: 'warm' },
+      { id: 'bartongilman', label: 'One Financial Plaza', floors: 34, columns: 18, width: 7.5, window: '1 / 4.6', arches: 3, look: 'crown' },
+      { id: 'metropark', label: 'Banigan Building', floors: 10, columns: 16, width: 6.5, window: '1 / 3', arches: 4, look: 'warm' },
       // Homewood Suites: no Monday 11 PM count yet, so it shows Sunday 9 PM.
       // Its total window count is an estimate (estimatedWindows in lights.json).
       { id: 'homewood', label: 'Homewood Suites', floors: 15, columns: 8, width: 5.5, window: '1 / 2.4', arches: 2,
