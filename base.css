@@ -51,9 +51,11 @@
 
   /* Night and building */
   --color-night: #08080a;         /* page background */
-  --color-building: #121115;      /* facade, lower */
-  --color-building-top: #1a191e;  /* facade, upper */
-  --color-building-edge: #25232a; /* cornice and ledges */
+  --color-building: #17161b;      /* facade, lower */
+  --color-building-top: #222127;  /* facade, upper */
+  --color-building-edge: #2e2c34; /* cornice and ledges */
+  --color-neighbor: #131217;      /* the buildings around 15 West, lower */
+  --color-neighbor-top: #1d1c22;  /* the buildings around 15 West, upper */
 
   /* Windows */
   --color-window-off: #0a090c;            /* dark window */
