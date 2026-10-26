@@ -104,7 +104,8 @@
     show(NIGHTS[0]);
 
     // The heading fades and grows in like the street section's heading, and
-    // the lamps switch on when they scroll into view
+    // the lamps switch on when they scroll into view. Once the lamps are fully
+    // off the screen they switch off again, so coming back lights them up anew.
     const heading = root.querySelector('.streetlights-heading');
     function onScroll() {
       const h = window.innerHeight;
@@ -112,6 +113,7 @@
       heading.classList.toggle('is-visible', box.top < h * 0.88 && box.bottom > h * 0.12);
       const g = grid.getBoundingClientRect();
       if (g.top < h * 0.8 && g.bottom > 0) root.classList.add('is-on');
+      else if (g.top > h || g.bottom < 0) root.classList.remove('is-on');
     }
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
