@@ -14,8 +14,8 @@ working late keep downtown lit and alive, while the offices go dark.
   goes dark after work, empty offices, Jane Jacobs' "eyes upon the street", light
   and crime. Context, not a statistics page. Design: "ds3 data vis 1.ai" poster.
 - **Core experience (after the opening):** 15 West, big, in the middle of its
-  street, with its neighbors either side (DarrowEverett, Textron, US Marshals,
-  Barton Gilman, Metropark, Merchants Bank; drawn from the Figma photos, with
+  street, with its neighbors either side (Turks Head Building, Textron, Federal Building,
+  One Financial Plaza, Banigan Building, Merchants Bank; drawn from the Figma photos, with
   their real window totals and lit counts). When the street scrolls into view
   every building draws itself: outline first, then the windows one by one from
   the bottom floor up, then the dark textured walls fill in. Lit windows then
