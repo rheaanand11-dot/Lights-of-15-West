@@ -65,6 +65,34 @@
   letter-spacing: -0.01em;
   text-transform: uppercase;
   color: var(--color-lime);
+  /* The title glows like a lit sign */
+  text-shadow:
+    0 0 8px color-mix(in srgb, var(--color-lime) 60%, transparent),
+    0 0 28px color-mix(in srgb, var(--color-lime) 35%, transparent);
+}
+
+/* "FALLS" flickers for about 2 seconds each time the title comes into view,
+   then stays lit (history.js wraps the word in this span) */
+@media (prefers-reduced-motion: no-preference) {
+  .history-step--intro.is-visible .history-title-flicker {
+    animation: title-flicker 2s linear both;
+  }
+}
+
+@keyframes title-flicker {
+  0% { color: var(--color-building-edge); text-shadow: none; }
+  8% { color: var(--color-lime); text-shadow: inherit; }
+  12% { color: var(--color-building-edge); text-shadow: none; }
+  22% { color: var(--color-lime); text-shadow: inherit; }
+  26% { color: var(--color-building-edge); text-shadow: none; }
+  30% { color: var(--color-lime); text-shadow: inherit; }
+  48% { color: var(--color-lime); text-shadow: inherit; }
+  52% { color: var(--color-building-edge); text-shadow: none; }
+  60% { color: var(--color-building-edge); text-shadow: none; }
+  64% { color: var(--color-lime); text-shadow: inherit; }
+  72% { color: var(--color-building-edge); text-shadow: none; }
+  76% { color: var(--color-lime); text-shadow: inherit; }
+  100% { color: var(--color-lime); text-shadow: inherit; }
 }
 
 .history-lede {
@@ -228,7 +256,7 @@
 .history-sources {
   max-width: 90ch;
   margin: 0;
-  padding: var(--space-4) 0 var(--space-6);
+  padding: var(--space-4) 0 var(--space-7); /* room below, so the page doesn't end abruptly */
   font-size: 0.75rem;
   line-height: 1.5;
   color: var(--color-text-muted);

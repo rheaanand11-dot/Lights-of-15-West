@@ -9,8 +9,9 @@
   margin: 0 auto;
   /* The same gap above the heading as between "The right light, not the
      brightest" and the "Lit Windows by Building" heading (the legend above
-     already ends in --space-5) */
-  padding: calc(var(--space-7) + var(--space-6) + var(--space-3)) var(--gutter) var(--space-6);
+     already ends in --space-5), and the same again below, before Sources */
+  --section-gap: calc(var(--space-7) + var(--space-6) + var(--space-3));
+  padding: var(--section-gap) var(--gutter);
   text-align: center;
 }
 
