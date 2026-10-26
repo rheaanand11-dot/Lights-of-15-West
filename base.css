@@ -15,6 +15,32 @@
   --color-pale-yellow: #efe7a4;   /* thin outlines */
   --color-chartreuse: #d1dc51;    /* "Lit Windows by Building" heading */
 
+  /* Swatches from the street-light poster palette, used by the four day
+     gradients below (bulb at the top, ground at the bottom) */
+  --color-red: #db3b33;
+  --color-coral: #e2664d;
+  --color-tangerine: #e89a40;
+  --color-lemon: #f5ee4c;
+  --color-mist: #e6efd9;
+  --color-sky: #7ecae4;
+  --color-orchid: #ac5c9e;
+  --color-violet: #5f2e8a;
+  --color-indigo: #454097;
+
+  /* Street-light gradients, one per night we counted */
+  --day-friday-1: var(--color-red);
+  --day-friday-2: var(--color-coral);
+  --day-friday-3: var(--color-tangerine);
+  --day-saturday-1: var(--color-tangerine);
+  --day-saturday-2: var(--color-lemon);
+  --day-saturday-3: var(--color-chartreuse);
+  --day-sunday-1: var(--color-mist);
+  --day-sunday-2: var(--color-sky);
+  --day-sunday-3: var(--color-orchid);
+  --day-monday-1: var(--color-orchid);
+  --day-monday-2: var(--color-violet);
+  --day-monday-3: var(--color-indigo);
+
   /* Night and building */
   --color-night: #08080a;         /* page background */
   --color-building: #121115;      /* facade, lower */
