@@ -82,6 +82,7 @@
     }
     const lit = new Set(Object.keys(storyAt));
     const random = seeded(15);
+    const offOrder = seeded(7); // separate, so the lit windows and colors stay the same
     while (lit.size < Math.min(litCount, allKeys.length)) {
       lit.add(allKeys[Math.floor(random() * allKeys.length)]);
     }
@@ -175,6 +176,8 @@
           // Real windows glow in different whites and yellows
           tone = pickTone(random());
           el.classList.add('is-lit', 'tone-' + tone);
+          // How long it waits before going out when the lights are switched off
+          el.style.setProperty('--off', (offOrder() * 1.6).toFixed(2) + 's');
         }
         if (roomStories.length) {
           el.type = 'button';
@@ -556,8 +559,14 @@
     function isDark() {
       return root.classList.contains('is-dark');
     }
+    let switchingOff = null;
     function updateSwitch() {
       const on = lightsSwitch.checked;
+      // Switching off: the windows go out slowly, one by one (windows.css),
+      // for the next few seconds; after that the flashlight reacts quickly again
+      clearTimeout(switchingOff);
+      root.classList.toggle('is-switching-off', !on);
+      if (!on) switchingOff = setTimeout(() => root.classList.remove('is-switching-off'), 4200);
       root.classList.toggle('is-dark', !on);
       count.innerHTML = on
         ? `<strong>${litCount + neighborsLit}</strong> windows lit on the block &middot; ${FACADE.label}`

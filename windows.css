@@ -204,8 +204,8 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   transition: opacity 0.5s ease-out; /* lights linger a moment after the cursor passes */
 }
 
-#windows.is-built .facade--main .window.is-lit { --ambient: 0.55; }
-#windows.is-built .facade--neighbor .window.is-lit { --ambient: 0.4; }
+#windows.is-built .facade--main .window.is-lit { --ambient: 0.63; }
+#windows.is-built .facade--neighbor .window.is-lit { --ambient: 0.46; }
 
 /* Lit windows: a light and a glow. Each lit window gets one of the tones
    below (picked by windows.js), matched to the photo of 15 West at night:
@@ -394,7 +394,9 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   margin: 0;
   transform: translateX(-50%);
   font-family: var(--font-body);
-  font-size: clamp(0.6rem, 1vw, 0.85rem);
+  /* Shrinks with the screen, so the names of the narrow buildings on the
+     right never run into each other */
+  font-size: clamp(0.44rem, 0.82vw, 0.85rem);
   font-weight: 400;
   line-height: 1.2;
   color: var(--color-text);
@@ -451,13 +453,23 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
 #windows.is-built .skyline-glow { opacity: 1; }
 #windows.is-built.is-dark .skyline-glow { opacity: 0.15; }
 
-/* Off: 15 West's lit windows go dark like the others */
-#windows.is-dark .facade--main .window.is-lit { --ambient: 0; }
-
+/* Off: 15 West's lit windows go dark like the others. They keep their color
+   so the flashlight only finds a faint trace of it. */
 #windows.is-dark .facade--main .window.is-lit::after {
-  background: var(--color-glass);
-  box-shadow: none;
+  opacity: calc(var(--light) * 0.35);
   animation: none;
+}
+
+/* While the switch is turning off (windows.js adds is-switching-off for a few
+   seconds), the windows go out one by one, each slowly fading: --off is each
+   window's own short wait, set by windows.js. The haze over the street fades
+   with them. Turning back on is quick. */
+#windows.is-switching-off .facade--main .window.is-lit::after {
+  transition: opacity 2.4s ease-in var(--off, 0s);
+}
+
+#windows.is-switching-off .skyline-glow {
+  transition-duration: 3.5s;
 }
 
 /* Under 15 West, as wide as the building, in two rows: its name with the
