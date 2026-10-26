@@ -41,6 +41,12 @@
   --day-monday-2: var(--color-violet);
   --day-monday-3: var(--color-indigo);
 
+  /* The street lamp's static greys (pole, arm) and dark ground tiles */
+  --color-lamp-light: #e4e4e4;
+  --color-lamp: #5a5a5a;
+  --color-lamp-dark: #2c2c2e;
+  --color-ground: #1b1a1f;
+
   /* Night and building */
   --color-night: #08080a;         /* page background */
   --color-building: #121115;      /* facade, lower */
