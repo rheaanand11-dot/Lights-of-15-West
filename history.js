@@ -36,7 +36,7 @@
   // shown; scrolling fades it out and brings in the next one.
   root.innerHTML = `
     <div class="history-step history-step--intro">
-      <h1 class="history-title">${HISTORY.title}</h1>
+      <h1 class="history-title">${titleWithFlicker(HISTORY.title)}</h1>
       <p class="history-lede">
         ${HISTORY.lede.map((line, i) => `<span style="--i: ${i}">${line}</span>`).join('')}
       </p>
@@ -82,6 +82,14 @@
 
   drawBlocks(root.querySelector('.blocks'));
   followScroll(root.querySelectorAll('.history-step'));
+
+  // The title's last word ("falls") flickers like a light switching on when
+  // the title appears (the flicker itself is in history.css)
+  function titleWithFlicker(title) {
+    const words = title.split(' ');
+    const last = words.pop();
+    return `${words.join(' ')} <span class="history-title-flicker">${last}</span>`;
+  }
 
   // Lit (orange) blocks above, lines dropping to dark (purple) blocks below.
   // Positions are [column, row] on a 10-unit grid, traced from the poster.
