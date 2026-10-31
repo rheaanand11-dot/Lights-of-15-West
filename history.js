@@ -13,12 +13,20 @@
       'Research links light to lower crime, but darkness only moves elsewhere.',
       'Who keeps the street lit now?',
     ],
-    offices: 'Only 1 in 5 empty offices is lit at night',
+    // Each figure: a headline, then a short plain-language explanation
+    offices: {
+      title: 'Only 1 in 5 empty offices is lit at night',
+      text: 'About a fifth of US office space now sits vacant (CBRE). With no one working late inside, those windows stay dark after 5 PM, and the street below loses their light.',
+    },
     crime: {
       caption: 'Better lighting is linked to less crime',
+      text: 'Studies of brighter streets found crime fell by 14 to 36%. A review of 13 studies found about a fifth less crime where lighting improved (Welsh & Farrington), and new lights at New York City public housing cut outdoor crime at night by about a third (Chalfin et al.).',
       rings: ['36% less crime', '21% less crime', '14% less crime'], // outer to inner
     },
-    displacement: 'Crime moves to darker blocks',
+    displacement: {
+      title: 'Crime moves to darker blocks',
+      text: 'People are less likely to break the law where they can be seen. When some streets glow and others don’t, the risk gathers in the dark gaps between them.',
+    },
     rightLight: {
       title: 'The right light, not the brightest',
       text: 'Brighter isn’t safer. Lights that are too bright cause glare: they dazzle your eyes and make everything around them harder to see.',
@@ -55,7 +63,8 @@
         ${[0, 1, 2, 3, 4].map((i) =>
           `<span class="office${i === 2 ? ' office--lit' : ''}" style="--i: ${i}"></span>`).join('')}
       </div>
-      <figcaption>${HISTORY.offices}</figcaption>
+      <figcaption>${HISTORY.offices.title}</figcaption>
+      <p class="history-explainer">${HISTORY.offices.text}</p>
     </figure>
 
     <figure class="history-step fig-crime">
@@ -64,12 +73,14 @@
           `<div class="ring ring--${i + 1}" style="--i: ${i}"><span>${label}</span></div>`).join('')}
       </div>
       <figcaption>${HISTORY.crime.caption}</figcaption>
+      <p class="history-explainer">${HISTORY.crime.text}</p>
     </figure>
 
     <figure class="history-step fig-displacement">
       <svg class="blocks" viewBox="0 0 120 130" role="img"
            aria-label="Lit blocks above, with crime moving down into darker blocks below"></svg>
-      <figcaption>${HISTORY.displacement}</figcaption>
+      <figcaption>${HISTORY.displacement.title}</figcaption>
+      <p class="history-explainer">${HISTORY.displacement.text}</p>
     </figure>
 
     <figure class="history-step history-step--scrub fig-right-light">
@@ -77,7 +88,7 @@
         <div class="light-frame"><div class="light-panel"></div></div>
         <p class="light-readout">Light <span>0</span>%</p>
         <figcaption>${HISTORY.rightLight.title}</figcaption>
-        <p class="light-explainer">${HISTORY.rightLight.text}</p>
+        <p class="history-explainer">${HISTORY.rightLight.text}</p>
       </div>
     </figure>`;
 

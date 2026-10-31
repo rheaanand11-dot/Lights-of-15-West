@@ -168,7 +168,7 @@
 
 .rings {
   position: relative;
-  width: min(100%, 560px, 68svh);
+  width: min(100%, 520px, 56svh); /* leaves room for the explanation underneath */
   aspect-ratio: 1;
 }
 
@@ -270,8 +270,8 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* The plain-language explanation under "The right light, not the brightest" */
-.light-explainer {
+/* The plain-language explanation under each figure's headline */
+.history-explainer {
   max-width: 30em;
   margin: var(--space-2) 0 0;
   padding: 0 var(--space-3);
