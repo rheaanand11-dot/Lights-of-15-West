@@ -19,7 +19,10 @@
       rings: ['36% less crime', '21% less crime', '14% less crime'], // outer to inner
     },
     displacement: 'Crime moves to darker blocks',
-    rightLight: 'The right light, not the brightest',
+    rightLight: {
+      title: 'The right light, not the brightest',
+      text: 'Brighter isn’t safer. Lights that are too bright cause glare: they dazzle your eyes and make everything around them harder to see.',
+    },
     sources: [
       'CBRE, U.S. Office Figures Q2 2026',
       'Welsh & Farrington, “Effects of Improved Street Lighting on Crime,” Campbell Systematic Reviews, 2008',
@@ -73,7 +76,8 @@
       <div class="history-sticky">
         <div class="light-frame"><div class="light-panel"></div></div>
         <p class="light-readout">Light <span>0</span>%</p>
-        <figcaption>${HISTORY.rightLight}</figcaption>
+        <figcaption>${HISTORY.rightLight.title}</figcaption>
+        <p class="light-explainer">${HISTORY.rightLight.text}</p>
       </div>
     </figure>`;
 

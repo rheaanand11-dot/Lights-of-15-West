@@ -270,6 +270,18 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* The plain-language explanation under "The right light, not the brightest" */
+.light-explainer {
+  max-width: 30em;
+  margin: var(--space-2) 0 0;
+  padding: 0 var(--space-3);
+  font-size: var(--text-md);
+  line-height: 1.45;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--color-text-muted);
+}
+
 /* Sources sit at the very bottom of the page (#sources in index.html) */
 #sources {
   max-width: var(--wide-width);
