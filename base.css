@@ -125,3 +125,48 @@ body {
 }
 
 img, svg { max-width: 100%; display: block; }
+
+/* Links between the two pages: "Next to the street lights" at the bottom of
+   the main page, and "Back to the buildings" at the top of the street-lights page */
+.page-link-row {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-6) var(--gutter) var(--space-5);
+}
+
+.page-link-row--top {
+  justify-content: flex-start;
+  padding: var(--space-4) var(--gutter) 0;
+}
+
+.page-link {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-5);
+  border: 1px solid var(--color-building-edge);
+  border-radius: 999px;
+  color: var(--color-text);
+  text-align: center;
+  text-decoration: none;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.page-link-row--top .page-link {
+  padding: var(--space-2) var(--space-4);
+}
+
+.page-link:hover,
+.page-link:focus-visible {
+  border-color: var(--color-chartreuse);
+  color: var(--color-chartreuse);
+}
+
+.page-link-title {
+  font-size: var(--text-lg);
+}
+
+.page-link-row--top .page-link-title {
+  font-size: var(--text-sm);
+}

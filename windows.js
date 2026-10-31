@@ -38,8 +38,7 @@
     ],
   };
   const LIGHT_RADIUS = 110; // size of the flashlight, in pixels (matches .facade-light in windows.css)
-  const ZOOM_IN = 2.25; // how far the magnifier button zooms in (2.25 = 225%)
-  const MAX_ZOOM = 2.5; // the most a trackpad pinch can zoom in
+  const HOVER_ZOOM = 2.8; // how close the street zooms in around the cursor (2.8 = 280%)
   const MOUSE_SLOP = 14; // how near the cursor has to be to a story window to open it, in pixels
   const OUTLINE_MS = 1600; // how long the outline takes to draw
   const WINDOW_STEP_MS = 7; // gap between one window appearing and the next
@@ -93,14 +92,6 @@
       <div class="skyline">
         <div class="skyline-glow" aria-hidden="true"></div>
         <div class="skyline-cursor" aria-hidden="true"></div>
-        <button type="button" class="skyline-zoom" aria-label="Zoom in on the street" aria-pressed="false">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="10" cy="10" r="6.5"/>
-            <path d="M15 15l6 6"/>
-            <path class="skyline-zoom-plus" d="M10 7v6"/>
-            <path d="M7 10h6"/>
-          </svg>
-        </button>
         <div class="skyline-row">
           <div class="facade facade--main" role="group" aria-label="15 West"
                style="--columns: ${FACADE.rooms}; width: ${MAIN_WIDTH}%">
@@ -128,11 +119,16 @@
         <p class="skyline-count" aria-live="polite"></p>
       </div>
       <dialog class="story-card" aria-label="Story from a lit window">
+        <div class="story-ray" aria-hidden="true"></div>
         <div class="story-card-panel">
           <button type="button" class="story-card-close" aria-label="Close story">&times;</button>
           <p class="story-card-text"></p>
           <p class="story-card-meta"></p>
-          <button type="button" class="story-card-next" hidden>Later in this room &rarr;</button>
+        </div>
+        <div class="story-card-nav">
+          <button type="button" class="story-card-prev" aria-label="Earlier story">&larr;</button>
+          <span class="story-card-count" aria-live="polite"></span>
+          <button type="button" class="story-card-next" aria-label="Later story">&rarr;</button>
         </div>
       </dialog>`;
 
@@ -305,7 +301,10 @@
 
     // Every window on the street, 15 West's and the neighbors', for the flashlight
     const allWindows = windows.concat(neighborWindows);
-    const facades = [...root.querySelectorAll('.facade')].map((el) => ({ el, x: 0, y: 0 }));
+    // Each building, with its pool of light (moved directly, see shine())
+    const facades = [...root.querySelectorAll('.facade')].map((el) =>
+      ({ el, pool: el.querySelector('.facade-light'), x: 0, y: 0 }));
+    const cursorRing = root.querySelector('.skyline-cursor');
 
     // Zooming in. The buildings (.skyline-row) are scaled up inside the street's
     // frame, which crops them. "scale" is how far in we are (1 = normal) and
@@ -396,16 +395,19 @@
 
     // The flashlight: windows on any building close to (x, y) light up, fading
     // out toward the edge. (x, y) is a street position (see "Zooming in").
+    // The ring and the pools of light are moved directly (not through a
+    // setting on the whole street), so the browser only redraws them and not
+    // every window on every building. That keeps the cursor quick.
     function shine(x, y) {
       skyline.classList.add('is-shining');
       // The cursor ring isn't zoomed, so it goes where the spot shows on screen
       const ring = toScreen(x, y);
-      skyline.style.setProperty('--x', ring.x + 'px');
-      skyline.style.setProperty('--y', ring.y + 'px');
+      cursorRing.style.transform = `translate(${ring.x}px, ${ring.y}px) translate(-50%, -50%)`;
       // Each building's pool of light is placed from its own corner
       facades.forEach((f) => {
-        f.el.style.setProperty('--x', x - f.x + 'px');
-        f.el.style.setProperty('--y', y - f.y + 'px');
+        if (!f.pool) return;
+        f.pool.style.setProperty('--x', x - f.x + 'px');
+        f.pool.style.setProperty('--y', y - f.y + 'px');
       });
       allWindows.forEach((w) => {
         const t = Math.max(0, 1 - Math.hypot(w.x - x, w.y - y) / LIGHT_RADIUS);
@@ -428,9 +430,11 @@
       return { x: e.clientX - box.left, y: e.clientY - box.top };
     }
 
-    // Mouse: the light follows the cursor anywhere over the buildings. The
-    // 15 West story window under (or right next to) the cursor is remembered,
-    // and the cursor ring shows it.
+    // Mouse: the light follows the cursor anywhere over the buildings, and the
+    // street zooms in around it like a magnifying glass, so you can see right
+    // into the windows. Moving the cursor moves the view; leaving the street
+    // zooms back out. The 15 West story window under (or right next to) the
+    // cursor is remembered, and the cursor ring shows it.
     let frame = null;
     let storyUnderCursor = null;
     let pointer = null; // where the mouse is in the street's frame, while it's over the buildings
@@ -443,8 +447,12 @@
     skylineRow.addEventListener('pointermove', (e) => {
       if (!built || e.pointerType === 'touch') return;
       pointer = pointIn(e);
+      lookAt(pointer);
+      if (zoom.target !== HOVER_ZOOM) zoomTo(HOVER_ZOOM);
       cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => follow(pointer));
+      frame = requestAnimationFrame(() => {
+        if (pointer) follow(pointer); // the cursor may have left the street meanwhile
+      });
     });
     skylineRow.addEventListener('pointerleave', (e) => {
       if (e.pointerType === 'touch') return;
@@ -453,6 +461,7 @@
       darken();
       storyUnderCursor = null;
       skyline.classList.remove('is-on-story');
+      zoomTo(1);
     });
 
     // Point the zoom at a spot in the street's frame
@@ -545,53 +554,8 @@
       zoom.target = target;
       const zoomed = target > 1.01;
       skyline.classList.toggle('is-zoomed', zoomed);
-      zoomButton.setAttribute('aria-pressed', zoomed);
-      zoomButton.setAttribute('aria-label', zoomed ? 'Zoom back out' : 'Zoom in on the street');
       startZooming();
     }
-
-    // The magnifier button: one click zooms in toward the middle of the
-    // street (then the view follows the cursor), another click zooms back out
-    const zoomButton = root.querySelector('.skyline-zoom');
-    zoomButton.addEventListener('click', () => {
-      if (zoom.target > 1.01) return zoomTo(1);
-      lookAt({ x: skyline.clientWidth / 2, y: skylineRow.offsetHeight * 0.55 });
-      zoomTo(ZOOM_IN);
-    });
-
-    // Trackpad: pinching two fingers apart zooms in where the fingers are,
-    // step by step. Pinching them together zooms all the way back out in one
-    // go, so one small pinch is enough. While zoomed in, a plain two-finger swipe slides the view (no need
-    // to press). Once the view reaches the street's top or bottom edge, a
-    // swipe up or down scrolls the page again, so nobody gets stuck.
-    let pinchOutAt = 0; // when the last pinch zoomed back out
-    skylineRow.addEventListener('wheel', (e) => {
-      if (!built) return;
-      if (!e.ctrlKey) {
-        if (zoom.target <= 1.01 || zoom.scale <= 1) return; // not zoomed: scroll the page as usual
-        const before = { x: zoom.fx, y: zoom.fy };
-        slideBy(-e.deltaX, -e.deltaY);
-        if (zoom.fx !== before.x || zoom.fy !== before.y) e.preventDefault();
-        return;
-      }
-      e.preventDefault();
-      // Pinching in: straight back to normal, as quickly as the magnifier
-      // button. (A trackpad sends tiny amounts, so any amount counts.)
-      if (e.deltaY > 0) {
-        if (zoom.target > 1) {
-          zoomTo(1);
-          pinchOutAt = performance.now();
-        }
-        return;
-      }
-      // Ignore the last flutters of that pinch, so it doesn't zoom back in
-      if (performance.now() - pinchOutAt < 500) return;
-      const p = pointIn(e);
-      lookAt(p);
-      // 0.03 = how strongly the fingers zoom: a short pinch is enough to get close
-      const target = Math.min(MAX_ZOOM, Math.max(1, zoom.target * Math.exp(-e.deltaY * 0.03)));
-      zoomTo(target < 1.02 ? 1 : target);
-    }, { passive: false });
 
     // The 15 West lights switch. It starts on. Off, 15 West goes dark, the glow
     // over the street fades, and the count shows how few windows are left lit.
@@ -675,24 +639,44 @@
       if (w) shine(w.x, w.y);
     });
 
-    // The story card, one at a time. It grows out of the window you tapped.
-    // A room with several stories gets a button to step through them in order.
-    const nextButton = root.querySelector('.story-card-next');
-    let current = null;
-    function openStory(w, index = 0) {
-      current = { w, index };
-      const s = w.stories[index];
+    // The story cards. Every story on the street, in order of the night
+    // (9:40 PM first), so you can step through them all with ← and →.
+    const sequence = [];
+    windows.forEach((w) => {
+      w.stories.forEach((s, index) => sequence.push({ w, index, s, at: minutesAfter6pm(s.time) }));
+    });
+    sequence.sort((a, b) => a.at - b.at);
+    const ray = root.querySelector('.story-ray');
+    const counter = root.querySelector('.story-card-count');
+    let position = 0;
+
+    // Show the story at this place in the sequence. direction is -1 or 1 when
+    // stepping left or right (the card slides in from that side).
+    function showStory(pos, direction = 0) {
+      position = (pos + sequence.length) % sequence.length;
+      const { w, s } = sequence[position];
       // The card is the same color as the window it came from
       panel.className = 'story-card-panel story-card-panel--' + w.tone;
       panel.querySelector('.story-card-text').textContent = s.text;
       panel.querySelector('.story-card-meta').textContent =
         [s.time, `Floor ${w.floor}`, w.room].join(' · ');
-      nextButton.hidden = w.stories.length < 2;
-      nextButton.innerHTML = index < w.stories.length - 1
-        ? 'Later in this room &rarr;'
-        : '&larr; Earlier in this room';
-      if (dialog.open) return;
+      counter.textContent = `${position + 1} / ${sequence.length}`;
+      castRay(w, direction ? 0.6 : 1);
+      if (direction && !reduceMotion) {
+        panel.animate(
+          [{ transform: `translateX(${direction * 60}px)`, opacity: 0 }, { transform: 'none', opacity: 1 }],
+          { duration: 350, easing: 'cubic-bezier(0.2, 0.7, 0.2, 1)' }
+        );
+      }
+    }
+
+    // Opening a card: a ray of light shines from the window, and the card grows
+    // out of it, briefly brighter, like stepping into the lit room.
+    function openStory(w, index = 0) {
+      const pos = sequence.findIndex((e) => e.w === w && e.index === index);
+      if (dialog.open) return showStory(pos);
       dialog.showModal();
+      showStory(pos);
 
       if (reduceMotion) return;
       const from = w.el.getBoundingClientRect();
@@ -701,15 +685,73 @@
       const dy = from.top + from.height / 2 - (to.top + to.height / 2);
       panel.animate(
         [
-          { transform: `translate(${dx}px, ${dy}px) scale(${from.width / to.width})`, opacity: 0.6 },
-          { transform: 'none', opacity: 1 },
+          { transform: `translate(${dx}px, ${dy}px) scale(${from.width / to.width})`, opacity: 0.6, filter: 'brightness(1.8)' },
+          { transform: 'none', opacity: 1, filter: 'brightness(1)' },
         ],
-        { duration: 500, easing: 'cubic-bezier(0.2, 0.7, 0.2, 1)' }
+        { duration: 600, easing: 'cubic-bezier(0.2, 0.7, 0.2, 1)' }
       );
     }
-    nextButton.addEventListener('click', () => {
-      openStory(current.w, (current.index + 1) % current.w.stories.length);
+
+    // The ray: a soft cone of the window's own light, from the window to the
+    // card, that shines and then fades (strength 0-1). Styles in windows.css.
+    function castRay(w, strength) {
+      if (reduceMotion) return;
+      const from = w.el.getBoundingClientRect();
+      const to = panel.getBoundingClientRect();
+      const x = from.left + from.width / 2;
+      const y = from.top + from.height / 2;
+      const tx = to.left + to.width / 2;
+      const ty = to.top + to.height / 2;
+      const distance = Math.max(1, Math.hypot(tx - x, ty - y));
+      // Angle the way CSS measures it: 0deg points up, turning clockwise
+      const angle = (Math.atan2(tx - x, -(ty - y)) * 180) / Math.PI;
+      // Wide enough to take in the whole card
+      const spread = Math.min(90, Math.max(18, (2 * Math.atan(to.width / 2 / distance) * 180) / Math.PI));
+      ray.className = 'story-ray story-ray--' + w.tone;
+      ray.style.setProperty('--ray-x', x + 'px');
+      ray.style.setProperty('--ray-y', y + 'px');
+      ray.style.setProperty('--ray-angle', ((angle + 360) % 360).toFixed(1) + 'deg');
+      ray.style.setProperty('--ray-spread', spread.toFixed(1) + 'deg');
+      ray.style.setProperty('--ray-len', Math.round(distance + to.height / 2) + 'px');
+      ray.animate(
+        [{ opacity: 0 }, { opacity: strength, offset: 0.35 }, { opacity: 0 }],
+        { duration: 1100, easing: 'ease-out' }
+      );
+    }
+
+    // Stepping through the cards: the ← and → buttons, the arrow keys, a swipe
+    // on a phone, or a sideways two-finger swipe on a trackpad
+    function step(direction) {
+      showStory(position + direction, direction);
+    }
+    root.querySelector('.story-card-prev').addEventListener('click', () => step(-1));
+    root.querySelector('.story-card-next').addEventListener('click', () => step(1));
+    dialog.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') step(-1);
+      if (e.key === 'ArrowRight') step(1);
     });
+    let swipeStart = null;
+    panel.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'touch') swipeStart = e.clientX;
+    });
+    panel.addEventListener('pointerup', (e) => {
+      if (swipeStart === null) return;
+      const dx = e.clientX - swipeStart;
+      swipeStart = null;
+      if (Math.abs(dx) > 50) step(dx < 0 ? 1 : -1); // swipe left = next story
+    });
+    let sideways = 0;
+    let wheelPause = false;
+    dialog.addEventListener('wheel', (e) => {
+      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY) || wheelPause) return;
+      sideways += e.deltaX;
+      if (Math.abs(sideways) < 60) return;
+      step(sideways > 0 ? 1 : -1);
+      sideways = 0;
+      wheelPause = true; // one card per swipe
+      setTimeout(() => (wheelPause = false), 450);
+    }, { passive: true });
+
     root.querySelector('.story-card-close').addEventListener('click', () => dialog.close());
     // Clicking the dark area around the card closes it too (Esc works on its own)
     dialog.addEventListener('click', (e) => {
@@ -736,6 +778,14 @@
       if ((n -= share) < 0) return name;
     }
     return TONES[0][0];
+  }
+
+  // "9:40 PM" -> minutes since 6 PM, so stories after midnight sort last
+  function minutesAfter6pm(time) {
+    const [, h, m, half] = time.match(/(\d+):(\d+)\s*(AM|PM)/i);
+    let minutes = ((Number(h) % 12) + (half.toUpperCase() === 'PM' ? 12 : 0)) * 60 + Number(m);
+    if (minutes < 18 * 60) minutes += 24 * 60; // after midnight
+    return minutes - 18 * 60;
   }
 
   // Floor 6, position 5 -> "605"

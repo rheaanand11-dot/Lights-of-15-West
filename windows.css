@@ -257,7 +257,7 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   inset: 0;
   opacity: max(var(--light), var(--ambient, 0));
   background: var(--color-glass);
-  transition: opacity 0.5s ease-out; /* lights linger a moment after the cursor passes */
+  transition: opacity 0.25s ease-out; /* lights linger a moment after the cursor passes */
 }
 
 #windows.is-built .facade--main .window.is-lit { --ambient: 0.7; }
@@ -349,8 +349,8 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
    the whole street, and grows and turns yellow on a window with a story. */
 .skyline-cursor {
   position: absolute;
-  top: var(--y, 50%);
-  left: var(--x, 50%);
+  top: 0;
+  left: 0; /* windows.js moves it to the cursor with a transform */
   z-index: 3;
   width: 10px;
   height: 10px;
@@ -371,62 +371,10 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   background: rgba(255, 224, 0, 0.25);
 }
 
-/* ---------- Zoom (magnifier) button ----------
-   Top right of the street. A plus inside the lens zooms in; once zoomed in,
-   the plus turns into a minus to zoom back out. */
-.skyline-zoom {
-  position: absolute;
-  top: var(--space-2);
-  right: var(--space-2);
-  z-index: 4;
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 1px solid var(--color-building-edge);
-  border-radius: 50%;
-  background: rgba(8, 8, 10, 0.7);
-  color: var(--color-text);
-  cursor: pointer;
-  opacity: 0.75;
-  transition: opacity 0.4s ease, border-color 0.2s ease;
-}
-
-.skyline-zoom:hover,
-.skyline.is-zoomed .skyline-zoom {
-  opacity: 1;
-  border-color: var(--color-pale-yellow);
-}
-
-.skyline-zoom:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
-}
-
-.skyline-zoom svg {
-  width: 22px;
-  height: 22px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-}
-
-.skyline.is-zoomed .skyline-zoom-plus { display: none; }
-
-/* While zoomed, crop the view at the street line so the buildings don't
-   spill into the names row (where 15 West's switch sits) */
-.skyline.is-scaled { clip-path: inset(0 0 3em 0); }
-
-/* While zoomed, a finger swipe on the street slides the view instead of
-   scrolling the page */
-.skyline.is-zoomed .skyline-row { touch-action: none; }
-
-#windows:not(.is-built) .skyline-zoom {
-  opacity: 0;
-  pointer-events: none;
-}
+/* ---------- Zoom on hover ----------
+   With a mouse, the street zooms in around the cursor like a magnifying
+   glass (windows.js). The street's frame crops the zoomed view. */
+.skyline.is-scaled { clip-path: inset(0); }
 
 /* ---------- The neighbors ----------
    Same parts as 15 West, but darker walls, plainer windows and dimmer light */
@@ -710,7 +658,8 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   display: flex;
   flex-direction: column;
   justify-content: center;
-  width: min(86vw, 440px, calc(86svh * 0.7));
+  /* leaves room under the card for the ← 4 / 29 → row */
+  width: min(86vw, 440px, calc((86svh - 64px) * 0.7));
   aspect-ratio: 7 / 10;
   padding: 10% 11% 22%;
   overflow: hidden;
@@ -751,24 +700,83 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   text-align: center;
 }
 
-.story-card-next {
-  position: absolute;
-  bottom: 6%;
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: nowrap;
-  z-index: 2;
-  padding: var(--space-2) 0;
-  border: 0;
-  background: none;
-  color: inherit;
+/* Under the card: ← 4 / 29 → to step through every story, in order of the
+   night. (Arrow keys, a swipe, or a sideways trackpad swipe do the same.) */
+.story-card-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  margin-top: var(--space-3);
+}
+
+.story-card-nav button {
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.story-card-nav button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.story-card-nav button:focus-visible {
+  outline: 2px solid var(--color-yellow);
+  outline-offset: 2px;
+}
+
+.story-card-count {
+  min-width: 5ch;
   font-family: var(--font-mono);
   font-size: var(--text-sm);
-  letter-spacing: 0.04em;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  cursor: pointer;
+  letter-spacing: 0.06em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
 }
+
+/* The ray of light that shines from the window into the card as it opens.
+   windows.js sets where it starts (--ray-x, --ray-y), which way it points
+   (--ray-angle), how wide it opens (--ray-spread), how far it reaches
+   (--ray-len), and its color (one class per window light below). */
+.story-ray {
+  --ray-rgb: 255 236 200;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: conic-gradient(
+    from calc(var(--ray-angle, 0deg) - var(--ray-spread, 30deg) / 2) at var(--ray-x, 50%) var(--ray-y, 50%),
+    rgb(var(--ray-rgb) / 0) 0deg,
+    rgb(var(--ray-rgb) / 0.12) calc(var(--ray-spread, 30deg) * 0.2),
+    rgb(var(--ray-rgb) / 0.42) calc(var(--ray-spread, 30deg) * 0.5),
+    rgb(var(--ray-rgb) / 0.12) calc(var(--ray-spread, 30deg) * 0.8),
+    rgb(var(--ray-rgb) / 0) var(--ray-spread, 30deg));
+  /* The ray fades out softly just past the card */
+  -webkit-mask-image: radial-gradient(circle at var(--ray-x, 50%) var(--ray-y, 50%),
+    #000 0, #000 var(--ray-len, 400px), transparent calc(var(--ray-len, 400px) + 160px));
+  mask-image: radial-gradient(circle at var(--ray-x, 50%) var(--ray-y, 50%),
+    #000 0, #000 var(--ray-len, 400px), transparent calc(var(--ray-len, 400px) + 160px));
+  filter: blur(8px);
+  mix-blend-mode: screen;
+}
+
+.story-ray--cool { --ray-rgb: 225 238 230; }
+.story-ray--amber { --ray-rgb: 255 184 96; }
+.story-ray--cream { --ray-rgb: 255 232 190; }
+.story-ray--dim { --ray-rgb: 214 160 96; }
+.story-ray--bright { --ray-rgb: 255 255 255; }
+.story-ray--blinds { --ray-rgb: 240 224 186; }
+.story-ray--purple { --ray-rgb: 160 130 255; }
+.story-ray--blue { --ray-rgb: 124 144 255; }
 
 .story-card-close {
   position: absolute;

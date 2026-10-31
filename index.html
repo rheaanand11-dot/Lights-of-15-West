@@ -21,8 +21,6 @@
   <link rel="stylesheet" href="windows.css">
   <!-- Owner not assigned yet -->
   <link rel="stylesheet" href="history.css">
-  <!-- Owned by Anna -->
-  <link rel="stylesheet" href="streetlights.css">
 </head>
 <body>
   <main>
@@ -35,8 +33,12 @@
     <!-- Person B: legend (window lit / window dark) -->
     <section id="legend" class="story-section"></section>
 
-    <!-- Anna: each building's lit windows as street lights, night by night -->
-    <section id="streetlights" aria-label="Buildings' window light in street light equivalent"></section>
+    <!-- Anna's street-lights section has its own page; this links to it -->
+    <nav class="page-link-row" aria-label="Next page">
+      <a class="page-link" href="streetlights.html">
+        <span class="page-link-title">Next to the street lights &rarr;</span>
+      </a>
+    </nav>
   </main>
 
   <!-- Sources for the opening section, at the very bottom (filled by history.js) -->
@@ -45,6 +47,5 @@
   <script src="history.js" defer></script>
   <script src="story.js" defer></script>
   <script src="windows.js" defer></script>
-  <script src="streetlights.js" defer></script>
 </body>
 </html>
