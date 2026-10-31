@@ -126,8 +126,8 @@ body {
 
 img, svg { max-width: 100%; display: block; }
 
-/* Links between the two pages: "Next" at the bottom of the main page, and
-   "Back to the street" at the top of the street-lights page */
+/* Links between the two pages: "Next to the street lights" at the bottom of
+   the main page, and "Back to the buildings" at the top of the street-lights page */
 .page-link-row {
   display: flex;
   justify-content: center;
@@ -161,14 +161,6 @@ img, svg { max-width: 100%; display: block; }
 .page-link:focus-visible {
   border-color: var(--color-chartreuse);
   color: var(--color-chartreuse);
-}
-
-.page-link-kicker {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
 }
 
 .page-link-title {
