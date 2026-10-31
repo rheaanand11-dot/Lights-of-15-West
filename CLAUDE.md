@@ -67,6 +67,7 @@ that way.
 | `windows.css` | Styles for the facade and story card | **Person A** |
 | `story.js` | Intro, narrative text, legend, credits | **Person B** |
 | `story.css` | Styles for the story sections | **Person B** |
+| `streetlights.html` | Second page for the street-light section (linked from the bottom of `index.html`) | Shared |
 | `streetlights.js` | "Buildings' Windows Light in Street Light Equivalent" section | **Anna** |
 | `streetlights.css` | Styles for the street-light section | **Anna** |
 
