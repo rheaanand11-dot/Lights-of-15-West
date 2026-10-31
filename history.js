@@ -15,8 +15,8 @@
     ],
     // Each figure: a headline, then a short plain-language explanation
     offices: {
-      title: 'Only 1 in 5 empty offices is lit at night',
-      text: 'About a fifth of US office space now sits vacant (CBRE). With no one working late inside, those windows stay dark after 5 PM, and the street below loses their light.',
+      title: 'About 1 in 5 offices is empty',
+      text: 'That’s across US office space (CBRE). With no one working late inside, those windows stay dark after 5 PM, and the street below loses their light.',
     },
     crime: {
       caption: 'Better lighting is linked to less crime',
@@ -24,7 +24,7 @@
       rings: ['36% less crime', '21% less crime', '14% less crime'], // outer to inner
     },
     displacement: {
-      title: 'Crime moves to darker blocks',
+      title: 'Darkness leaves gaps',
       text: 'People are less likely to break the law where they can be seen. When some streets glow and others don’t, the risk gathers in the dark gaps between them.',
     },
     rightLight: {
@@ -78,7 +78,7 @@
 
     <figure class="history-step fig-displacement">
       <svg class="blocks" viewBox="0 0 120 130" role="img"
-           aria-label="Lit blocks above, with crime moving down into darker blocks below"></svg>
+           aria-label="Lit blocks above, with dark gaps between them below"></svg>
       <figcaption>${HISTORY.displacement.title}</figcaption>
       <p class="history-explainer">${HISTORY.displacement.text}</p>
     </figure>
