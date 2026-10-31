@@ -55,7 +55,17 @@
   min-height: 100svh; /* the title still gets the whole first screen */
 }
 
+/* The title and the beam of light that falls onto it */
+.history-title-wrap {
+  position: relative;
+}
+
+.history-beam {
+  display: none; /* only shown when the opening animation plays (below) */
+}
+
 .history-title {
+  position: relative;
   margin: 0;
   font-family: var(--font-display);
   font-size: clamp(2.4rem, 8.6vw, 6.4rem);
@@ -249,17 +259,75 @@
     opacity: 1;
   }
 
-  /* The first screen comes in quickly: title almost at once, then the
-     subtitle lines in quick succession */
+  /* ----- The opening, in order -----
+     0.0s  all black
+     0.5s  a beam of light drops from the top of the screen onto the title
+     1.2s  the light falls across the letters, top to bottom, and lights them
+     2.4s  the subtitle lines appear, one at a time
+     5.4s  "Scroll" appears
+     It plays once, when the page opens. */
   .history-step--intro > * {
     transition-duration: 0.25s;
   }
 
+  .history-beam {
+    display: block;
+    position: absolute;
+    left: -6%;
+    right: -6%;
+    bottom: -12%;
+    height: 100vh;
+    height: 100svh;
+    pointer-events: none;
+    /* A cone of light: narrow at the top, wide where it lands on the title */
+    clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%);
+    background: linear-gradient(to bottom,
+      rgba(240, 255, 140, 0) 0%,
+      rgba(240, 255, 140, 0.06) 55%,
+      rgba(240, 255, 140, 0.2) 100%);
+    transform-origin: top;
+    transform: scaleY(0);
+    opacity: 0;
+    animation: beam-falls 2.6s ease-out 0.5s forwards;
+  }
+
+  @keyframes beam-falls {
+    0% { transform: scaleY(0); opacity: 0; }
+    30% { transform: scaleY(1); opacity: 1; }
+    100% { transform: scaleY(1); opacity: 0.35; } /* settles into a soft spotlight */
+  }
+
+  /* The letters start dark and the light passes down over them */
+  .history-title {
+    background: linear-gradient(to bottom, var(--color-lime) 0 40%, #1b1c10 60% 100%);
+    background-size: 100% 250%;
+    background-position: 0 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: light-falls 1.2s ease-in-out 1.2s forwards;
+  }
+
+  @keyframes light-falls {
+    to { background-position: 0 0; }
+  }
+
+  /* Subtitle lines, one at a time */
   .history-lede span {
     opacity: 0;
-    transform: translateY(6px);
-    transition: opacity 0.35s ease, transform 0.35s ease;
-    transition-delay: calc(0.1s + var(--i) * 0.12s);
+    transform: translateY(8px);
+    animation: line-appears 0.7s ease both; /* "both": stays hidden until its turn */
+    animation-delay: calc(2.4s + var(--i) * 0.6s);
+  }
+
+  @keyframes line-appears {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .history-scroll-hint {
+    opacity: 0;
+    animation: line-appears 0.7s ease 5.4s both;
   }
 
   .office {
@@ -296,7 +364,6 @@
     transition: opacity 0.6s ease calc(1.6s + var(--i) * 0.04s);
   }
 
-  .is-visible .history-lede span,
   .is-visible .office,
   .is-visible .lit-dot {
     opacity: 1;
