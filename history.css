@@ -86,6 +86,35 @@
   letter-spacing: -0.01em;
   text-transform: uppercase;
   color: var(--color-lime);
+  /* The title glows like a lit sign */
+  text-shadow:
+    0 0 8px color-mix(in srgb, var(--color-lime) 60%, transparent),
+    0 0 28px color-mix(in srgb, var(--color-lime) 35%, transparent);
+}
+
+/* "FALLS" flickers for about 2 seconds, then stays lit. history.js wraps the
+   word in this span and adds is-flickering once the page has loaded (and its
+   fonts are in), and again each time you scroll back up to the title. */
+@media (prefers-reduced-motion: no-preference) {
+  .history-title-flicker.is-flickering {
+    animation: title-flicker 2s linear both;
+  }
+}
+
+@keyframes title-flicker {
+  0% { color: var(--color-building-edge); text-shadow: none; }
+  8% { color: var(--color-lime); text-shadow: inherit; }
+  12% { color: var(--color-building-edge); text-shadow: none; }
+  22% { color: var(--color-lime); text-shadow: inherit; }
+  26% { color: var(--color-building-edge); text-shadow: none; }
+  30% { color: var(--color-lime); text-shadow: inherit; }
+  48% { color: var(--color-lime); text-shadow: inherit; }
+  52% { color: var(--color-building-edge); text-shadow: none; }
+  60% { color: var(--color-building-edge); text-shadow: none; }
+  64% { color: var(--color-lime); text-shadow: inherit; }
+  72% { color: var(--color-building-edge); text-shadow: none; }
+  76% { color: var(--color-lime); text-shadow: inherit; }
+  100% { color: var(--color-lime); text-shadow: inherit; }
 }
 
 /* Wide enough that each sentence fits on one line on a laptop. When a
@@ -252,7 +281,7 @@
 .history-sources {
   max-width: 90ch;
   margin: 0;
-  padding: var(--space-4) 0 var(--space-6);
+  padding: var(--space-4) 0 var(--space-7); /* room below, so the page doesn't end abruptly */
   font-size: 0.75rem;
   line-height: 1.5;
   color: var(--color-text-muted);
@@ -369,25 +398,28 @@
   }
 
   /* The title can't be seen in the dark. Where the light lands, it appears,
-     lit from the top-right where the light comes from, then gives off a
-     gentle glow. */
+     from the top right where the light comes from, glow and all. A mask
+     slides across it: the see-through (bottom-left) end first, then the
+     solid (top-right) end. The padding gives the title's glow room inside
+     the mask; the negative margin keeps the layout the same. */
   .history-title {
-    background: linear-gradient(225deg, var(--color-lime) 0 30%, rgba(220, 236, 0, 0) 60% 100%);
-    background-size: 300% 300%;
-    /* Starts on the unlit (bottom-left) end of the gradient, then slides to
-       the lit (top-right) end, so the light sweeps in from the top right */
-    background-position: 0 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    filter: drop-shadow(0 0 0 rgba(220, 236, 0, 0));
+    padding: 0.35em;
+    margin: -0.35em;
+    -webkit-mask-image: linear-gradient(225deg, #000 0 30%, transparent 60% 100%);
+    mask-image: linear-gradient(225deg, #000 0 30%, transparent 60% 100%);
+    -webkit-mask-size: 300% 300%;
+    mask-size: 300% 300%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: 0 100%;
+    mask-position: 0 100%;
     animation: light-falls 1.8s ease-in-out 2.6s both;
   }
 
   @keyframes light-falls {
     to {
-      background-position: 100% 0;
-      filter: drop-shadow(0 0 22px rgba(220, 236, 0, 0.22));
+      -webkit-mask-position: 100% 0;
+      mask-position: 100% 0;
     }
   }
 

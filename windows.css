@@ -9,14 +9,47 @@
   gap: var(--space-4);
   min-height: 100vh;
   min-height: 100svh;
-  padding: var(--space-5) var(--gutter);
+  /* Little room on top: the "right light" step above already ends in space */
+  padding: var(--space-3) var(--gutter) var(--space-5);
 }
 
+/* "Lit Windows by Building..." heading, Helvetica Bold in chartreuse */
+.windows-heading {
+  max-width: 22ch;
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  color: var(--color-chartreuse);
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* Fades and grows in like the crime rings (windows.js adds is-visible) */
+@media (prefers-reduced-motion: no-preference) {
+  .windows-heading {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .windows-heading.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Sub-heading under the heading: Helvetica Light Oblique, as in the
+   Visual System's sub-heading style */
 .facade-hint {
   margin: 0;
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  letter-spacing: 0.04em;
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.35;
   color: var(--color-text-muted);
   text-align: center;
 }
@@ -97,19 +130,22 @@
   transform: none;
 }
 
+/* windows.js scales this row up to zoom in; the street's frame crops it */
 .skyline-row {
+  transform-origin: 0 0;
   display: flex;
   flex: 0 0 auto;
   align-items: flex-end;
-  gap: 0.5%;
+  gap: 0.2%; /* small, so all the buildings (98.5% wide together) fit on screen */
   width: 100%;
   border-bottom: 2px solid var(--color-building-edge);
+  cursor: none; /* the flashlight is the cursor, over every building */
 }
 
 /* Warm haze over the street from all the lit windows */
 .skyline-glow {
   position: absolute;
-  inset: 15% -10% 0;
+  inset: 15% -10% 3em; /* stops at the street, above the building names */
   background: radial-gradient(ellipse 45% 70% at 50% 100%, rgba(255, 196, 120, 0.2), transparent 75%);
   opacity: 0;
   pointer-events: none;
@@ -121,10 +157,6 @@
   flex: 0 0 auto;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
-}
-
-.facade--main {
-  cursor: none; /* the flashlight is the cursor */
 }
 
 /* Windows and ledges sit above the grain and the pool of light */
@@ -228,8 +260,8 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   transition: opacity 0.5s ease-out; /* lights linger a moment after the cursor passes */
 }
 
-#windows.is-built .facade--main .window.is-lit { --ambient: 0.55; }
-#windows.is-built .facade--neighbor .window.is-lit { --ambient: 0.4; }
+#windows.is-built .facade--main .window.is-lit { --ambient: 0.7; }
+#windows.is-built .facade--neighbor .window.is-lit { --ambient: 0.56; }
 
 /* Lit windows: a light and a glow. Each lit window gets one of the tones
    below (picked by windows.js), matched to the photo of 15 West at night:
@@ -311,11 +343,11 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   transition: opacity 0.4s ease;
 }
 
-.facade.is-shining .facade-light { opacity: 1; }
+.skyline.is-shining .facade-light { opacity: 1; }
 
-/* A small ring at the exact point you'll click. It grows and turns yellow
-   when you're on a window with a story. */
-.facade-cursor {
+/* A small ring at the exact point you'll click. It follows the cursor over
+   the whole street, and grows and turns yellow on a window with a story. */
+.skyline-cursor {
   position: absolute;
   top: var(--y, 50%);
   left: var(--x, 50%);
@@ -330,20 +362,79 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   transition: width 0.15s ease, height 0.15s ease, background-color 0.15s ease, opacity 0.2s ease;
 }
 
-.facade.is-shining .facade-cursor { opacity: 1; }
+.skyline.is-shining .skyline-cursor { opacity: 1; }
 
-.facade.is-on-story .facade-cursor {
+.skyline.is-on-story .skyline-cursor {
   width: 22px;
   height: 22px;
   border-color: var(--color-yellow);
   background: rgba(255, 224, 0, 0.25);
 }
 
+/* ---------- Zoom (magnifier) button ----------
+   Top right of the street. A plus inside the lens zooms in; once zoomed in,
+   the plus turns into a minus to zoom back out. */
+.skyline-zoom {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--color-building-edge);
+  border-radius: 50%;
+  background: rgba(8, 8, 10, 0.7);
+  color: var(--color-text);
+  cursor: pointer;
+  opacity: 0.75;
+  transition: opacity 0.4s ease, border-color 0.2s ease;
+}
+
+.skyline-zoom:hover,
+.skyline.is-zoomed .skyline-zoom {
+  opacity: 1;
+  border-color: var(--color-pale-yellow);
+}
+
+.skyline-zoom:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.skyline-zoom svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.skyline.is-zoomed .skyline-zoom-plus { display: none; }
+
+/* While zoomed, crop the view at the street line so the buildings don't
+   spill into the names row (where 15 West's switch sits) */
+.skyline.is-scaled { clip-path: inset(0 0 3em 0); }
+
+/* While zoomed, a finger swipe on the street slides the view instead of
+   scrolling the page */
+.skyline.is-zoomed .skyline-row { touch-action: none; }
+
+#windows:not(.is-built) .skyline-zoom {
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* ---------- The neighbors ----------
    Same parts as 15 West, but darker walls, plainer windows and dimmer light */
 
 .facade--neighbor .facade-fill {
-  background: linear-gradient(to bottom, #151418, #0e0d11);
+  background: linear-gradient(to bottom, var(--color-neighbor-top), var(--color-neighbor));
+  /* A thin edge around each building, so it stands out from the night sky */
+  box-shadow: inset 0 0 0 1px var(--color-building-edge);
 }
 
 .facade--neighbor .window {
@@ -353,7 +444,7 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
 .facade--neighbor .window::before { display: none; } /* too small for window frames */
 
 .facade--neighbor .window.is-lit::after {
-  filter: brightness(0.75) saturate(0.85);
+  filter: brightness(0.9) saturate(0.9);
   box-shadow: 0 0 6px 1px var(--glow, var(--color-window-glow));
 }
 
@@ -361,7 +452,7 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
 .facade--purple-wash .facade-fill {
   background:
     linear-gradient(to left, rgba(150, 60, 200, 0.28), transparent 45%),
-    linear-gradient(to bottom, #151418, #0e0d11);
+    linear-gradient(to bottom, var(--color-neighbor-top), var(--color-neighbor));
 }
 
 /* US Marshals: floodlit stone */
@@ -388,21 +479,39 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
 #windows.is-built .skyline-glow { opacity: 1; }
 #windows.is-built.is-dark .skyline-glow { opacity: 0.15; }
 
-/* Off: 15 West's lit windows go dark like the others */
-#windows.is-dark .facade--main .window.is-lit { --ambient: 0; }
-
+/* Off: 15 West's lit windows go dark like the others. They keep their color
+   so the flashlight only finds a faint trace of it. */
 #windows.is-dark .facade--main .window.is-lit::after {
-  background: var(--color-glass);
-  box-shadow: none;
+  opacity: calc(var(--light) * 0.35);
   animation: none;
 }
 
+/* While the switch is turning off (windows.js adds is-switching-off for a
+   moment), the windows go out in a quick ripple, 0.3 seconds in all: each
+   fades for 0.2s after its own tiny wait (--off, up to 0.1s, set by
+   windows.js). The haze over the street fades with them. */
+#windows.is-switching-off .facade--main .window.is-lit::after {
+  transition: opacity 0.2s ease-in var(--off, 0s);
+}
+
+#windows.is-switching-off .skyline-glow {
+  transition-duration: 0.3s;
+}
+
+/* Under 15 West, as wide as the building, in two rows: its name with the
+   lights switch (level with the other buildings' names), then the count.
+   --main-width is 15 West's width, set by windows.js. */
 .skyline-controls {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: var(--space-3) var(--space-5);
+  gap: var(--space-2);
+  width: var(--main-width, 50%);
+  /* Sits just under 15 West. (The building names now show above each
+     building on hover, so there is no names row under the street to pull
+     up into.) #windows puts a --space-4 gap between the street and this. */
+  margin-top: calc(var(--space-3) - var(--space-4));
+  text-align: center;
   transition: opacity 1.2s ease;
 }
 
@@ -412,6 +521,8 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  font-size: var(--text-md);
+  line-height: 1.2;
   cursor: pointer;
 }
 
@@ -469,11 +580,49 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   color: var(--color-text);
 }
 
+/* Lights on: the count shines like a lit window: warm yellow letters with a
+   strong halo, pulsing gently. Only the letters glow, so the line takes up
+   the same space whether the lights are on or off. */
+.skyline-count,
+.skyline-count strong {
+  transition: color 0.8s ease, text-shadow 0.8s ease;
+}
+
+#windows:not(.is-dark) .skyline-count {
+  color: var(--color-window-on);
+  text-shadow:
+    0 0 4px rgba(255, 214, 140, 0.9),
+    0 0 12px rgba(255, 190, 90, 0.75),
+    0 0 28px rgba(255, 170, 60, 0.55);
+}
+
+#windows:not(.is-dark) .skyline-count strong {
+  color: var(--color-window-on-top);
+  text-shadow: inherit;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  #windows.is-built:not(.is-dark) .skyline-count {
+    animation: count-shine 2.6s ease-in-out infinite;
+  }
+}
+
+@keyframes count-shine {
+  0%, 100% { filter: brightness(0.9); }
+  50% { filter: brightness(1.4); }
+}
+
 /* Phones: 15 West stays big, so the street is wider than the screen and the
    outer buildings get cropped at the edges */
 @media (max-width: 700px) {
   .skyline-row { width: 130%; }
-  .skyline-count { text-align: center; }
+  /* The switch and count get the full screen width so they're easy to read
+     and tap. They still sit up in the names row, right under the building
+     (15 West covers the middle, so the other names stay clear at the sides). */
+  .skyline-controls {
+    width: 100%;
+    gap: var(--space-3);
+  }
 }
 
 /* ---------- Drawing the building in ----------

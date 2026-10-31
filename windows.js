@@ -1,7 +1,7 @@
 // windows.js — owned by Person A.
 // 15 West at night with the buildings around it. The buildings draw
 // themselves in, then their lit windows glow (the neighbors dimmer than
-// 15 West). The cursor is a flashlight over 15 West; tap a window with a story
+// 15 West). The cursor is a flashlight over the whole street; tap a 15 West window with a story
 // to read what was happening inside that room. A switch turns 15 West's
 // lights off to show how much darker the block gets.
 
@@ -23,23 +23,23 @@
   // total are wall. width = share of the skyline's width, in % (keep both
   // sides adding up to about the same, so 15 West stays in the middle).
   // window = a window's width / height. look = extra styling in windows.css.
+  // label = the short name written under the building.
   const NEIGHBORS = {
     left: [
-      { id: 'darroweverett', floors: 25, columns: 15, width: 8.5, window: '1 / 1.9', arches: 4, look: 'purple-wash' },
-      { id: 'textron', floors: 42, columns: 23, width: 8, window: '1 / 5', arches: 3 },
-      { id: 'usmarshals', floors: 2, columns: 13, width: 7.5, window: '1 / 3', arches: 5, look: 'floodlit' },
+      { id: 'darroweverett', label: 'Turks Head Building', floors: 25, columns: 15, width: 8.5, window: '1 / 1.9', arches: 4, look: 'purple-wash' },
+      { id: 'textron', label: 'Textron Tower', floors: 42, columns: 23, width: 8, window: '1 / 5', arches: 3 },
+      { id: 'usmarshals', label: 'Federal Building', floors: 2, columns: 13, width: 7.5, window: '1 / 3', arches: 5, look: 'floodlit' },
     ],
     right: [
-      { id: 'bartongilman', floors: 34, columns: 18, width: 7.5, window: '1 / 4.6', arches: 3, look: 'crown' },
-      { id: 'metropark', floors: 10, columns: 16, width: 6.5, window: '1 / 3', arches: 4, look: 'warm' },
-      // Homewood Suites: no Monday 11 PM count yet, so it shows Sunday 9 PM.
-      // Its total window count is an estimate (estimatedWindows in lights.json).
-      { id: 'homewood', floors: 15, columns: 8, width: 5.5, window: '1 / 2.4', arches: 2,
-        when: { day: 'Sunday', time: '21:00', label: 'Sunday, 9 PM' } },
-      { id: 'merchants', floors: 5, columns: 8, width: 5, window: '1 / 2', arches: 3 },
+      // (Homewood Suites is left out; these three widen to fill its space)
+      { id: 'bartongilman', label: 'One Financial Plaza', floors: 34, columns: 18, width: 9.5, window: '1 / 4.6', arches: 3, look: 'crown' },
+      { id: 'metropark', label: 'Banigan Building', floors: 10, columns: 16, width: 8, window: '1 / 3', arches: 4, look: 'warm' },
+      { id: 'merchants', label: 'Merchants Bank', floors: 5, columns: 8, width: 6.5, window: '1 / 2', arches: 3 },
     ],
   };
   const LIGHT_RADIUS = 110; // size of the flashlight, in pixels (matches .facade-light in windows.css)
+  const ZOOM_IN = 2.25; // how far the magnifier button zooms in (2.25 = 225%)
+  const MAX_ZOOM = 2.5; // the most a trackpad pinch can zoom in
   const MOUSE_SLOP = 14; // how near the cursor has to be to a story window to open it, in pixels
   const OUTLINE_MS = 1600; // how long the outline takes to draw
   const WINDOW_STEP_MS = 7; // gap between one window appearing and the next
@@ -79,17 +79,28 @@
     }
     const lit = new Set(Object.keys(storyAt));
     const random = seeded(15);
+    const offOrder = seeded(7); // separate, so the lit windows and colors stay the same
     while (lit.size < Math.min(litCount, allKeys.length)) {
       lit.add(allKeys[Math.floor(random() * allKeys.length)]);
     }
 
     root.innerHTML = `
+      <h2 class="windows-heading">Lit Windows by Building in Downtown Providence at Night</h2>
       <p class="facade-hint">
-        <span class="hint-mouse">Shine your light across 15 West. Click a flickering window to look inside.</span>
-        <span class="hint-touch">Tap 15 West to shine a light. Tap a flickering window to look inside.</span>
+        <span class="hint-mouse">Shine your light across the street. Click a flickering window on 15 West to look inside.</span>
+        <span class="hint-touch">Tap a building to shine a light. Tap a flickering window on 15 West to look inside.</span>
       </p>
       <div class="skyline">
         <div class="skyline-glow" aria-hidden="true"></div>
+        <div class="skyline-cursor" aria-hidden="true"></div>
+        <button type="button" class="skyline-zoom" aria-label="Zoom in on the street" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="10" cy="10" r="6.5"/>
+            <path d="M15 15l6 6"/>
+            <path class="skyline-zoom-plus" d="M10 7v6"/>
+            <path d="M7 10h6"/>
+          </svg>
+        </button>
         <div class="skyline-row">
           <div class="facade facade--main" role="group" aria-label="15 West"
                style="--columns: ${FACADE.rooms}; width: ${MAIN_WIDTH}%">
@@ -101,7 +112,6 @@
             <div class="facade-grid"></div>
             <div class="facade-base"></div>
             <div class="facade-light" aria-hidden="true"></div>
-            <div class="facade-cursor" aria-hidden="true"></div>
             <div class="facade-label" aria-hidden="true">
               <span class="facade-label-name">15 West</span>
               <span class="facade-label-count"></span>
@@ -109,11 +119,11 @@
           </div>
         </div>
       </div>
-      <div class="skyline-controls">
+      <div class="skyline-controls" style="--main-width: ${MAIN_WIDTH}%">
         <label class="windows-switch">
+          <span>15 West</span>
           <input type="checkbox" role="switch" checked aria-label="15 West lights">
           <span class="windows-switch-track" aria-hidden="true"></span>
-          <span>15 West lights <strong>on</strong></span>
         </label>
         <p class="skyline-count" aria-live="polite"></p>
       </div>
@@ -125,6 +135,41 @@
           <button type="button" class="story-card-next" hidden>Later in this room &rarr;</button>
         </div>
       </dialog>`;
+
+    // The heading fades and grows in as it scrolls onto the screen, and fades
+    // back out as it leaves, like the crime rings in the opening section
+    const heading = root.querySelector('.windows-heading');
+    function fadeHeading() {
+      const box = heading.getBoundingClientRect();
+      const h = window.innerHeight;
+      heading.classList.toggle('is-visible', box.top < h * 0.88 && box.bottom > h * 0.12);
+    }
+    window.addEventListener('scroll', fadeHeading, { passive: true });
+    window.addEventListener('resize', fadeHeading);
+    fadeHeading();
+
+    // Space above the heading: the same as above the street-light section's
+    // heading (the legend's bottom padding plus that section's top padding).
+    // "The right light, not the brightest" sits in the middle of a full-screen
+    // step, so the space under it changes with the screen's height; the
+    // padding here makes up the rest, so the gap is the same on every screen.
+    function spaceAboveHeading() {
+      const caption = document.querySelector('.history-sticky figcaption');
+      const sticky = document.querySelector('.history-sticky');
+      const legend = document.getElementById('legend');
+      const nextSection = document.getElementById('streetlights');
+      if (!caption || !sticky || !legend || !nextSection) return;
+      const gap = parseFloat(getComputedStyle(legend).paddingBottom) +
+        parseFloat(getComputedStyle(nextSection).paddingTop);
+      const below = sticky.getBoundingClientRect().bottom - caption.getBoundingClientRect().bottom;
+      const space = gap - below;
+      // On tall screens the step already leaves more than enough empty space
+      // under the caption, so this section tucks up into it instead
+      root.style.paddingTop = Math.max(16, space) + 'px';
+      root.style.marginTop = Math.min(0, space - 16) + 'px';
+    }
+    window.addEventListener('resize', spaceAboveHeading);
+    spaceAboveHeading();
 
     const facade = root.querySelector('.facade--main');
     const grid = facade.querySelector('.facade-grid');
@@ -155,6 +200,8 @@
           // Real windows glow in different whites and yellows
           tone = pickTone(random());
           el.classList.add('is-lit', 'tone-' + tone);
+          // How long it waits before going out when the lights are switched off
+          el.style.setProperty('--off', (offOrder() * 0.1).toFixed(2) + 's');
         }
         if (roomStories.length) {
           el.type = 'button';
@@ -170,7 +217,9 @@
     for (let i = 0; i < 10; i++) base.appendChild(document.createElement('span'));
 
     // The neighbors, on either side of 15 West
+    const skyline = root.querySelector('.skyline');
     const skylineRow = root.querySelector('.skyline-row');
+    const neighborWindows = []; // every neighbor window, for the flashlight
     let neighborsLit = 0;
     NEIGHBORS.left.forEach((b, i) => skylineRow.insertBefore(buildNeighbor(b, i === 0 ? 'start' : ''), facade));
     NEIGHBORS.right.forEach((b, i, all) =>
@@ -216,8 +265,9 @@
         <div class="facade-cornice"></div>
         <div class="facade-grid"></div>
         <div class="facade-base"></div>
+        <div class="facade-light" aria-hidden="true"></div>
         <div class="facade-label${edge ? ' facade-label--' + edge : ''}" aria-hidden="true">
-          <span class="facade-label-name">${info.name}</span>
+          <span class="facade-label-name">${b.label || info.name}</span>
           <span class="facade-label-count">${litHere} of ${info.windows ? '' : '~'}${total} lit${b.when ? ' &middot; ' + b.when.label : ''}</span>
         </div>`;
 
@@ -244,6 +294,7 @@
           const fromBottom = b.floors - 1 - Math.floor(i / b.columns);
           w.style.setProperty('--d', Math.round((fromBottom * b.columns + (i % b.columns)) * step));
           if (litWindows.has(i - spare)) w.classList.add('is-lit', 'tone-' + pickTone(pick()));
+          neighborWindows.push({ el: w, x: 0, y: 0, light: 0 });
         }
         g.appendChild(w);
       }
@@ -252,14 +303,65 @@
       return el;
     }
 
-    // Remember where each window's center is, relative to the facade
+    // Every window on the street, 15 West's and the neighbors', for the flashlight
+    const allWindows = windows.concat(neighborWindows);
+    const facades = [...root.querySelectorAll('.facade')].map((el) => ({ el, x: 0, y: 0 }));
+
+    // Zooming in. The buildings (.skyline-row) are scaled up inside the street's
+    // frame, which crops them. "scale" is how far in we are (1 = normal) and
+    // "focus" is the spot we zoom toward. Zooming glides a little every frame,
+    // so it's gradual. Once zoomed in, the view stays still until you drag it
+    // (mouse or finger) to look somewhere else.
+    //
+    // Two kinds of position are used below: "screen" = where something shows
+    // inside the street's frame right now, and "street" = where it would be
+    // without any zoom. Window positions and the flashlight use street positions.
+    const zoom = { scale: 1, target: 1, fx: 0, fy: 0, focusX: null, focusY: null, moving: false };
+    function rowOrigin() {
+      return { x: skylineRow.offsetLeft, y: skylineRow.offsetTop };
+    }
+    function shift() {
+      const o = rowOrigin();
+      return { x: -(zoom.fx - o.x) * (zoom.scale - 1), y: -(zoom.fy - o.y) * (zoom.scale - 1) };
+    }
+    function toStreet(x, y) {
+      const o = rowOrigin();
+      const t = shift();
+      return { x: o.x + (x - o.x - t.x) / zoom.scale, y: o.y + (y - o.y - t.y) / zoom.scale };
+    }
+    function toScreen(x, y) {
+      const o = rowOrigin();
+      const t = shift();
+      return { x: o.x + t.x + zoom.scale * (x - o.x), y: o.y + t.y + zoom.scale * (y - o.y) };
+    }
+
+    // Remember where each window's center is, and where each building's corner
+    // is, on the street
     function measure() {
-      const box = facade.getBoundingClientRect();
-      windows.forEach((w) => {
+      const box = skyline.getBoundingClientRect();
+      allWindows.forEach((w) => {
         const r = w.el.getBoundingClientRect();
-        w.x = r.left - box.left + r.width / 2;
-        w.y = r.top - box.top + r.height / 2;
+        const p = toStreet(r.left - box.left + r.width / 2, r.top - box.top + r.height / 2);
+        w.x = p.x;
+        w.y = p.y;
       });
+      facades.forEach((f) => {
+        const r = f.el.getBoundingClientRect();
+        const p = toStreet(r.left - box.left, r.top - box.top);
+        f.x = p.x;
+        f.y = p.y;
+      });
+      // Line the switch and count up exactly under 15 West (the buildings
+      // either side aren't quite the same width, so it sits a little off
+      // the middle). On phones they span the whole screen instead.
+      const controls = root.querySelector('.skyline-controls');
+      if (window.matchMedia('(min-width: 701px)').matches) {
+        const main = facades.find((f) => f.el === facade);
+        const mainCenter = main.x + facade.offsetWidth / 2;
+        controls.style.translate = `${mainCenter - skyline.clientWidth / 2}px 0`;
+      } else {
+        controls.style.translate = '';
+      }
     }
     measure();
     window.addEventListener('resize', measure);
@@ -282,6 +384,7 @@
       setTimeout(() => {
         root.classList.add('is-built');
         built = true;
+        measure(); // in case the layout shifted while it drew in
       }, OUTLINE_MS + lastWindow + 300);
     }
     function checkInView() {
@@ -291,70 +394,229 @@
     window.addEventListener('scroll', checkInView, { passive: true });
     checkInView();
 
-    // The flashlight: windows close to (x, y) light up, fading out toward the edge
+    // The flashlight: windows on any building close to (x, y) light up, fading
+    // out toward the edge. (x, y) is a street position (see "Zooming in").
     function shine(x, y) {
-      facade.classList.add('is-shining');
-      facade.style.setProperty('--x', x + 'px');
-      facade.style.setProperty('--y', y + 'px');
-      windows.forEach((w) => {
+      skyline.classList.add('is-shining');
+      // The cursor ring isn't zoomed, so it goes where the spot shows on screen
+      const ring = toScreen(x, y);
+      skyline.style.setProperty('--x', ring.x + 'px');
+      skyline.style.setProperty('--y', ring.y + 'px');
+      // Each building's pool of light is placed from its own corner
+      facades.forEach((f) => {
+        f.el.style.setProperty('--x', x - f.x + 'px');
+        f.el.style.setProperty('--y', y - f.y + 'px');
+      });
+      allWindows.forEach((w) => {
         const t = Math.max(0, 1 - Math.hypot(w.x - x, w.y - y) / LIGHT_RADIUS);
-        w.light = t * t * (3 - 2 * t); // soft edge
-        w.el.style.setProperty('--light', w.light.toFixed(2));
+        const light = t * t * (3 - 2 * t); // soft edge
+        if (light === 0 && w.light === 0) return; // far away and already dark: skip it
+        w.light = light;
+        w.el.style.setProperty('--light', light.toFixed(2));
       });
     }
     function darken() {
-      facade.classList.remove('is-shining');
-      windows.forEach((w) => {
+      skyline.classList.remove('is-shining');
+      allWindows.forEach((w) => {
+        if (w.light === 0) return;
         w.light = 0;
         w.el.style.setProperty('--light', 0);
       });
     }
     function pointIn(e) {
-      const box = facade.getBoundingClientRect();
+      const box = skyline.getBoundingClientRect();
       return { x: e.clientX - box.left, y: e.clientY - box.top };
     }
 
-    // Mouse: the light follows the cursor. The story window under (or right
-    // next to) the cursor is remembered, and the cursor ring shows it.
+    // Mouse: the light follows the cursor anywhere over the buildings. The
+    // 15 West story window under (or right next to) the cursor is remembered,
+    // and the cursor ring shows it.
     let frame = null;
     let storyUnderCursor = null;
-    facade.addEventListener('pointermove', (e) => {
+    let pointer = null; // where the mouse is in the street's frame, while it's over the buildings
+    function follow(p) {
+      const s = toStreet(p.x, p.y);
+      shine(s.x, s.y);
+      storyUnderCursor = isDark() ? null : nearestStory(s.x, s.y, MOUSE_SLOP);
+      skyline.classList.toggle('is-on-story', !!storyUnderCursor);
+    }
+    skylineRow.addEventListener('pointermove', (e) => {
       if (!built || e.pointerType === 'touch') return;
-      const p = pointIn(e);
+      pointer = pointIn(e);
       cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        shine(p.x, p.y);
-        storyUnderCursor = isDark() ? null : nearestStory(p.x, p.y, MOUSE_SLOP);
-        facade.classList.toggle('is-on-story', !!storyUnderCursor);
-      });
+      frame = requestAnimationFrame(() => follow(pointer));
     });
-    facade.addEventListener('pointerleave', (e) => {
+    skylineRow.addEventListener('pointerleave', (e) => {
       if (e.pointerType === 'touch') return;
+      pointer = null;
+      cancelAnimationFrame(frame);
       darken();
       storyUnderCursor = null;
-      facade.classList.remove('is-on-story');
+      skyline.classList.remove('is-on-story');
     });
+
+    // Point the zoom at a spot in the street's frame
+    function lookAt(p) {
+      zoom.focusX = p.x;
+      zoom.focusY = p.y;
+      if (zoom.scale === 1 && zoom.target === 1) {
+        // Not zoomed: nothing moves, so just remember the spot
+        zoom.fx = p.x;
+        zoom.fy = p.y;
+        return;
+      }
+      startZooming();
+    }
+    // Glide the zoom a little toward its target every frame until it gets there
+    function startZooming() {
+      if (zoom.moving) return;
+      zoom.moving = true;
+      requestAnimationFrame(stepZoom);
+    }
+    function stepZoom() {
+      // Share of the remaining distance covered each frame: zooming in and out
+      // both take about 0.2 seconds, for the button and the trackpad alike
+      const ease = reduceMotion ? 1 : 0.3;
+      const fx = zoom.focusX ?? zoom.fx;
+      const fy = zoom.focusY ?? zoom.fy;
+      zoom.scale += (zoom.target - zoom.scale) * ease;
+      zoom.fx += (fx - zoom.fx) * ease;
+      zoom.fy += (fy - zoom.fy) * ease;
+      const done = Math.abs(zoom.target - zoom.scale) < 0.002 &&
+        Math.abs(fx - zoom.fx) < 0.5 && Math.abs(fy - zoom.fy) < 0.5;
+      if (done) {
+        zoom.scale = zoom.target;
+        zoom.fx = fx;
+        zoom.fy = fy;
+      }
+      applyZoom();
+      zoom.moving = !done;
+      if (!done) requestAnimationFrame(stepZoom);
+    }
+    function applyZoom() {
+      const t = shift();
+      skylineRow.style.transform = zoom.scale === 1 ? '' :
+        `translate(${t.x}px, ${t.y}px) scale(${zoom.scale})`;
+      skyline.classList.toggle('is-scaled', zoom.scale !== 1);
+      if (pointer) follow(pointer); // keep the light on whatever is under the cursor
+    }
+
+    // Dragging while zoomed in (press and move the mouse, or swipe a finger)
+    // slides the view, like moving a photo around
+    let drag = null;
+    let dragged = false; // true right after a drag, so letting go doesn't open a story
+    skylineRow.addEventListener('pointerdown', (e) => {
+      dragged = false;
+      if (!built || zoom.target <= 1.01) return;
+      drag = { x: e.clientX, y: e.clientY, distance: 0 };
+      skylineRow.setPointerCapture(e.pointerId);
+    });
+    skylineRow.addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      const dx = e.clientX - drag.x;
+      const dy = e.clientY - drag.y;
+      drag.x = e.clientX;
+      drag.y = e.clientY;
+      drag.distance += Math.abs(dx) + Math.abs(dy);
+      if (drag.distance > 6) {
+        dragged = true;
+        skyline.classList.add('is-dragging');
+        slideBy(dx, dy);
+      }
+    });
+    function endDrag() {
+      drag = null;
+      skyline.classList.remove('is-dragging');
+    }
+    skylineRow.addEventListener('pointerup', endDrag);
+    skylineRow.addEventListener('pointercancel', endDrag);
+
+    // Move the view by (dx, dy) pixels, without sliding past the street's edges
+    function slideBy(dx, dy) {
+      if (zoom.scale <= 1) return;
+      const o = rowOrigin();
+      const fx = Math.min(o.x + skylineRow.offsetWidth, Math.max(o.x, zoom.fx - dx / (zoom.scale - 1)));
+      const fy = Math.min(o.y + skylineRow.offsetHeight, Math.max(o.y, zoom.fy - dy / (zoom.scale - 1)));
+      zoom.fx = zoom.focusX = fx;
+      zoom.fy = zoom.focusY = fy;
+      applyZoom();
+    }
+    function zoomTo(target) {
+      zoom.target = target;
+      const zoomed = target > 1.01;
+      skyline.classList.toggle('is-zoomed', zoomed);
+      zoomButton.setAttribute('aria-pressed', zoomed);
+      zoomButton.setAttribute('aria-label', zoomed ? 'Zoom back out' : 'Zoom in on the street');
+      startZooming();
+    }
+
+    // The magnifier button: one click zooms in toward the middle of the
+    // street (then the view follows the cursor), another click zooms back out
+    const zoomButton = root.querySelector('.skyline-zoom');
+    zoomButton.addEventListener('click', () => {
+      if (zoom.target > 1.01) return zoomTo(1);
+      lookAt({ x: skyline.clientWidth / 2, y: skylineRow.offsetHeight * 0.55 });
+      zoomTo(ZOOM_IN);
+    });
+
+    // Trackpad: pinching two fingers apart zooms in where the fingers are,
+    // step by step. Pinching them together zooms all the way back out in one
+    // go, so one small pinch is enough. While zoomed in, a plain two-finger swipe slides the view (no need
+    // to press). Once the view reaches the street's top or bottom edge, a
+    // swipe up or down scrolls the page again, so nobody gets stuck.
+    let pinchOutAt = 0; // when the last pinch zoomed back out
+    skylineRow.addEventListener('wheel', (e) => {
+      if (!built) return;
+      if (!e.ctrlKey) {
+        if (zoom.target <= 1.01 || zoom.scale <= 1) return; // not zoomed: scroll the page as usual
+        const before = { x: zoom.fx, y: zoom.fy };
+        slideBy(-e.deltaX, -e.deltaY);
+        if (zoom.fx !== before.x || zoom.fy !== before.y) e.preventDefault();
+        return;
+      }
+      e.preventDefault();
+      // Pinching in: straight back to normal, as quickly as the magnifier
+      // button. (A trackpad sends tiny amounts, so any amount counts.)
+      if (e.deltaY > 0) {
+        if (zoom.target > 1) {
+          zoomTo(1);
+          pinchOutAt = performance.now();
+        }
+        return;
+      }
+      // Ignore the last flutters of that pinch, so it doesn't zoom back in
+      if (performance.now() - pinchOutAt < 500) return;
+      const p = pointIn(e);
+      lookAt(p);
+      // 0.03 = how strongly the fingers zoom: a short pinch is enough to get close
+      const target = Math.min(MAX_ZOOM, Math.max(1, zoom.target * Math.exp(-e.deltaY * 0.03)));
+      zoomTo(target < 1.02 ? 1 : target);
+    }, { passive: false });
 
     // The 15 West lights switch. It starts on. Off, 15 West goes dark, the glow
     // over the street fades, and the count shows how few windows are left lit.
     const lightsSwitch = root.querySelector('.windows-switch input');
-    const switchWord = root.querySelector('.windows-switch strong');
     const count = root.querySelector('.skyline-count');
     const mainLabelCount = facade.querySelector('.facade-label-count');
     function isDark() {
       return root.classList.contains('is-dark');
     }
+    let switchingOff = null;
     function updateSwitch() {
       const on = lightsSwitch.checked;
+      // Switching off: the windows go out in a quick ripple (windows.css,
+      // 0.3 seconds); after that the flashlight reacts as usual again
+      clearTimeout(switchingOff);
+      root.classList.toggle('is-switching-off', !on);
+      if (!on) switchingOff = setTimeout(() => root.classList.remove('is-switching-off'), 400);
       root.classList.toggle('is-dark', !on);
-      switchWord.textContent = on ? 'on' : 'off';
       count.innerHTML = on
         ? `<strong>${litCount + neighborsLit}</strong> windows lit on the block &middot; ${FACADE.label}`
         : `<strong>${neighborsLit}</strong> windows lit without 15 West`;
       mainLabelCount.textContent = on ? `${litCount} of ${allKeys.length} lit` : 'lights off';
       if (!on) {
         storyUnderCursor = null;
-        facade.classList.remove('is-on-story');
+        skyline.classList.remove('is-on-story');
       }
     }
     lightsSwitch.addEventListener('change', updateSwitch);
@@ -364,16 +626,23 @@
     // window that was already lit up by the flashlight, so the reveal comes first.
     let lastPointer = null;
     let tapTarget = null;
-    facade.addEventListener('pointerdown', (e) => {
+    skylineRow.addEventListener('pointerdown', (e) => {
       lastPointer = e.pointerType;
       if (!built || e.pointerType !== 'touch') return;
-      const p = pointIn(e);
+      const tap = pointIn(e);
+      const p = toStreet(tap.x, tap.y);
       const near = isDark() ? null : nearestStory(p.x, p.y, TOUCH_SLOP);
       tapTarget = near && near.light > 0.3 ? near : null;
       shine(p.x, p.y);
     });
-    facade.addEventListener('click', (e) => {
+    skylineRow.addEventListener('click', (e) => {
       if (!built || isDark()) return; // no stories while 15 West's lights are off
+      if (dragged) { // that was the end of a drag, not a click
+        dragged = false;
+        lastPointer = null;
+        tapTarget = null;
+        return;
+      }
       let w;
       if (lastPointer === 'touch') {
         w = tapTarget;
