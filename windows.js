@@ -38,8 +38,7 @@
     ],
   };
   const LIGHT_RADIUS = 110; // size of the flashlight, in pixels (matches .facade-light in windows.css)
-  const ZOOM_IN = 2.25; // how far the magnifier button zooms in (2.25 = 225%)
-  const MAX_ZOOM = 2.5; // the most a trackpad pinch can zoom in
+  const HOVER_ZOOM = 2.8; // how close the street zooms in around the cursor (2.8 = 280%)
   const MOUSE_SLOP = 14; // how near the cursor has to be to a story window to open it, in pixels
   const OUTLINE_MS = 1600; // how long the outline takes to draw
   const WINDOW_STEP_MS = 7; // gap between one window appearing and the next
@@ -93,14 +92,6 @@
       <div class="skyline">
         <div class="skyline-glow" aria-hidden="true"></div>
         <div class="skyline-cursor" aria-hidden="true"></div>
-        <button type="button" class="skyline-zoom" aria-label="Zoom in on the street" aria-pressed="false">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="10" cy="10" r="6.5"/>
-            <path d="M15 15l6 6"/>
-            <path class="skyline-zoom-plus" d="M10 7v6"/>
-            <path d="M7 10h6"/>
-          </svg>
-        </button>
         <div class="skyline-row">
           <div class="facade facade--main" role="group" aria-label="15 West"
                style="--columns: ${FACADE.rooms}; width: ${MAIN_WIDTH}%">
@@ -439,9 +430,11 @@
       return { x: e.clientX - box.left, y: e.clientY - box.top };
     }
 
-    // Mouse: the light follows the cursor anywhere over the buildings. The
-    // 15 West story window under (or right next to) the cursor is remembered,
-    // and the cursor ring shows it.
+    // Mouse: the light follows the cursor anywhere over the buildings, and the
+    // street zooms in around it like a magnifying glass, so you can see right
+    // into the windows. Moving the cursor moves the view; leaving the street
+    // zooms back out. The 15 West story window under (or right next to) the
+    // cursor is remembered, and the cursor ring shows it.
     let frame = null;
     let storyUnderCursor = null;
     let pointer = null; // where the mouse is in the street's frame, while it's over the buildings
@@ -454,8 +447,12 @@
     skylineRow.addEventListener('pointermove', (e) => {
       if (!built || e.pointerType === 'touch') return;
       pointer = pointIn(e);
+      lookAt(pointer);
+      if (zoom.target !== HOVER_ZOOM) zoomTo(HOVER_ZOOM);
       cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => follow(pointer));
+      frame = requestAnimationFrame(() => {
+        if (pointer) follow(pointer); // the cursor may have left the street meanwhile
+      });
     });
     skylineRow.addEventListener('pointerleave', (e) => {
       if (e.pointerType === 'touch') return;
@@ -464,6 +461,7 @@
       darken();
       storyUnderCursor = null;
       skyline.classList.remove('is-on-story');
+      zoomTo(1);
     });
 
     // Point the zoom at a spot in the street's frame
@@ -556,53 +554,8 @@
       zoom.target = target;
       const zoomed = target > 1.01;
       skyline.classList.toggle('is-zoomed', zoomed);
-      zoomButton.setAttribute('aria-pressed', zoomed);
-      zoomButton.setAttribute('aria-label', zoomed ? 'Zoom back out' : 'Zoom in on the street');
       startZooming();
     }
-
-    // The magnifier button: one click zooms in toward the middle of the
-    // street (then the view follows the cursor), another click zooms back out
-    const zoomButton = root.querySelector('.skyline-zoom');
-    zoomButton.addEventListener('click', () => {
-      if (zoom.target > 1.01) return zoomTo(1);
-      lookAt({ x: skyline.clientWidth / 2, y: skylineRow.offsetHeight * 0.55 });
-      zoomTo(ZOOM_IN);
-    });
-
-    // Trackpad: pinching two fingers apart zooms in where the fingers are,
-    // step by step. Pinching them together zooms all the way back out in one
-    // go, so one small pinch is enough. While zoomed in, a plain two-finger swipe slides the view (no need
-    // to press). Once the view reaches the street's top or bottom edge, a
-    // swipe up or down scrolls the page again, so nobody gets stuck.
-    let pinchOutAt = 0; // when the last pinch zoomed back out
-    skylineRow.addEventListener('wheel', (e) => {
-      if (!built) return;
-      if (!e.ctrlKey) {
-        if (zoom.target <= 1.01 || zoom.scale <= 1) return; // not zoomed: scroll the page as usual
-        const before = { x: zoom.fx, y: zoom.fy };
-        slideBy(-e.deltaX, -e.deltaY);
-        if (zoom.fx !== before.x || zoom.fy !== before.y) e.preventDefault();
-        return;
-      }
-      e.preventDefault();
-      // Pinching in: straight back to normal, as quickly as the magnifier
-      // button. (A trackpad sends tiny amounts, so any amount counts.)
-      if (e.deltaY > 0) {
-        if (zoom.target > 1) {
-          zoomTo(1);
-          pinchOutAt = performance.now();
-        }
-        return;
-      }
-      // Ignore the last flutters of that pinch, so it doesn't zoom back in
-      if (performance.now() - pinchOutAt < 500) return;
-      const p = pointIn(e);
-      lookAt(p);
-      // 0.03 = how strongly the fingers zoom: a short pinch is enough to get close
-      const target = Math.min(MAX_ZOOM, Math.max(1, zoom.target * Math.exp(-e.deltaY * 0.03)));
-      zoomTo(target < 1.02 ? 1 : target);
-    }, { passive: false });
 
     // The 15 West lights switch. It starts on. Off, 15 West goes dark, the glow
     // over the street fades, and the count shows how few windows are left lit.
