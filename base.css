@@ -110,7 +110,12 @@
 
 html, body { margin: 0; padding: 0; }
 
+/* Light and buildings can spread past the screen edges without making the
+   page scroll sideways (or phones zoom out to fit them) */
+main { overflow-x: clip; }
+
 body {
+  overflow-x: clip;
   background: var(--color-night);
   color: var(--color-text);
   font-family: var(--font-body);

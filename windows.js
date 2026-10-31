@@ -112,6 +112,10 @@
             <div class="facade-grid"></div>
             <div class="facade-base"></div>
             <div class="facade-light" aria-hidden="true"></div>
+            <div class="facade-label" aria-hidden="true">
+              <span class="facade-label-name">15 West</span>
+              <span class="facade-label-count"></span>
+            </div>
           </div>
         </div>
       </div>
@@ -217,10 +221,24 @@
     const skylineRow = root.querySelector('.skyline-row');
     const neighborWindows = []; // every neighbor window, for the flashlight
     let neighborsLit = 0;
-    NEIGHBORS.left.forEach((b) => skylineRow.insertBefore(buildNeighbor(b), facade));
-    NEIGHBORS.right.forEach((b) => skylineRow.appendChild(buildNeighbor(b)));
+    NEIGHBORS.left.forEach((b, i) => skylineRow.insertBefore(buildNeighbor(b, i === 0 ? 'start' : ''), facade));
+    NEIGHBORS.right.forEach((b, i, all) =>
+      skylineRow.appendChild(buildNeighbor(b, i === all.length - 1 ? 'end' : '')));
 
-    function buildNeighbor(b) {
+    // Building names stay hidden until you hover over a building (or tap it on
+    // a phone). Only one name shows at a time.
+    skylineRow.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'touch') return;
+      const tapped = e.target.closest('.facade');
+      skylineRow.querySelectorAll('.facade.is-labeled').forEach((f) => {
+        if (f !== tapped) f.classList.remove('is-labeled');
+      });
+      if (tapped) tapped.classList.add('is-labeled');
+    });
+
+    // edge = 'start' or 'end' for the outermost buildings, so their name lines
+    // up with the screen edge instead of hanging off it
+    function buildNeighbor(b, edge) {
       const info = lights.buildings.find((x) => x.id === b.id);
       const when = b.when || FACADE;
       const obs = lights.observations.find((o) =>
@@ -248,7 +266,10 @@
         <div class="facade-grid"></div>
         <div class="facade-base"></div>
         <div class="facade-light" aria-hidden="true"></div>
-        <p class="facade-label" aria-hidden="true">${b.label}</p>`;
+        <div class="facade-label${edge ? ' facade-label--' + edge : ''}" aria-hidden="true">
+          <span class="facade-label-name">${b.label || info.name}</span>
+          <span class="facade-label-count">${litHere} of ${info.windows ? '' : '~'}${total} lit${b.when ? ' &middot; ' + b.when.label : ''}</span>
+        </div>`;
 
       // Which windows are lit: picked at random (seeded, so it's the same on
       // every visit) until the number matches the count in the data
@@ -576,6 +597,7 @@
     // over the street fades, and the count shows how few windows are left lit.
     const lightsSwitch = root.querySelector('.windows-switch input');
     const count = root.querySelector('.skyline-count');
+    const mainLabelCount = facade.querySelector('.facade-label-count');
     function isDark() {
       return root.classList.contains('is-dark');
     }
@@ -591,6 +613,7 @@
       count.innerHTML = on
         ? `<strong>${litCount + neighborsLit}</strong> windows lit on the block &middot; ${FACADE.label}`
         : `<strong>${neighborsLit}</strong> windows lit without 15 West`;
+      mainLabelCount.textContent = on ? `${litCount} of ${allKeys.length} lit` : 'lights off';
       if (!on) {
         storyUnderCursor = null;
         skyline.classList.remove('is-on-story');

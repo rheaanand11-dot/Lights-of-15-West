@@ -70,8 +70,64 @@
   display: flex;
   justify-content: center;
   width: 100%;
-  padding-bottom: 3em; /* room for the building names under the street */
+  padding-top: 4.5rem; /* room for building names above the tallest towers */
   overflow: hidden; /* on phones the outer buildings get cropped, never scrolled */
+}
+
+/* Building names: hidden until you hover over a building (or tap it on a
+   phone, which adds .is-labeled). Name in Helvetica, count in Degular Mono. */
+.facade-label {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, 6px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.facade-label--start {
+  left: 0;
+  align-items: flex-start;
+  transform: translate(0, 6px);
+}
+
+.facade-label--end {
+  left: auto;
+  right: 0;
+  align-items: flex-end;
+  transform: translate(0, 6px);
+}
+
+.facade-label-name {
+  font-size: var(--text-md);
+  color: var(--color-text);
+}
+
+.facade-label-count {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+
+#windows.is-built .facade:hover .facade-label,
+#windows.is-built .facade.is-labeled .facade-label {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+#windows.is-built .facade:hover .facade-label--start,
+#windows.is-built .facade.is-labeled .facade-label--start,
+#windows.is-built .facade:hover .facade-label--end,
+#windows.is-built .facade.is-labeled .facade-label--end {
+  transform: none;
 }
 
 /* windows.js scales this row up to zoom in; the street's frame crops it */
@@ -387,38 +443,6 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
 
 .facade--neighbor .window::before { display: none; } /* too small for window frames */
 
-/* Each neighbor's name, under the street like the poster's labels */
-.facade-label {
-  position: absolute;
-  top: calc(100% + var(--space-3));
-  left: 50%;
-  width: 100%; /* as wide as the building, so long names wrap onto two lines */
-  margin: 0;
-  transform: translateX(-50%);
-  font-family: var(--font-body);
-  /* Shrinks with the screen, so the names of the narrow buildings on the
-     right never run into each other */
-  font-size: clamp(0.44rem, 0.82vw, 0.85rem);
-  font-weight: 400;
-  line-height: 1.2;
-  color: var(--color-text);
-  text-align: center;
-  pointer-events: none;
-  transition: opacity 1.2s ease;
-}
-
-/* The last building sits at the screen's edge, so its name lines up with its
-   right side instead of spilling off the edge */
-.facade:last-child .facade-label {
-  left: auto;
-  right: 0;
-  width: min-content; /* one word per line */
-  transform: none;
-  text-align: right;
-}
-
-#windows:not(.is-built) .facade-label { opacity: 0; }
-
 .facade--neighbor .window.is-lit::after {
   filter: brightness(0.9) saturate(0.9);
   box-shadow: 0 0 6px 1px var(--glow, var(--color-window-glow));
@@ -483,10 +507,10 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   align-items: center;
   gap: var(--space-2);
   width: var(--main-width, 50%);
-  /* Pull up into the names row under the street (the street leaves 3em for
-     names, they start one --space-3 below the ground, and #windows puts a
-     --space-4 gap between the street and this) */
-  margin-top: calc(var(--space-3) - 3em - var(--space-4));
+  /* Sits just under 15 West. (The building names now show above each
+     building on hover, so there is no names row under the street to pull
+     up into.) #windows puts a --space-4 gap between the street and this. */
+  margin-top: calc(var(--space-3) - var(--space-4));
   text-align: center;
   transition: opacity 1.2s ease;
 }

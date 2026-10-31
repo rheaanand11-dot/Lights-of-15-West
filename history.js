@@ -36,7 +36,11 @@
   // shown; scrolling fades it out and brings in the next one.
   root.innerHTML = `
     <div class="history-step history-step--intro">
-      <h1 class="history-title">${titleWithFlicker(HISTORY.title)}</h1>
+      <div class="history-ray" aria-hidden="true"></div>
+      <div class="history-title-wrap">
+        <div class="history-glow" aria-hidden="true"></div>
+        <h1 class="history-title">${titleWithFlicker(HISTORY.title)}</h1>
+      </div>
       <p class="history-lede">
         ${HISTORY.lede.map((line, i) => `<span style="--i: ${i}">${line}</span>`).join('')}
       </p>
@@ -82,11 +86,38 @@
 
   drawBlocks(root.querySelector('.blocks'));
   followScroll(root.querySelectorAll('.history-step'));
+  aimRay();
+
+  // The opening ray of light comes from just past the top-right corner of the
+  // screen and lands on the title. Work out the angle from that corner to the
+  // title, so the ray hits it on any screen size.
+  function aimRay() {
+    const ray = root.querySelector('.history-ray');
+    const title = root.querySelector('.history-title');
+    function aim() {
+      const box = ray.getBoundingClientRect();
+      const t = title.getBoundingClientRect();
+      const sourceX = box.width * 1.04;
+      const sourceY = -box.height * 0.06;
+      const targetX = t.left - box.left + t.width / 2;
+      const targetY = t.top - box.top + t.height / 2;
+      // Angle the way CSS measures it: 0deg points up, turning clockwise
+      const angle = (Math.atan2(targetX - sourceX, -(targetY - sourceY)) * 180) / Math.PI;
+      ray.style.setProperty('--ray-angle', ((angle + 360) % 360).toFixed(1) + 'deg');
+      ray.style.setProperty('--spot-x', ((targetX / box.width) * 100).toFixed(1) + '%');
+      ray.style.setProperty('--spot-y', ((targetY / box.height) * 100).toFixed(1) + '%');
+    }
+    aim();
+    window.addEventListener('resize', aim);
+  }
 
   // The title's last word ("falls") flickers like a light switching on: once
   // the page has loaded and its fonts are in (so you see it happen, not a
   // half-drawn page), and again whenever the title comes back into view.
+  // The first time, it waits for the opening ray of light to reach the title
+  // (about 3 seconds, see "The opening, in order" in history.css).
   // The flicker itself is in history.css.
+  const RAY_ARRIVES_MS = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 3000;
   const flicker = root.querySelector('.history-title-flicker');
   const intro = root.querySelector('.history-step--intro');
   function flickerOn() {
@@ -99,7 +130,8 @@
     if (document.readyState === 'complete') done();
     else window.addEventListener('load', done);
   });
-  Promise.all([fontsReady, pageLoaded]).then(() => {
+  const rayArrived = new Promise((done) => setTimeout(done, RAY_ARRIVES_MS));
+  Promise.all([fontsReady, pageLoaded, rayArrived]).then(() => {
     if (intro.classList.contains('is-visible')) flickerOn();
     // From then on, flicker each time the title scrolls back into view
     new MutationObserver(() => {
