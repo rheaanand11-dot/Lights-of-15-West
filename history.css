@@ -50,20 +50,29 @@
 /* ---------- Intro ---------- */
 
 .history-step--intro {
-  overflow-x: clip; /* the light can spread wide without making the page scroll sideways */
+  position: relative;
   align-items: flex-start;
   min-height: 100vh;
   min-height: 100svh; /* the title still gets the whole first screen */
 }
 
-/* The title and the beam of light that falls onto it */
-.history-title-wrap {
+/* The text sits above the ray of light */
+.history-title-wrap,
+.history-lede,
+.history-scroll-hint {
   position: relative;
 }
 
-.history-beam,
+.history-ray,
 .history-glow {
   display: none; /* only shown when the opening animation plays (below) */
+}
+
+/* How far the light has spread from its corner (animated in the opening) */
+@property --reach {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
 }
 
 .history-title {
@@ -263,98 +272,121 @@
 
   /* ----- The opening, in order -----
      0.0s  just black
-     1.2s  a light slowly warms up above the title, with a little flutter,
-           like a real lamp coming on
-     1.8s  its light falls across the letters, top to bottom, and lights them
-     3.4s  the subtitle lines appear, one at a time
-     6.6s  "Scroll" appears
+     1.0s  a ray of light comes in from the top-right corner of the screen,
+           soft and glowing, blending into the dark, and spreads toward the title
+     2.6s  where the light lands, the title appears and starts to glow
+     4.2s  the subtitle lines appear, one at a time
+     7.4s  "Scroll" appears
      It plays once, when the page opens. */
   .history-step--intro > * {
     transition-duration: 0.25s;
   }
 
-  /* The beam: a soft cone of warm light from a source above the screen.
-     Its shape comes from two masks laid over each other (a cone that fades
-     at its edges, and a fade from top to bottom), so it has no hard edges. */
-  .history-beam {
+  /* The ray covers the whole first screen, edge to edge, so it never shows a
+     box. Its direction (--ray-angle) and the spot where it lands (--spot-x,
+     --spot-y) are worked out in history.js so it always hits the title. */
+  .history-ray {
     display: block;
     position: absolute;
-    left: -10%;
-    right: -10%;
-    bottom: -14%;
-    height: 100vh;
-    height: 100svh;
+    top: 0;
+    bottom: 0;
+    left: calc(50% - 50vw);
+    width: 100vw;
     pointer-events: none;
+    /* The light spreads out from the corner as --reach grows, and fades out
+       softly toward the bottom of the screen */
     -webkit-mask-image:
-      conic-gradient(from 150deg at 50% -12%, transparent 0deg, #000 16deg, #000 44deg, transparent 60deg),
-      linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.4) 35%, #000 85%, rgba(0, 0, 0, 0.7) 100%);
+      radial-gradient(circle at 104% -6%, #000 var(--reach), transparent calc(var(--reach) + 25%)),
+      linear-gradient(to bottom, #000 55%, transparent 95%);
     -webkit-mask-composite: source-in;
     mask-image:
-      conic-gradient(from 150deg at 50% -12%, transparent 0deg, #000 16deg, #000 44deg, transparent 60deg),
-      linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.4) 35%, #000 85%, rgba(0, 0, 0, 0.7) 100%);
+      radial-gradient(circle at 104% -6%, #000 var(--reach), transparent calc(var(--reach) + 25%)),
+      linear-gradient(to bottom, #000 55%, transparent 95%);
     mask-composite: intersect;
+    overflow: hidden; /* keeps the blurred light inside the screen */
     opacity: 0;
-    animation: light-warms-up 2.6s ease-out 1.2s both;
+    animation: ray-comes-in 2.8s cubic-bezier(0.3, 0.1, 0.3, 1) 1s both;
   }
 
-  /* The light itself: warm white, a little brighter where it lands */
-  .history-beam::before,
-  .history-beam::after {
+  /* The light: a soft wedge of warm white-yellow from the corner, brightest
+     where it lands, with blurred edges so it melts into the dark */
+  .history-ray::before {
+    content: "";
+    position: absolute;
+    inset: -40px;
+    background:
+      radial-gradient(ellipse 34% 26% at var(--spot-x, 40%) var(--spot-y, 40%),
+        rgba(255, 246, 214, 0.2), rgba(255, 246, 214, 0.06) 55%, transparent 80%),
+      conic-gradient(from calc(var(--ray-angle, 245deg) - 18deg) at 104% -6%,
+        transparent 0deg,
+        rgba(255, 247, 218, 0.05) 7deg,
+        rgba(255, 247, 218, 0.15) 15deg,
+        rgba(255, 247, 218, 0.18) 18deg,
+        rgba(255, 247, 218, 0.15) 21deg,
+        rgba(255, 247, 218, 0.05) 29deg,
+        transparent 36deg);
+    filter: blur(18px);
+  }
+
+  /* A little grain in the light, like dust floating in it */
+  .history-ray::after {
     content: "";
     position: absolute;
     inset: 0;
-  }
-
-  .history-beam::before {
-    background: linear-gradient(to bottom, rgba(255, 242, 212, 0.08), rgba(255, 238, 200, 0.2));
-  }
-
-  /* A little grain in the light, like dust in the air */
-  .history-beam::after {
     background-image: var(--grain);
     mix-blend-mode: screen;
-    opacity: 0.1;
+    opacity: 0.09;
+    -webkit-mask-image: conic-gradient(from calc(var(--ray-angle, 245deg) - 18deg) at 104% -6%,
+      transparent 0deg, #000 12deg, #000 24deg, transparent 36deg);
+    mask-image: conic-gradient(from calc(var(--ray-angle, 245deg) - 18deg) at 104% -6%,
+      transparent 0deg, #000 12deg, #000 24deg, transparent 36deg);
   }
 
-  /* The soft pool of light around the title where the beam lands */
+  /* Light coming in: a faint flutter as it starts, then it spreads and steadies */
+  @keyframes ray-comes-in {
+    0% { --reach: 0%; opacity: 0; }
+    10% { opacity: 0.5; }
+    16% { opacity: 0.25; }
+    28% { opacity: 0.8; }
+    100% { --reach: 150%; opacity: 1; }
+  }
+
+  /* The soft pool of light around the title where the ray lands */
   .history-glow {
     display: block;
     position: absolute;
     inset: -45% -20% -70%;
     pointer-events: none;
     background: radial-gradient(ellipse 50% 45% at 50% 50%,
-      rgba(255, 236, 190, 0.11) 0%, rgba(255, 236, 190, 0.04) 45%, transparent 72%);
+      rgba(255, 240, 200, 0.1) 0%, rgba(255, 240, 200, 0.035) 45%, transparent 72%);
     opacity: 0;
-    animation: light-warms-up 2.6s ease-out 1.2s both;
+    animation: glow-appears 1.6s ease-out 2.4s both;
   }
 
-  /* A lamp coming on: a faint flicker, then it settles and steadies */
-  @keyframes light-warms-up {
-    0% { opacity: 0; }
-    12% { opacity: 0.25; }
-    18% { opacity: 0.1; }
-    30% { opacity: 0.55; }
-    36% { opacity: 0.4; }
-    60% { opacity: 0.9; }
-    100% { opacity: 0.75; }
+  @keyframes glow-appears {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
-  /* The letters start dark and the light passes down over them, with a soft
-     edge, then they give off a gentle glow */
+  /* The title can't be seen in the dark. Where the light lands, it appears,
+     lit from the top-right where the light comes from, then gives off a
+     gentle glow. */
   .history-title {
-    background: linear-gradient(to bottom, var(--color-lime) 0 32%, #1b1c10 68% 100%);
-    background-size: 100% 300%;
+    background: linear-gradient(225deg, var(--color-lime) 0 30%, rgba(220, 236, 0, 0) 60% 100%);
+    background-size: 300% 300%;
+    /* Starts on the unlit (bottom-left) end of the gradient, then slides to
+       the lit (top-right) end, so the light sweeps in from the top right */
     background-position: 0 100%;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
     filter: drop-shadow(0 0 0 rgba(220, 236, 0, 0));
-    animation: light-falls 1.6s ease-in-out 1.8s both;
+    animation: light-falls 1.8s ease-in-out 2.6s both;
   }
 
   @keyframes light-falls {
     to {
-      background-position: 0 0;
+      background-position: 100% 0;
       filter: drop-shadow(0 0 22px rgba(220, 236, 0, 0.22));
     }
   }
@@ -364,7 +396,7 @@
     opacity: 0;
     transform: translateY(8px);
     animation: line-appears 0.7s ease both; /* "both": stays hidden until its turn */
-    animation-delay: calc(3.4s + var(--i) * 0.6s);
+    animation-delay: calc(4.2s + var(--i) * 0.6s);
   }
 
   @keyframes line-appears {
@@ -374,7 +406,7 @@
 
   .history-scroll-hint {
     opacity: 0;
-    animation: line-appears 0.7s ease 6.6s both;
+    animation: line-appears 0.7s ease 7.4s both;
   }
 
   .office {

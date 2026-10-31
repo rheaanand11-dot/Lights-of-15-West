@@ -36,9 +36,9 @@
   // shown; scrolling fades it out and brings in the next one.
   root.innerHTML = `
     <div class="history-step history-step--intro">
+      <div class="history-ray" aria-hidden="true"></div>
       <div class="history-title-wrap">
         <div class="history-glow" aria-hidden="true"></div>
-        <div class="history-beam" aria-hidden="true"></div>
         <h1 class="history-title">${HISTORY.title}</h1>
       </div>
       <p class="history-lede">
@@ -86,6 +86,30 @@
 
   drawBlocks(root.querySelector('.blocks'));
   followScroll(root.querySelectorAll('.history-step'));
+  aimRay();
+
+  // The opening ray of light comes from just past the top-right corner of the
+  // screen and lands on the title. Work out the angle from that corner to the
+  // title, so the ray hits it on any screen size.
+  function aimRay() {
+    const ray = root.querySelector('.history-ray');
+    const title = root.querySelector('.history-title');
+    function aim() {
+      const box = ray.getBoundingClientRect();
+      const t = title.getBoundingClientRect();
+      const sourceX = box.width * 1.04;
+      const sourceY = -box.height * 0.06;
+      const targetX = t.left - box.left + t.width / 2;
+      const targetY = t.top - box.top + t.height / 2;
+      // Angle the way CSS measures it: 0deg points up, turning clockwise
+      const angle = (Math.atan2(targetX - sourceX, -(targetY - sourceY)) * 180) / Math.PI;
+      ray.style.setProperty('--ray-angle', ((angle + 360) % 360).toFixed(1) + 'deg');
+      ray.style.setProperty('--spot-x', ((targetX / box.width) * 100).toFixed(1) + '%');
+      ray.style.setProperty('--spot-y', ((targetY / box.height) * 100).toFixed(1) + '%');
+    }
+    aim();
+    window.addEventListener('resize', aim);
+  }
 
   // Lit (orange) blocks above, lines dropping to dark (purple) blocks below.
   // Positions are [column, row] on a 10-unit grid, traced from the poster.
