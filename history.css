@@ -50,6 +50,7 @@
 /* ---------- Intro ---------- */
 
 .history-step--intro {
+  overflow-x: clip; /* the light can spread wide without making the page scroll sideways */
   align-items: flex-start;
   min-height: 100vh;
   min-height: 100svh; /* the title still gets the whole first screen */
@@ -60,7 +61,8 @@
   position: relative;
 }
 
-.history-beam {
+.history-beam,
+.history-glow {
   display: none; /* only shown when the opening animation plays (below) */
 }
 
@@ -260,56 +262,101 @@
   }
 
   /* ----- The opening, in order -----
-     0.0s  all black
-     0.5s  a beam of light drops from the top of the screen onto the title
-     1.2s  the light falls across the letters, top to bottom, and lights them
-     2.4s  the subtitle lines appear, one at a time
-     5.4s  "Scroll" appears
+     0.0s  just black
+     1.2s  a light slowly warms up above the title, with a little flutter,
+           like a real lamp coming on
+     1.8s  its light falls across the letters, top to bottom, and lights them
+     3.4s  the subtitle lines appear, one at a time
+     6.6s  "Scroll" appears
      It plays once, when the page opens. */
   .history-step--intro > * {
     transition-duration: 0.25s;
   }
 
+  /* The beam: a soft cone of warm light from a source above the screen.
+     Its shape comes from two masks laid over each other (a cone that fades
+     at its edges, and a fade from top to bottom), so it has no hard edges. */
   .history-beam {
     display: block;
     position: absolute;
-    left: -6%;
-    right: -6%;
-    bottom: -12%;
+    left: -10%;
+    right: -10%;
+    bottom: -14%;
     height: 100vh;
     height: 100svh;
     pointer-events: none;
-    /* A cone of light: narrow at the top, wide where it lands on the title */
-    clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%);
-    background: linear-gradient(to bottom,
-      rgba(240, 255, 140, 0) 0%,
-      rgba(240, 255, 140, 0.06) 55%,
-      rgba(240, 255, 140, 0.2) 100%);
-    transform-origin: top;
-    transform: scaleY(0);
+    -webkit-mask-image:
+      conic-gradient(from 150deg at 50% -12%, transparent 0deg, #000 16deg, #000 44deg, transparent 60deg),
+      linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.4) 35%, #000 85%, rgba(0, 0, 0, 0.7) 100%);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      conic-gradient(from 150deg at 50% -12%, transparent 0deg, #000 16deg, #000 44deg, transparent 60deg),
+      linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.4) 35%, #000 85%, rgba(0, 0, 0, 0.7) 100%);
+    mask-composite: intersect;
     opacity: 0;
-    animation: beam-falls 2.6s ease-out 0.5s forwards;
+    animation: light-warms-up 2.6s ease-out 1.2s both;
   }
 
-  @keyframes beam-falls {
-    0% { transform: scaleY(0); opacity: 0; }
-    30% { transform: scaleY(1); opacity: 1; }
-    100% { transform: scaleY(1); opacity: 0.35; } /* settles into a soft spotlight */
+  /* The light itself: warm white, a little brighter where it lands */
+  .history-beam::before,
+  .history-beam::after {
+    content: "";
+    position: absolute;
+    inset: 0;
   }
 
-  /* The letters start dark and the light passes down over them */
+  .history-beam::before {
+    background: linear-gradient(to bottom, rgba(255, 242, 212, 0.08), rgba(255, 238, 200, 0.2));
+  }
+
+  /* A little grain in the light, like dust in the air */
+  .history-beam::after {
+    background-image: var(--grain);
+    mix-blend-mode: screen;
+    opacity: 0.1;
+  }
+
+  /* The soft pool of light around the title where the beam lands */
+  .history-glow {
+    display: block;
+    position: absolute;
+    inset: -45% -20% -70%;
+    pointer-events: none;
+    background: radial-gradient(ellipse 50% 45% at 50% 50%,
+      rgba(255, 236, 190, 0.11) 0%, rgba(255, 236, 190, 0.04) 45%, transparent 72%);
+    opacity: 0;
+    animation: light-warms-up 2.6s ease-out 1.2s both;
+  }
+
+  /* A lamp coming on: a faint flicker, then it settles and steadies */
+  @keyframes light-warms-up {
+    0% { opacity: 0; }
+    12% { opacity: 0.25; }
+    18% { opacity: 0.1; }
+    30% { opacity: 0.55; }
+    36% { opacity: 0.4; }
+    60% { opacity: 0.9; }
+    100% { opacity: 0.75; }
+  }
+
+  /* The letters start dark and the light passes down over them, with a soft
+     edge, then they give off a gentle glow */
   .history-title {
-    background: linear-gradient(to bottom, var(--color-lime) 0 40%, #1b1c10 60% 100%);
-    background-size: 100% 250%;
+    background: linear-gradient(to bottom, var(--color-lime) 0 32%, #1b1c10 68% 100%);
+    background-size: 100% 300%;
     background-position: 0 100%;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    animation: light-falls 1.2s ease-in-out 1.2s forwards;
+    filter: drop-shadow(0 0 0 rgba(220, 236, 0, 0));
+    animation: light-falls 1.6s ease-in-out 1.8s both;
   }
 
   @keyframes light-falls {
-    to { background-position: 0 0; }
+    to {
+      background-position: 0 0;
+      filter: drop-shadow(0 0 22px rgba(220, 236, 0, 0.22));
+    }
   }
 
   /* Subtitle lines, one at a time */
@@ -317,7 +364,7 @@
     opacity: 0;
     transform: translateY(8px);
     animation: line-appears 0.7s ease both; /* "both": stays hidden until its turn */
-    animation-delay: calc(2.4s + var(--i) * 0.6s);
+    animation-delay: calc(3.4s + var(--i) * 0.6s);
   }
 
   @keyframes line-appears {
@@ -327,7 +374,7 @@
 
   .history-scroll-hint {
     opacity: 0;
-    animation: line-appears 0.7s ease 5.4s both;
+    animation: line-appears 0.7s ease 6.6s both;
   }
 
   .office {

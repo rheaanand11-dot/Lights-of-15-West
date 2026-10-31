@@ -37,6 +37,7 @@
   root.innerHTML = `
     <div class="history-step history-step--intro">
       <div class="history-title-wrap">
+        <div class="history-glow" aria-hidden="true"></div>
         <div class="history-beam" aria-hidden="true"></div>
         <h1 class="history-title">${HISTORY.title}</h1>
       </div>
