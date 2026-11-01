@@ -13,7 +13,7 @@
   padding: var(--space-3) var(--gutter) var(--space-5);
 }
 
-/* "Lit Windows by Building..." heading, Helvetica Bold in chartreuse */
+/* "Lit Windows by Building..." heading, Neue Haas Grotesque Bold in chartreuse */
 .windows-heading {
   max-width: 22ch;
   margin: 0 0 var(--space-4);
@@ -41,7 +41,7 @@
   }
 }
 
-/* Sub-heading under the heading: Helvetica Light Oblique, as in the
+/* Sub-heading under the heading: Neue Haas Grotesque Light Italic, as in the
    Visual System's sub-heading style */
 .facade-hint {
   margin: 0;
@@ -75,7 +75,7 @@
 }
 
 /* Building names: hidden until you hover over a building (or tap it on a
-   phone, which adds .is-labeled). Name in Helvetica, count in Degular Mono. */
+   phone, which adds .is-labeled). Name in Neue Haas Grotesque, count in Degular Mono. */
 .facade-label {
   position: absolute;
   bottom: calc(100% + 10px);
@@ -684,7 +684,7 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   margin: 0 0 1.1em;
   font-family: var(--font-body);
   font-size: clamp(1.3rem, 5.4vw, 1.75rem);
-  font-weight: 500; /* Helvetica Neue Medium */
+  font-weight: 500; /* Neue Haas Grotesque Medium */
   line-height: 1.2;
   letter-spacing: -0.01em;
   text-align: center;
