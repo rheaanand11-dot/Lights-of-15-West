@@ -20,8 +20,13 @@
     },
     crime: {
       caption: 'Better lighting is linked to less crime',
-      text: 'Studies of brighter streets found crime fell by 14 to 36%. A review of 13 studies found about a fifth less crime where lighting improved (Welsh & Farrington), and new lights at New York City public housing cut outdoor crime at night by about a third (Chalfin et al.).',
-      rings: ['36% less crime', '21% less crime', '14% less crime'], // outer to inner
+      text: 'Each pie is a place’s crime before its lighting improved; the lit slice is how much went away. Across 13 studies it fell by about a fifth (Welsh & Farrington), and at New York City public housing, outdoor crime at night fell by about a third (Chalfin et al.).',
+      // One pie each, smallest drop first. The lit slice is the crime that went away.
+      pies: [
+        { share: 14, label: 'Lowest drop found in the studies' },
+        { share: 21, label: 'Average across 13 studies' },
+        { share: 36, label: 'New York City public housing, outdoor crime at night' },
+      ],
     },
     displacement: {
       title: 'Darkness leaves gaps',
@@ -68,19 +73,16 @@
     </figure>
 
     <figure class="history-step fig-crime">
-      <div class="rings">
-        ${HISTORY.crime.rings.map((label, i) =>
-          `<div class="ring ring--${i + 1}" style="--i: ${i}"><span>${label}</span></div>`).join('')}
+      <div class="pies">
+        ${HISTORY.crime.pies.map((pie, i) => `
+          <div class="pie-item" style="--i: ${i}; --share: ${pie.share}">
+            <div class="pie" role="img" aria-label="${pie.share}% less crime: ${pie.label}"></div>
+            <p class="pie-number">${pie.share}%<span> less crime</span></p>
+            <p class="pie-label">${pie.label}</p>
+          </div>`).join('')}
       </div>
       <figcaption>${HISTORY.crime.caption}</figcaption>
       <p class="history-explainer">${HISTORY.crime.text}</p>
-    </figure>
-
-    <figure class="history-step fig-displacement">
-      <svg class="blocks" viewBox="0 0 120 130" role="img"
-           aria-label="Lit blocks above, with dark gaps between them below"></svg>
-      <figcaption>${HISTORY.displacement.title}</figcaption>
-      <p class="history-explainer">${HISTORY.displacement.text}</p>
     </figure>
 
     <figure class="history-step history-step--scrub fig-right-light">
@@ -90,6 +92,13 @@
         <figcaption>${HISTORY.rightLight.title}</figcaption>
         <p class="history-explainer">${HISTORY.rightLight.text}</p>
       </div>
+    </figure>
+
+    <figure class="history-step fig-displacement">
+      <svg class="blocks" viewBox="0 0 120 130" role="img"
+           aria-label="Lit blocks above, with dark gaps between them below"></svg>
+      <figcaption>${HISTORY.displacement.title}</figcaption>
+      <p class="history-explainer">${HISTORY.displacement.text}</p>
     </figure>`;
 
   // Sources go at the very bottom of the page, not here

@@ -41,9 +41,9 @@ working late keep downtown lit and alive, while the offices go dark.
 - Build **one section at a time**. When a section is done, stop and ask for the
   next frame (link or screenshot) instead of inventing a design.
 - Visual language: black, magenta, orange and yellow; film grain texture;
-  Helvetica Neue for text; Degular Mono (Adobe Fonts, linked in index.html) to
+  Neue Haas Grotesque for text (Adobe Fonts, Helvetica Neue as fallback); Degular Mono (Adobe Fonts, linked in index.html) to
   label data and statistics. Story cards are grainy gradient panels with the
-  story in Helvetica and "time · Floor · room" in mono underneath; each card is
+  story in Neue Haas Grotesque and "time · Floor · room" in mono underneath; each card is
   the same color as the window it opens from.
 - All colors, fonts, type sizes and spacing come from CSS variables in
   `base.css`. Never hard-code a color or font in another file. If Figma

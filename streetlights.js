@@ -3,8 +3,9 @@
 // windows turned into street lights (1 street light ≈ 10 lit windows ≈ 25 m
 // of lit street). Each building gets a lamp whose triangle of light falls on
 // a row of 12 pavement squares, one per street light (25 m each): the more
-// lights, the wider the triangle. Buttons switch between the four nights we
-// counted, each with its own gradient.
+// lights, the wider the triangle. The four nights we counted follow one after
+// another down the page, each in its own gradient. Within a night the lamps
+// sit in rows of 1, then 2, then 3, and switch on one at a time as you scroll.
 
 (function () {
   // The nights we counted (see lights.json), each with its gradient in base.css
@@ -24,6 +25,7 @@
   const WINDOWS_PER_LIGHT = 10; // 1 street light ≈ 10 lit windows
   const METERS_PER_LIGHT = 25; // ≈ 25 m of lit street
   const SQUARES = 12; // pavement squares under each lamp: one per street light
+  const ROWS = [1, 2, 3]; // lamps per row, top to bottom; any left over get a row of their own
 
   // Where things sit in each drawing (its viewBox is 420 x 330). The lamp is
   // Anna's "street lamp 2.svg", shrunk to LAMP.scale and placed at LAMP.x/y.
@@ -50,18 +52,8 @@
         <span class="streetlights-key-swatch" aria-hidden="true"></span>
         = 1&nbsp;street light ≈ 10&nbsp;lit windows ≈ 25&nbsp;m of lit street
       </p>
-      <div class="streetlights-nights" role="group" aria-label="Night">
-        ${NIGHTS.map((n) => `
-          <button type="button" class="streetlights-night streetlights-night--${n.id}" data-night="${n.id}" aria-pressed="false">${n.label}</button>`).join('')}
-      </div>
       <svg class="streetlights-defs" aria-hidden="true" focusable="false">
         <defs>
-          <!-- The light: the night's gradient, from the bulb down to the street -->
-          <linearGradient id="sl-beam" gradientUnits="userSpaceOnUse" x1="0" y1="${BULB.y}" x2="0" y2="${GROUND}">
-            <stop offset="0" class="sl-stop-1"/>
-            <stop offset="0.5" class="sl-stop-2"/>
-            <stop offset="1" class="sl-stop-3"/>
-          </linearGradient>
           <!-- The lamp's static shading, from "street lamp 2.svg" -->
           <linearGradient id="sl-lamp" gradientUnits="userSpaceOnUse" x1="111.65" y1="582" x2="604.29" y2="582">
             <stop offset="0.22" class="sl-lamp-light"/>
@@ -81,39 +73,61 @@
           </filter>
         </defs>
       </svg>
-      <ul class="streetlights-grid"></ul>`;
+      ${NIGHTS.map(nightBlock).join('')}`;
 
-    const grid = root.querySelector('.streetlights-grid');
-    const buttons = [...root.querySelectorAll('.streetlights-night')];
-
-    // Show one night: a lamp per building that was counted that night,
-    // most street lights first
-    function show(night) {
-      NIGHTS.forEach((n) => root.classList.toggle('is-' + n.id, n === night));
-      buttons.forEach((b) => b.setAttribute('aria-pressed', b.dataset.night === night.id));
+    // One night: its label, then a lamp per building that was counted that
+    // night, most street lights first, in rows of 1, 2 and 3
+    function nightBlock(night) {
       const buildings = lights.observations
         .filter((o) => o.day === night.day && o.time === night.time && NAMES[o.building])
         .map((o) => ({ id: o.building, lit: o.lit }))
         .sort((a, b) => b.lit - a.lit);
-      grid.innerHTML = buildings.map(card).join('');
+      let rows = '';
+      let start = 0;
+      for (let r = 0; start < buildings.length; r++) {
+        const size = ROWS[r] || buildings.length - start;
+        const row = buildings.slice(start, start + size);
+        rows += `<ul class="streetlights-row">${row.map((b, i) => card(b, night, i)).join('')}</ul>`;
+        start += size;
+      }
+      return `
+        <section class="streetlights-night-block is-${night.id}" data-night="${night.id}" aria-label="${night.label}">
+          <!-- This night's light: its gradient, from the bulb down to the street -->
+          <svg class="streetlights-defs" aria-hidden="true" focusable="false">
+            <defs>
+              <linearGradient id="sl-beam-${night.id}" gradientUnits="userSpaceOnUse" x1="0" y1="${BULB.y}" x2="0" y2="${GROUND}">
+                <stop offset="0" class="sl-stop-1"/>
+                <stop offset="0.5" class="sl-stop-2"/>
+                <stop offset="1" class="sl-stop-3"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <h3 class="streetlights-night streetlights-night--${night.id}">${night.label}</h3>
+          ${rows}
+        </section>`;
     }
 
-    buttons.forEach((b) => b.addEventListener('click', () => {
-      show(NIGHTS.find((n) => n.id === b.dataset.night));
-    }));
-    show(NIGHTS[0]);
-
-    // The heading fades and grows in like the street section's heading, and
-    // the lamps switch on when they scroll into view. Once the lamps are fully
-    // off the screen they switch off again, so coming back lights them up anew.
+    // As you scroll, each night's label and then each lamp switches on when it
+    // comes into view, one at a time. Things that scroll fully off the screen
+    // switch off again, so coming back lights them up anew. The key's square
+    // takes the color of the night in the middle of the screen.
     const heading = root.querySelector('.streetlights-heading');
+    const reveals = root.querySelectorAll('.streetlights-night, .streetlight');
+    const blocks = root.querySelectorAll('.streetlights-night-block');
     function onScroll() {
       const h = window.innerHeight;
       const box = heading.getBoundingClientRect();
       heading.classList.toggle('is-visible', box.top < h * 0.88 && box.bottom > h * 0.12);
-      const g = grid.getBoundingClientRect();
-      if (g.top < h * 0.8 && g.bottom > 0) root.classList.add('is-on');
-      else if (g.top > h || g.bottom < 0) root.classList.remove('is-on');
+      reveals.forEach((el) => {
+        const b = el.getBoundingClientRect();
+        if (b.top < h * 0.8 && b.bottom > 0) el.classList.add('is-on');
+        else if (b.top > h || b.bottom < 0) el.classList.remove('is-on');
+      });
+      let current = NIGHTS[0].id;
+      blocks.forEach((block) => {
+        if (block.getBoundingClientRect().top < h / 2) current = block.dataset.night;
+      });
+      NIGHTS.forEach((n) => root.classList.toggle('is-' + n.id, n.id === current));
     }
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
@@ -122,7 +136,8 @@
 
   // One building: the lamp, its triangle of light, the row of pavement
   // squares (lit ones highlighted), the meters of lit street, and a caption
-  function card(b) {
+  // (i = its place in the row, so lamps side by side switch on one after another)
+  function card(b, night, i) {
     const streetLights = Math.max(1, Math.min(SQUARES, Math.round(b.lit / WINDOWS_PER_LIGHT)));
     const meters = Math.round((b.lit / WINDOWS_PER_LIGHT) * METERS_PER_LIGHT);
     const name = NAMES[b.id] || b.id;
@@ -150,10 +165,10 @@
 
     const plural = streetLights === 1 ? 'street light' : 'street lights';
     return `
-      <li class="streetlight">
+      <li class="streetlight" style="--n: ${i}">
         <svg viewBox="0 0 420 ${metersY + 12}" role="img"
              aria-label="${name}: ${b.lit} lit windows, about ${streetLights} ${plural} or ${meters} m of lit street">
-          <polygon class="sl-beam" filter="url(#sl-grain)" points="${beam}"/>
+          <polygon class="sl-beam" fill="url(#sl-beam-${night.id})" filter="url(#sl-grain)" points="${beam}"/>
           ${litRow}
           ${squares}
           <text class="sl-meters-glow" x="${metersX}" y="${metersY}" text-anchor="middle" filter="url(#sl-glow)">${meters} m</text>
