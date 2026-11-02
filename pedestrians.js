@@ -26,8 +26,8 @@
   // A folder's tab: flat on the side it shares with the folder's edge, with a
   // smooth slope down on the other side, like the reference folders
   const TAB_PATH = 'M0 28 V7 Q0 0 7 0 H136 C146 0 150 5 154 12 C159 21 164 28 180 28 Z';
-  // Close (×), drawn so it matches the bold arrows of the buttons
-  const CLOSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+  // Close (×): two straight bars with sharp, squared-off ends
+  const CLOSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4l16 16M20 4L4 20"/></svg>';
 
   const root = document.getElementById('pedestrians');
   if (!root) return;

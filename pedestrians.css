@@ -9,12 +9,13 @@
   padding: var(--space-section) var(--gutter) 0; /* the top is fine-tuned by pedestrians.js */
 }
 
-/* ---------- Heading and text (as in the Figma frame: heading on the left,
-   the text set in a little) ---------- */
+/* ---------- Heading (centered) and text (set in a little, as in the
+   Figma frame) ---------- */
 
 .pedestrians-heading {
   max-width: 20ch;
-  margin: 0 0 calc(var(--space-6) + var(--space-3));
+  margin: 0 auto calc(var(--space-6) + var(--space-3)); /* centered */
+  text-align: center;
   font-family: var(--font-display);
   font-size: var(--text-xl);
   font-weight: var(--weight-bold);
@@ -28,7 +29,6 @@
   .pedestrians-heading {
     opacity: 0;
     transform: scale(0.9);
-    transform-origin: left center;
     transition: opacity 0.8s ease, transform 0.8s ease;
   }
 
@@ -205,12 +205,12 @@
 }
 
 .folder-close svg {
-  width: 22px;
-  height: 22px;
+  width: 16px;
+  height: 16px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 2.6;
-  stroke-linecap: round;
+  stroke-width: 3.2;
+  stroke-linecap: butt; /* sharp, squared-off ends */
 }
 
 /* Left tabs have their number on the left, so the × goes right; right
