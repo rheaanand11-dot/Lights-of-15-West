@@ -28,8 +28,6 @@
     body: 'Unlike streetlights, lit windows don’t have a clearly defined range of illumination. ' +
       'But what if their collective glow could be experienced as a walk down a lit street at night?',
   };
-  // The bold arrow of the page links (see .page-link-arrow in base.css), pointing up
-  const ARROW_UP = '<svg class="page-link-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V5M5.5 11.5L12 5l6.5 6.5"/></svg>';
   const WINDOWS_PER_LIGHT = 10; // 1 street light ≈ 10 lit windows
   const METERS_PER_LIGHT = 25; // ≈ 25 m of lit street
   const SQUARES = 12; // pavement squares under each lamp: one per street light
@@ -104,10 +102,6 @@
       </svg>
       <ul class="streetlights-grid"></ul>
       </div>
-      </div>
-      <!-- A small "Back to top" at the very bottom of the page, under the lamps -->
-      <div class="streetlights-top-row">
-        <button type="button" class="streetlights-top">Back to top ${ARROW_UP}</button>
       </div>`;
 
     const grid = root.querySelector('.streetlights-grid');
@@ -129,10 +123,13 @@
     buttons.forEach((b) => b.addEventListener('click', () => {
       show(NIGHTS.find((n) => n.id === b.dataset.night));
     }));
-    const topButton = root.querySelector('.streetlights-top');
-    topButton.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+    // "Back to top" sits at the very bottom of the page (streetlights.html)
+    const topButton = document.querySelector('.streetlights-top');
+    if (topButton) {
+      topButton.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
 
     // Switching the lamps on (the timing is in streetlights.css):
     // - When all the lamps fit on the screen (laptops), they all switch on at
