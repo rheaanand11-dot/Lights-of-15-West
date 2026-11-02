@@ -144,24 +144,36 @@
     window.addEventListener('resize', fadeHeading);
     fadeHeading();
 
-    // Space above the heading: the same as between the opening's steps
-    // (about 130px from one step's last line to the next step's first).
-    // The opening's last step sits in the middle of its own tall block, so
-    // the empty space under its text changes with the screen's height; the
-    // padding here makes up the rest, so the gap is the same on every screen,
-    // whichever step comes last.
-    const SECTION_GAP = 130;
+    // Space above the heading. This is a new visualization, so it gets the
+    // bigger gap between separate parts of the page: the same as between the
+    // title screen ("Scroll ↓") and the first figure (the five offices).
+    // Steps inside the opening keep their own, smaller gaps.
+    // Both gaps change with the screen's height, because the title screen and
+    // the opening's steps are sized to the screen, so this measures the title
+    // screen's gap and matches it, whichever step comes last.
+    const MIN_GAP = 130; // never closer than the steps inside the opening
+
+    // Where a step's text or picture starts and ends (leaving out the sticky
+    // wrapper and the title screen's light ray, which fill the whole step)
+    function contentOf(step) {
+      const parts = [...step.querySelectorAll(':scope > *, .history-sticky > *')]
+        .filter((el) => !el.classList.contains('history-sticky') && !el.classList.contains('history-ray'));
+      if (!parts.length) return null;
+      const boxes = parts.map((el) => el.getBoundingClientRect());
+      return { top: Math.min(...boxes.map((b) => b.top)), bottom: Math.max(...boxes.map((b) => b.bottom)) };
+    }
+
     function spaceAboveHeading() {
       const steps = document.querySelectorAll('.history-step');
+      if (steps.length < 2) return;
+      const first = contentOf(steps[0]);
+      const second = contentOf(steps[1]);
       const last = steps[steps.length - 1];
-      if (!last) return;
-      // The bottom of the last step's text or picture
-      const parts = [...last.querySelectorAll(':scope > *, .history-sticky > *')]
-        .filter((el) => !el.classList.contains('history-sticky'));
-      if (!parts.length) return;
-      const contentBottom = Math.max(...parts.map((el) => el.getBoundingClientRect().bottom));
-      const below = last.getBoundingClientRect().bottom - contentBottom;
-      const space = SECTION_GAP - below;
+      const lastContent = contentOf(last);
+      if (!first || !second || !lastContent) return;
+      const gap = Math.max(MIN_GAP, second.top - first.bottom);
+      const below = last.getBoundingClientRect().bottom - lastContent.bottom;
+      const space = gap - below;
       // On tall screens the step already leaves more than enough empty space
       // under the caption, so this section tucks up into it instead
       root.style.paddingTop = Math.max(16, space) + 'px';
