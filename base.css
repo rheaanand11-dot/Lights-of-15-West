@@ -166,8 +166,8 @@ img, svg { max-width: 100%; display: block; }
   align-items: center;
   gap: var(--space-1);
   padding: var(--space-3) var(--space-5);
-  /* A soft rectangle with a light outline */
-  border: 1px solid var(--color-text);
+  /* A soft rectangle with a grey outline, the same grey as its arrow */
+  border: 1px solid var(--color-text-muted);
   border-radius: var(--radius-soft);
   color: var(--color-text);
   text-align: center;
