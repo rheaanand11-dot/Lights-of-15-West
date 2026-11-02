@@ -1,0 +1,250 @@
+/* pedestrians.css — owned by Anna.
+   "How Do Lights Make Pedestrians Feel at Night?": quotes as folders stacked
+   like crosswalk stripes. Closed: white with a grainy texture. Hovered or
+   open: grey with a chartreuse tab and number. Colors come from base.css. */
+
+#pedestrians {
+  max-width: var(--wide-width);
+  margin: 0 auto;
+  padding: var(--space-section) var(--gutter) 0; /* the top is fine-tuned by pedestrians.js */
+}
+
+/* ---------- Heading and text (as in the Figma frame: heading on the left,
+   the text set in a little) ---------- */
+
+.pedestrians-heading {
+  max-width: 20ch;
+  margin: 0 0 calc(var(--space-6) + var(--space-3));
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  color: var(--color-chartreuse);
+  text-wrap: balance;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pedestrians-heading {
+    opacity: 0;
+    transform: scale(0.9);
+    transform-origin: left center;
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .pedestrians-heading.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.pedestrians-body {
+  max-width: 30em;
+  margin: 0 0 calc(var(--space-6) + var(--space-3)) 16%;
+  font-size: var(--text-lede);
+  line-height: 1.35;
+  color: var(--color-white);
+}
+
+@media (max-width: 640px) {
+  .pedestrians-body { margin-left: 0; }
+}
+
+/* ---------- Folders ---------- */
+
+.folders {
+  --stripe: 72px; /* the height of a closed folder: one crosswalk stripe */
+  --tab-w: 180px;
+  --tab-h: 28px;
+  --folder-bg: var(--color-white);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (max-width: 640px) {
+  .folders { --stripe: 56px; --tab-w: 140px; --tab-h: 24px; }
+}
+
+.folder {
+  position: relative;
+  --folder-bg: var(--color-white);
+  --tab-bg: var(--color-white);
+  --number: var(--color-black);
+}
+
+/* Hovered or open: grey folder, chartreuse tab and number */
+.folder:hover,
+.folder:focus-within,
+.folder.is-open {
+  --folder-bg: var(--color-folder);
+  --tab-bg: var(--color-chartreuse);
+  --number: var(--color-chartreuse);
+}
+
+/* The tab and the stripe below it are one button */
+.folder-toggle {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.folder-toggle:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.folder-tab {
+  display: block;
+  width: var(--tab-w);
+  height: var(--tab-h);
+  margin-bottom: -1px; /* no hairline between the tab and the stripe */
+  overflow: visible;
+}
+
+.folder-tab path {
+  fill: var(--tab-bg);
+  transition: fill 0.25s ease;
+}
+
+/* Right-hand tabs: the same shape, flipped */
+.folder--right .folder-tab {
+  margin-left: auto;
+  transform: scaleX(-1);
+}
+
+.folder-stripe {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: var(--stripe);
+  padding: 0 var(--space-4);
+  border-radius: 0 var(--radius-soft) var(--radius-soft) var(--radius-soft); /* square where the tab joins */
+  background: var(--folder-bg);
+  transition: background-color 0.25s ease, border-radius 0.25s ease;
+}
+
+.folder--right .folder-stripe {
+  justify-content: flex-end;
+  border-radius: var(--radius-soft) 0 var(--radius-soft) var(--radius-soft);
+}
+
+/* Open: the stripe and the panel under it read as one sheet */
+.folder.is-open .folder-stripe {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.folder-number {
+  font-family: var(--font-mono);
+  font-weight: var(--weight-mono-semibold);
+  font-size: var(--text-sm);
+  letter-spacing: 0.06em;
+  color: var(--number);
+  transition: color 0.25s ease;
+}
+
+/* The quote: opens smoothly under the stripe (the row grows from nothing to
+   its full height) */
+.folder-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  margin-top: -1px; /* no hairline between the stripe and the open panel */
+  transition: grid-template-rows 0.45s ease;
+}
+
+.folder.is-open .folder-panel { grid-template-rows: 1fr; }
+
+.folder-panel-inner {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 0 0 var(--radius-soft) var(--radius-soft);
+  background: var(--folder-bg);
+}
+
+.folder-quote {
+  max-width: 34em;
+  margin: 0;
+  padding: var(--space-4) var(--space-7) var(--space-6) var(--space-6);
+  font-family: var(--font-mono);
+  font-weight: var(--weight-mono);
+  font-size: var(--text-lg);
+  line-height: 1.45;
+  color: var(--color-black);
+}
+
+.folder-close {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-3);
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-soft);
+  background: none;
+  color: var(--color-black);
+  cursor: pointer;
+}
+
+.folder-close svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+
+.folder-close:focus-visible {
+  outline: 2px solid var(--color-black);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .folder-quote {
+    padding: var(--space-3) var(--space-6) var(--space-5) var(--space-4);
+    font-size: var(--text-md);
+  }
+}
+
+/* Film grain over each folder, like the light under the street lamps. It
+   only darkens, so the black gaps between the stripes stay black. */
+.folder::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--grain);
+  mix-blend-mode: multiply;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* ---------- Coming into view ----------
+   The folders slide in one after another, like stripes being painted */
+
+@media (prefers-reduced-motion: no-preference) {
+  .folder {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    transition-delay: calc(var(--i) * 0.06s);
+  }
+
+  .folders.is-on .folder {
+    opacity: 1;
+    transform: none;
+  }
+}
