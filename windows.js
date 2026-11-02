@@ -144,21 +144,24 @@
     window.addEventListener('resize', fadeHeading);
     fadeHeading();
 
-    // Space above the heading: the same as above the street-light section's
-    // heading (the legend's bottom padding plus that section's top padding).
-    // "The right light, not the brightest" sits in the middle of a full-screen
-    // step, so the space under it changes with the screen's height; the
-    // padding here makes up the rest, so the gap is the same on every screen.
+    // Space above the heading: the same as between the opening's steps
+    // (about 130px from one step's last line to the next step's first).
+    // The opening's last step sits in the middle of its own tall block, so
+    // the empty space under its text changes with the screen's height; the
+    // padding here makes up the rest, so the gap is the same on every screen,
+    // whichever step comes last.
+    const SECTION_GAP = 130;
     function spaceAboveHeading() {
-      const caption = document.querySelector('.history-sticky figcaption');
-      const sticky = document.querySelector('.history-sticky');
-      const legend = document.getElementById('legend');
-      const nextSection = document.getElementById('streetlights');
-      if (!caption || !sticky || !legend || !nextSection) return;
-      const gap = parseFloat(getComputedStyle(legend).paddingBottom) +
-        parseFloat(getComputedStyle(nextSection).paddingTop);
-      const below = sticky.getBoundingClientRect().bottom - caption.getBoundingClientRect().bottom;
-      const space = gap - below;
+      const steps = document.querySelectorAll('.history-step');
+      const last = steps[steps.length - 1];
+      if (!last) return;
+      // The bottom of the last step's text or picture
+      const parts = [...last.querySelectorAll(':scope > *, .history-sticky > *')]
+        .filter((el) => !el.classList.contains('history-sticky'));
+      if (!parts.length) return;
+      const contentBottom = Math.max(...parts.map((el) => el.getBoundingClientRect().bottom));
+      const below = last.getBoundingClientRect().bottom - contentBottom;
+      const space = SECTION_GAP - below;
       // On tall screens the step already leaves more than enough empty space
       // under the caption, so this section tucks up into it instead
       root.style.paddingTop = Math.max(16, space) + 'px';
