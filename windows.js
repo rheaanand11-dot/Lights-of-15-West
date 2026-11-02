@@ -133,12 +133,18 @@
       </dialog>`;
 
     // The heading fades and grows in as it scrolls onto the screen, and fades
-    // back out as it leaves, like the crime rings in the opening section
+    // back out as it leaves, like the crime rings in the opening section.
+    // The "Next to the street lights" button at the bottom does the same
+    // (its look is in base.css).
     const heading = root.querySelector('.windows-heading');
+    const nextLink = document.querySelector('.page-link-row:not(.page-link-row--top) .page-link');
     function fadeHeading() {
-      const box = heading.getBoundingClientRect();
       const h = window.innerHeight;
-      heading.classList.toggle('is-visible', box.top < h * 0.88 && box.bottom > h * 0.12);
+      [heading, nextLink].forEach((el) => {
+        if (!el) return;
+        const box = el.getBoundingClientRect();
+        el.classList.toggle('is-visible', box.top < h * 0.88 && box.bottom > h * 0.12);
+      });
     }
     window.addEventListener('scroll', fadeHeading, { passive: true });
     window.addEventListener('resize', fadeHeading);
@@ -172,6 +178,8 @@
       const lastContent = contentOf(last);
       if (!first || !second || !lastContent) return;
       const gap = Math.max(MIN_GAP, second.top - first.bottom);
+      // Shared with base.css, which leaves the same gap before Sources
+      document.documentElement.style.setProperty('--section-gap', Math.round(gap) + 'px');
       const below = last.getBoundingClientRect().bottom - lastContent.bottom;
       const space = gap - below;
       // On tall screens the step already leaves more than enough empty space
