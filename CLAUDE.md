@@ -70,6 +70,8 @@ that way.
 | `streetlights.html` | Second page for the street-light section (linked from the bottom of `index.html`) | Shared |
 | `streetlights.js` | "Buildings' Windows Light in Street Light Equivalent" section | **Anna** |
 | `streetlights.css` | Styles for the street-light section | **Anna** |
+| `pedestrians.js` | "How Do Lights Make Pedestrians Feel at Night?" quote folders (on the street-light page) | **Anna** |
+| `pedestrians.css` | Styles for the quote folders | **Anna** |
 
 Person A = [NAME A], Person B = [NAME B]. Replace these with real names.
 
