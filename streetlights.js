@@ -105,11 +105,8 @@
       <ul class="streetlights-grid"></ul>
       </div>
       </div>
-      <!-- A small "Back to top" at the very bottom of the page, under the lamps
-           (handy on phones, where the lamps scroll) -->
-      <div class="streetlights-top-row">
-        <button type="button" class="streetlights-top">Back to top ${ARROW_UP}</button>
-      </div>`;
+      <!-- A small "Back to top", always in the bottom-right corner of the window -->
+      <button type="button" class="streetlights-top">Back to top ${ARROW_UP}</button>`;
 
     const grid = root.querySelector('.streetlights-grid');
     const buttons = [...root.querySelectorAll('.streetlights-night')];

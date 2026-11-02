@@ -25,12 +25,7 @@
 /* ---------- Two screens ----------
    Like two frames in Figma: the first screen has the headline, the text and
    the key; scrolling down brings the second screen, with the night buttons
-   and every lamp on it at once. The page settles on each screen as you
-   scroll (scroll-snap). */
-
-html:has(#streetlights) {
-  scroll-snap-type: y proximity;
-}
+   and every lamp on it at once. */
 
 /* The first screen fills what's left of the window under "Back to the
    buildings" (64px) and the gap above the headline */
@@ -52,26 +47,23 @@ html:has(#streetlights) {
   justify-content: center;
   padding: var(--space-4) 0;
   min-height: 100svh;
-  scroll-snap-align: start;
 }
 
 /* "Back to top": a small soft-rectangle button in the page links' style
-   (grey outline, bold arrow), sitting still at the very bottom of the page,
-   under the lamps */
-.streetlights-top-row {
-  display: flex;
-  justify-content: flex-end;
-  padding: var(--space-4) 0 var(--space-5);
-}
-
+   (grey outline, bold arrow), always in the bottom-right corner of the
+   window, so it can be clicked from anywhere on the page */
 .streetlights-top {
+  position: fixed;
+  right: var(--gutter);
+  bottom: var(--space-4);
+  z-index: 10;
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
   padding: var(--space-1) var(--space-2);
   border: 1px solid var(--color-text-muted);
   border-radius: var(--radius-soft);
-  background: none;
+  background: var(--color-night); /* so lamps scrolling behind it don't show through */
   color: var(--color-text);
   font: inherit;
   font-size: var(--text-sm);
