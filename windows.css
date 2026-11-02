@@ -19,7 +19,7 @@
   margin: 0 0 var(--space-4);
   font-family: var(--font-display);
   font-size: var(--text-xl);
-  font-weight: 700;
+  font-weight: var(--weight-bold);
   line-height: 1.05;
   letter-spacing: -0.01em;
   color: var(--color-chartreuse);
@@ -47,7 +47,7 @@
   margin: 0;
   font-family: var(--font-body);
   font-size: var(--text-lg);
-  font-weight: 300;
+  font-weight: var(--weight-light);
   font-style: italic;
   line-height: 1.35;
   color: var(--color-text-muted);
@@ -112,6 +112,7 @@
 
 .facade-label-count {
   font-family: var(--font-mono);
+  font-weight: var(--weight-mono);
   font-size: var(--text-sm);
   letter-spacing: 0.04em;
   color: var(--color-text-muted);
@@ -517,6 +518,7 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
 .skyline-count {
   margin: 0;
   font-family: var(--font-mono);
+  font-weight: var(--weight-mono);
   font-size: var(--text-sm);
   letter-spacing: 0.04em;
   color: var(--color-text-muted);
@@ -524,7 +526,7 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
 
 .skyline-count strong {
   font-size: var(--text-lg);
-  font-weight: 400;
+  font-weight: var(--weight-mono);
   color: var(--color-text);
 }
 
@@ -684,7 +686,7 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   margin: 0 0 1.1em;
   font-family: var(--font-body);
   font-size: clamp(1.3rem, 5.4vw, 1.75rem);
-  font-weight: 500; /* Neue Haas Grotesque Medium */
+  font-weight: var(--weight-medium);
   line-height: 1.2;
   letter-spacing: -0.01em;
   text-align: center;
@@ -695,6 +697,7 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   z-index: 1;
   margin: 0;
   font-family: var(--font-mono);
+  font-weight: var(--weight-mono);
   font-size: clamp(0.95rem, 3.8vw, 1.15rem);
   letter-spacing: 0.06em;
   text-align: center;
@@ -736,6 +739,7 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
 .story-card-count {
   min-width: 5ch;
   font-family: var(--font-mono);
+  font-weight: var(--weight-mono);
   font-size: var(--text-sm);
   letter-spacing: 0.06em;
   text-align: center;

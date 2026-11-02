@@ -25,7 +25,7 @@
 #streetlights .is-monday, #streetlights.is-monday { --sl-1: var(--day-monday-1); --sl-2: var(--day-monday-2); --sl-3: var(--day-monday-3); }
 
 /* ---------- Heading and key ----------
-   Same as the street section: heading, then the sub-heading in Helvetica
+   Same as the street section: heading, then the sub-heading in Neue Haas Grotesk
    Light Oblique, with the same gaps between them */
 
 .streetlights-heading {
@@ -33,7 +33,7 @@
   margin: 0 auto var(--space-6);
   font-family: var(--font-display);
   font-size: var(--text-xl);
-  font-weight: 700;
+  font-weight: var(--weight-bold);
   line-height: 1.05;
   letter-spacing: -0.01em;
   color: var(--color-chartreuse);
@@ -58,7 +58,7 @@
   margin: 0 0 var(--space-5);
   font-family: var(--font-body);
   font-size: var(--text-lg);
-  font-weight: 300;
+  font-weight: var(--weight-light);
   font-style: italic;
   line-height: 1.35;
   color: var(--color-text-muted);
@@ -93,7 +93,7 @@
   color: var(--color-black);
   font-family: var(--font-mono);
   font-size: var(--text-lg);
-  font-weight: 400;
+  font-weight: var(--weight-mono);
   letter-spacing: 0.04em;
 }
 
@@ -177,6 +177,7 @@ path.sl-lamp { fill: url(#sl-lamp); }
 .sl-meters,
 .sl-meters-glow {
   font-family: var(--font-mono);
+  font-weight: var(--weight-mono);
   font-size: 22px;
   letter-spacing: 0.04em;
 }
