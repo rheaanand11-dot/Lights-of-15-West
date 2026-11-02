@@ -38,6 +38,7 @@ html:has(#streetlights) {
   /* The same, roomy gap between the headline, the text and the key */
   --intro-gap: calc(var(--space-6) + var(--space-3));
   /* The headline, text and key sit in the middle of the first screen */
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -86,9 +87,9 @@ html:has(#streetlights) {
 /* What the section is about: the same size as the explanations under the
    opening's figures, in white */
 .streetlights-body {
-  max-width: 30em;
+  max-width: 34em;
   margin: 0 auto var(--intro-gap);
-  font-size: var(--text-md);
+  font-size: var(--text-lede); /* the same size as the lines under the opening title */
   line-height: 1.45;
   text-wrap: balance;
   color: var(--color-white);
@@ -117,6 +118,20 @@ html:has(#streetlights) {
   transition: background-color 0.6s ease, box-shadow 0.6s ease;
 }
 
+/* "Scroll ↓" at the bottom of the first screen, like the opening's */
+.streetlights-scroll-hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: var(--space-5);
+  margin: 0;
+  font-family: var(--font-mono);
+  font-weight: var(--weight-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+}
+
 /* ---------- Night buttons ----------
    One per night. Only the picked night wears its gradient; the others are
    plain outlines until picked. */
@@ -131,19 +146,23 @@ html:has(#streetlights) {
 
 .streetlights-night {
   padding: var(--space-2) var(--space-4);
-  border: 1px solid var(--color-building-edge);
-  border-radius: 999px;
+  /* Soft rectangles with a light outline, like the page links */
+  border: 1px solid var(--color-text);
+  border-radius: var(--radius-soft);
   background: transparent;
-  color: var(--color-text-muted);
+  color: var(--color-text);
   font-family: var(--font-mono);
   font-size: var(--text-md);
-  font-weight: var(--weight-mono);
+  font-weight: var(--weight-mono-semibold);
   letter-spacing: 0.04em;
   cursor: pointer;
   transition: color 0.3s ease, border-color 0.3s ease;
 }
 
-.streetlights-night:hover { color: var(--color-text); }
+.streetlights-night:hover {
+  border-color: var(--color-chartreuse);
+  color: var(--color-chartreuse);
+}
 
 .streetlights-night:focus-visible {
   outline: 2px solid var(--color-accent);

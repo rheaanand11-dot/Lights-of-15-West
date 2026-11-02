@@ -60,6 +60,7 @@
           <span class="streetlights-key-swatch" aria-hidden="true"></span>
           = 1&nbsp;street light ≈ 10&nbsp;lit windows ≈ 25&nbsp;m of lit street
         </p>
+        <p class="streetlights-scroll-hint" aria-hidden="true">Scroll &darr;</p>
       </div>
       <svg class="streetlights-defs" aria-hidden="true" focusable="false">
         <defs>
