@@ -144,7 +144,9 @@ img, svg { max-width: 100%; display: block; }
 .page-link-row {
   display: flex;
   justify-content: center;
-  padding: var(--space-6) var(--gutter) var(--space-5);
+  /* Below it, the same gap as between separate sections before Sources
+     (--section-gap is measured on the page by windows.js) */
+  padding: var(--space-6) var(--gutter) var(--section-gap, 320px);
 }
 
 .page-link-row--top {
@@ -168,6 +170,22 @@ img, svg { max-width: 100%; display: block; }
 
 .page-link-row--top .page-link {
   padding: var(--space-2) var(--space-4);
+}
+
+/* "Next to the street lights" fades and grows in as it scrolls onto the
+   screen, and back out as it leaves, like the section headings
+   (windows.js adds is-visible) */
+@media (prefers-reduced-motion: no-preference) {
+  .page-link-row:not(.page-link-row--top) .page-link {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.8s ease, transform 0.8s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .page-link-row:not(.page-link-row--top) .page-link.is-visible {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .page-link:hover,
