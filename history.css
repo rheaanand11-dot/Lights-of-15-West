@@ -79,7 +79,11 @@
   position: relative;
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(2.4rem, 8.6vw, 6.4rem);
+  /* Always on one line: in Black, the title is about 12.65 times as wide as
+     its font size, so the font size is the space across the page divided by
+     12.9 (a little room to spare) */
+  font-size: calc((min(100vw, var(--wide-width)) - 2 * var(--gutter)) / 12.9);
+  white-space: nowrap;
   font-weight: var(--weight-black);
   line-height: 0.92;
   letter-spacing: -0.01em;
@@ -121,7 +125,7 @@
    none ends with a lonely word or two. */
 .history-lede {
   max-width: 46em;
-  margin: var(--space-4) 0 0;
+  margin: var(--space-6) 0 0; /* well clear of the title */
   font-size: clamp(1.05rem, 2.1vw, 1.4rem);
   line-height: 1.35;
   color: var(--color-lime);
@@ -130,6 +134,12 @@
 .history-lede span {
   display: block;
   text-wrap: balance;
+}
+
+/* "Who keeps the street lit now?" stands apart from the lines above, in italic */
+.history-lede .history-lede-question {
+  margin-top: var(--space-4);
+  font-style: italic;
 }
 
 .history-scroll-hint {
@@ -456,7 +466,7 @@
 
   .history-scroll-hint {
     opacity: 0;
-    animation: line-appears 0.7s ease 7.4s both;
+    animation: line-appears 0.7s ease 6.8s both; /* just after the last line */
   }
 
   .office {

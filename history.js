@@ -8,11 +8,11 @@
     title: 'Where the light falls',
     lede: [
       'Downtown goes dark after work.',
-      'One in five US offices now sits empty.',
       'Jane Jacobs called lit windows “eyes upon the street”, a quiet kind of watching.',
       'Research links light to lower crime, but darkness only moves elsewhere.',
-      'Who keeps the street lit now?',
     ],
+    // Set apart below the lines above, in italic
+    question: 'Who keeps the street lit now?',
     // Each figure: a headline, then a short plain-language explanation
     offices: {
       title: 'About 1 in 5 offices is empty',
@@ -59,6 +59,7 @@
       </div>
       <p class="history-lede">
         ${HISTORY.lede.map((line, i) => `<span style="--i: ${i}">${line}</span>`).join('')}
+        <span class="history-lede-question" style="--i: ${HISTORY.lede.length}">${HISTORY.question}</span>
       </p>
       <p class="history-scroll-hint" aria-hidden="true">Scroll &darr;</p>
     </div>
