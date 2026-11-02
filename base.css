@@ -66,6 +66,7 @@
 
   /* Text */
   --color-text: #f2efe8;
+  --color-white: #ffffff;          /* pure white: the street-light page's intro text */
   --color-text-muted: #8f8d99;
   --color-accent: var(--color-yellow);
 
