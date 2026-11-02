@@ -49,24 +49,55 @@ html:has(#streetlights) {
 .streetlights-screen--lamps {
   display: flex;
   flex-direction: column;
-  /* The same space above the night buttons, between the lamps and
-     "Back to top", and below it */
-  justify-content: space-evenly;
+  justify-content: center;
+  padding: var(--space-4) 0;
   min-height: 100svh;
   scroll-snap-align: start;
 }
 
-/* "Back to top": the same soft-rectangle button as the page links
-   (.page-link in base.css), here a button rather than a link */
-.streetlights-top-row {
-  display: flex;
-  justify-content: center;
+/* "Back to top": a small soft-rectangle button in the bottom-right corner of
+   the window, in the page links' style (grey outline, bold arrow). It stays
+   put while you scroll and shows once the first screen has scrolled away. */
+.streetlights-top {
+  position: fixed;
+  right: var(--gutter);
+  bottom: var(--space-4);
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-text-muted);
+  border-radius: var(--radius-soft);
+  background: var(--color-night);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
-.streetlights-top {
-  background: none;
-  font: inherit;
-  cursor: pointer;
+.streetlights-top.is-shown {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.streetlights-top:hover,
+.streetlights-top:focus-visible {
+  border-color: var(--color-chartreuse);
+  color: var(--color-chartreuse);
+}
+
+.streetlights-top:hover .page-link-arrow,
+.streetlights-top:focus-visible .page-link-arrow {
+  stroke: currentColor;
+}
+
+.streetlights-top .page-link-arrow {
+  width: 1em;
+  height: 1em;
 }
 
 /* ---------- Heading and key ----------
@@ -219,7 +250,7 @@ html:has(#streetlights) {
   /* Narrow enough that both rows of lamps fit on the screen with the night
      buttons: each lamp's drawing is about 0.77 times as tall as it is wide,
      plus its caption; the rest of the screen is buttons and gaps */
-  width: min(100%, calc((100svh - 440px) * 2.6 + 48px)); /* leaves room for "Back to top" too */
+  width: min(100%, calc((100svh - 340px) * 2.6 + 48px));
   margin: 0 auto;
   padding: 0;
   list-style: none;

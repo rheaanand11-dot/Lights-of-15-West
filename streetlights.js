@@ -104,13 +104,12 @@
       </svg>
       <ul class="streetlights-grid"></ul>
       </div>
-      <!-- Back up to the headline, in the same style as the page links -->
-      <div class="streetlights-top-row">
-        <button type="button" class="page-link streetlights-top">
-          <span class="page-link-title">Back to top ${ARROW_UP}</span>
-        </button>
       </div>
-      </div>`;
+      <!-- A small "Back to top" that stays in the bottom corner of the window
+           once you've scrolled down (handy on phones, where the lamps scroll) -->
+      <button type="button" class="streetlights-top" aria-label="Back to top">
+        Back to top ${ARROW_UP}
+      </button>`;
 
     const grid = root.querySelector('.streetlights-grid');
     const buttons = [...root.querySelectorAll('.streetlights-night')];
@@ -131,7 +130,8 @@
     buttons.forEach((b) => b.addEventListener('click', () => {
       show(NIGHTS.find((n) => n.id === b.dataset.night));
     }));
-    root.querySelector('.streetlights-top').addEventListener('click', () => {
+    const topButton = root.querySelector('.streetlights-top');
+    topButton.addEventListener('click', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
@@ -144,6 +144,8 @@
       const h = window.innerHeight;
       const box = heading.getBoundingClientRect();
       heading.classList.toggle('is-visible', box.top < h * 0.88 && box.bottom > h * 0.12);
+      // "Back to top" shows once the first screen has scrolled away
+      topButton.classList.toggle('is-shown', window.scrollY > h * 0.6);
       const g = grid.getBoundingClientRect();
       const lamps = grid.querySelectorAll('.streetlight');
       if (g.top < h * 0.8 && g.bottom > 0) lamps.forEach((el) => el.classList.add('is-on'));
