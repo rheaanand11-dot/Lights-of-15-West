@@ -90,12 +90,14 @@
   --weight-bold: 700;    /* 75 Bold: section headings */
   --weight-black: 900;   /* 95 Black: the "Where the light falls" title */
   --weight-mono: 400;    /* Degular Mono Regular: data labels and numbers */
+  --weight-mono-semibold: 600; /* Degular Mono Semibold: the night buttons */
 
   /* Type sizes */
   --text-sm: 0.875rem;
   --text-md: 1rem;
   --text-lg: 1.25rem;
   --text-xl: clamp(2rem, 6vw, 4rem);
+  --text-lede: clamp(1.05rem, 2.1vw, 1.4rem); /* the lines under the opening title */
 
   /* Spacing scale */
   --space-1: 4px;
@@ -105,6 +107,9 @@
   --space-5: 40px;
   --space-6: 64px;
   --space-7: 120px;
+
+  /* Corners: the soft rectangles of the buttons */
+  --radius-soft: 10px;
 
   /* Layout */
   --content-width: 720px;
@@ -161,8 +166,9 @@ img, svg { max-width: 100%; display: block; }
   align-items: center;
   gap: var(--space-1);
   padding: var(--space-3) var(--space-5);
-  border: 1px solid var(--color-building-edge);
-  border-radius: 999px;
+  /* A soft rectangle with a light outline */
+  border: 1px solid var(--color-text);
+  border-radius: var(--radius-soft);
   color: var(--color-text);
   text-align: center;
   text-decoration: none;
@@ -196,7 +202,27 @@ img, svg { max-width: 100%; display: block; }
 }
 
 .page-link-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
   font-size: var(--text-lg);
+}
+
+/* The bold arrow in the page links (an inline drawing in the HTML) */
+.page-link-arrow {
+  width: 1.1em;
+  height: 1.1em;
+  fill: none;
+  stroke: var(--color-text-muted);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.2s ease;
+}
+
+.page-link:hover .page-link-arrow,
+.page-link:focus-visible .page-link-arrow {
+  stroke: currentColor;
 }
 
 .page-link-row--top .page-link-title {
