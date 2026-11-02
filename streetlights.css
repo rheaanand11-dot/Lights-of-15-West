@@ -14,13 +14,10 @@
   text-align: center;
 }
 
-/* The night's gradient: --sl-1 at the bulb, --sl-3 on the street.
-   streetlights.js puts is-friday, is-saturday ... on the section for the
-   picked night. */
-#streetlights.is-friday { --sl-1: var(--day-friday-1); --sl-2: var(--day-friday-2); --sl-3: var(--day-friday-3); }
-#streetlights.is-saturday { --sl-1: var(--day-saturday-1); --sl-2: var(--day-saturday-2); --sl-3: var(--day-saturday-3); }
-#streetlights.is-sunday { --sl-1: var(--day-sunday-1); --sl-2: var(--day-sunday-2); --sl-3: var(--day-sunday-3); }
-#streetlights.is-monday { --sl-1: var(--day-monday-1); --sl-2: var(--day-monday-2); --sl-3: var(--day-monday-3); }
+/* The light's gradient: --sl-1 at the bulb, --sl-3 on the street. Every
+   night uses the same orange (Sunday's), so only the numbers change from
+   night to night. */
+#streetlights { --sl-1: var(--day-sunday-1); --sl-2: var(--day-sunday-2); --sl-3: var(--day-sunday-3); }
 
 /* ---------- Two screens ----------
    Like two frames in Figma: the first screen has the headline, the text and
@@ -165,7 +162,7 @@
 }
 
 /* ---------- Night buttons ----------
-   One per night. Only the picked night wears its gradient; the others are
+   One per night. Only the picked night wears the orange gradient; the others are
    plain outlines until picked. */
 
 .streetlights-nights {
@@ -207,10 +204,7 @@
   color: var(--color-black);
 }
 
-.streetlights-night--friday[aria-pressed="true"] { background-image: linear-gradient(90deg, var(--day-friday-1), var(--day-friday-3)); }
-.streetlights-night--saturday[aria-pressed="true"] { background-image: linear-gradient(90deg, var(--day-saturday-1), var(--day-saturday-3)); }
-.streetlights-night--sunday[aria-pressed="true"] { background-image: linear-gradient(90deg, var(--day-sunday-1), var(--day-sunday-3)); }
-.streetlights-night--monday[aria-pressed="true"] { background-image: linear-gradient(90deg, var(--day-monday-1), var(--day-monday-3)); color: var(--color-text); }
+.streetlights-night[aria-pressed="true"] { background-image: linear-gradient(90deg, var(--sl-1), var(--sl-3)); }
 
 /* ---------- The lamps ---------- */
 

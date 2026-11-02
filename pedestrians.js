@@ -26,8 +26,6 @@
   // A folder's tab: flat on the side it shares with the folder's edge, with a
   // smooth slope down on the other side, like the reference folders
   const TAB_PATH = 'M0 28 V7 Q0 0 7 0 H136 C146 0 150 5 154 12 C159 21 164 28 180 28 Z';
-  // Close (×): two straight bars with sharp, squared-off ends
-  const CLOSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4l16 16M20 4L4 20"/></svg>';
 
   const root = document.getElementById('pedestrians');
   if (!root) return;
@@ -51,7 +49,7 @@
           </svg>
           <span class="folder-stripe"><span class="folder-number">${n}</span></span>
         </button>
-        <button type="button" class="folder-close" aria-label="Close quote ${n}">${CLOSE}</button>
+        <button type="button" class="folder-close" aria-label="Close quote ${n}">&times;</button>
         <div class="folder-panel" id="quote-${n}">
           <div class="folder-panel-inner">
             <p class="folder-quote">“${quote}”</p>

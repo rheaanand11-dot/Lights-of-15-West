@@ -181,7 +181,7 @@
   font-weight: var(--weight-mono);
   font-size: var(--text-lg);
   line-height: 1.45;
-  color: var(--color-black);
+  color: var(--color-white); /* white on the dark grey, for contrast */
 }
 
 /* Close (×): in the stripe of the open folder, on the side across from
@@ -191,34 +191,24 @@
   top: calc(var(--tab-h) + (var(--stripe) - 40px) / 2);
   right: var(--space-3);
   z-index: 2;
-  display: grid;
-  place-items: center;
+  /* The same × as the residents' story cards: a × in a round, see-through
+     circle (here white, on the dark grey) */
   width: 40px;
   height: 40px;
   padding: 0;
   border: 0;
-  border-radius: var(--radius-soft);
-  background: none;
-  color: var(--color-black);
-  /* Softened, like the grey arrows on the buttons (the arrows' own grey
-     would vanish on the grey folder, so the × is see-through instead) */
-  opacity: 0.5;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-white) 14%, transparent);
+  color: var(--color-white);
+  font-family: var(--font-body);
+  font-size: 24px;
+  line-height: 1;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
-.folder-close:hover,
-.folder-close:focus-visible {
-  opacity: 1;
-}
-
-.folder-close svg {
-  width: 16px;
-  height: 16px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 3.2;
-  stroke-linecap: butt; /* sharp, squared-off ends */
+.folder-close:hover {
+  background: color-mix(in srgb, var(--color-white) 24%, transparent);
 }
 
 /* Left tabs have their number on the left, so the × goes right; right
@@ -233,7 +223,7 @@
 }
 
 .folder-close:focus-visible {
-  outline: 2px solid var(--color-black);
+  outline: 2px solid var(--color-white);
   outline-offset: 2px;
 }
 
