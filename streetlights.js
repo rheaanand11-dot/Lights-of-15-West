@@ -4,7 +4,7 @@
 // of lit street). Each building gets a lamp whose triangle of light falls on
 // a row of 12 pavement squares, one per street light (25 m each): the more
 // lights, the wider the triangle. Buttons switch between the four nights we
-// counted, each in its own gradient; the night's lamps sit four to a row and
+// counted, all in the same orange; the night's lamps sit four to a row and
 // all switch on together when they scroll into view.
 
 (function () {
@@ -92,7 +92,7 @@
       </div>
       <svg class="streetlights-defs" aria-hidden="true" focusable="false">
         <defs>
-          <!-- The light: the picked night's gradient, from the bulb down to the street -->
+          <!-- The light: the orange gradient, from the bulb down to the street -->
           <linearGradient id="sl-beam" gradientUnits="userSpaceOnUse" x1="0" y1="${BULB.y}" x2="0" y2="${GROUND}">
             <stop offset="0" class="sl-stop-1"/>
             <stop offset="0.5" class="sl-stop-2"/>
