@@ -88,6 +88,7 @@
   --weight-medium: 600;  /* 65 Medium: story cards */
   --weight-bold: 700;    /* 75 Bold: section headings */
   --weight-black: 900;   /* 95 Black: the "Where the light falls" title */
+  --weight-mono: 400;    /* Degular Mono Regular: data labels and numbers */
 
   /* Type sizes */
   --text-sm: 0.875rem;
