@@ -134,10 +134,13 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
-    // When the lamps come into view they all switch on at the same time
-    // (the timing is in streetlights.css). Once they've all
-    // scrolled fully off the screen they switch off, so coming back lights
-    // them up anew.
+    // Switching the lamps on (the timing is in streetlights.css):
+    // - When all the lamps fit on the screen (laptops), they all switch on at
+    //   the same time as they come into view.
+    // - When they don't (phones, where they stack), each lamp switches on by
+    //   itself as you scroll down to it, so you see every one light up.
+    // Lamps that scroll fully off the screen switch off again, so coming back
+    // lights them up anew.
     const heading = root.querySelector('.streetlights-heading');
     function onScroll() {
       const h = window.innerHeight;
@@ -145,8 +148,14 @@
       heading.classList.toggle('is-visible', box.top < h * 0.88 && box.bottom > h * 0.12);
       const g = grid.getBoundingClientRect();
       const lamps = grid.querySelectorAll('.streetlight');
-      if (g.top < h * 0.8 && g.bottom > 0) lamps.forEach((el) => el.classList.add('is-on'));
-      else if (g.top > h || g.bottom < 0) lamps.forEach((el) => el.classList.remove('is-on'));
+      const allFit = g.height <= h;
+      const parts = allFit ? [grid] : [...lamps];
+      parts.forEach((part) => {
+        const b = part.getBoundingClientRect();
+        const targets = allFit ? lamps : [part];
+        if (b.top < h * 0.8 && b.bottom > 0) targets.forEach((el) => el.classList.add('is-on'));
+        else if (b.top > h || b.bottom < 0) targets.forEach((el) => el.classList.remove('is-on'));
+      });
     }
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
