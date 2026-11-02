@@ -22,6 +22,12 @@
     usmarshals: 'Federal Building', bartongilman: 'One Financial Plaza', metropark: 'Banigan Building',
     merchants: 'Merchants Bank',
   };
+  // The words on the first screen
+  const TEXT = {
+    heading: 'Building Light in Illustrative Streetlight Equivalents',
+    body: 'Unlike streetlights, lit windows don’t have a clearly defined range of illumination. ' +
+      'But what if their collective glow could be experienced as a walk down a lit street at night?',
+  };
   const WINDOWS_PER_LIGHT = 10; // 1 street light ≈ 10 lit windows
   const METERS_PER_LIGHT = 25; // ≈ 25 m of lit street
   const SQUARES = 12; // pavement squares under each lamp: one per street light
@@ -46,11 +52,15 @@
 
   function build(lights) {
     root.innerHTML = `
-      <h2 class="streetlights-heading">Buildings’ Windows Light in Street Light Equivalent</h2>
-      <p class="streetlights-key">
-        <span class="streetlights-key-swatch" aria-hidden="true"></span>
-        = 1&nbsp;street light ≈ 10&nbsp;lit windows ≈ 25&nbsp;m of lit street
-      </p>
+      <!-- First screen: the headline, what it's about, and the key -->
+      <div class="streetlights-screen streetlights-screen--intro">
+        <h2 class="streetlights-heading">${TEXT.heading}</h2>
+        <p class="streetlights-body">${TEXT.body}</p>
+        <p class="streetlights-key">
+          <span class="streetlights-key-swatch" aria-hidden="true"></span>
+          = 1&nbsp;street light ≈ 10&nbsp;lit windows ≈ 25&nbsp;m of lit street
+        </p>
+      </div>
       <svg class="streetlights-defs" aria-hidden="true" focusable="false">
         <defs>
           <!-- The lamp's static shading, from "street lamp 2.svg" -->
@@ -72,6 +82,8 @@
           </filter>
         </defs>
       </svg>
+      <!-- Second screen: the night buttons and every lamp, all on one screen -->
+      <div class="streetlights-screen streetlights-screen--lamps">
       <div class="streetlights-nights" role="group" aria-label="Night">
         ${NIGHTS.map((n) => `
           <button type="button" class="streetlights-night streetlights-night--${n.id}" data-night="${n.id}" aria-pressed="false">${n.label}</button>`).join('')}
@@ -86,7 +98,8 @@
           </linearGradient>
         </defs>
       </svg>
-      <ul class="streetlights-grid"></ul>`;
+      <ul class="streetlights-grid"></ul>
+      </div>`;
 
     const grid = root.querySelector('.streetlights-grid');
     const buttons = [...root.querySelectorAll('.streetlights-night')];

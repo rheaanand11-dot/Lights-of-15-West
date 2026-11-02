@@ -9,9 +9,8 @@
   max-width: var(--wide-width);
   margin: 0 auto;
   /* Above the heading, the same gap as between the opening title and the
-     lines under it (64px) below "Back to the buildings"; a big gap below */
-  --section-gap: calc(var(--space-7) + var(--space-6) + var(--space-3));
-  padding: var(--space-6) var(--gutter) var(--section-gap);
+     lines under it (64px) below "Back to the buildings" */
+  padding: var(--space-6) var(--gutter) 0;
   text-align: center;
 }
 
@@ -22,6 +21,31 @@
 #streetlights.is-saturday { --sl-1: var(--day-saturday-1); --sl-2: var(--day-saturday-2); --sl-3: var(--day-saturday-3); }
 #streetlights.is-sunday { --sl-1: var(--day-sunday-1); --sl-2: var(--day-sunday-2); --sl-3: var(--day-sunday-3); }
 #streetlights.is-monday { --sl-1: var(--day-monday-1); --sl-2: var(--day-monday-2); --sl-3: var(--day-monday-3); }
+
+/* ---------- Two screens ----------
+   Like two frames in Figma: the first screen has the headline, the text and
+   the key; scrolling down brings the second screen, with the night buttons
+   and every lamp on it at once. The page settles on each screen as you
+   scroll (scroll-snap). */
+
+html:has(#streetlights) {
+  scroll-snap-type: y proximity;
+}
+
+/* The first screen fills what's left of the window under "Back to the
+   buildings" (64px) and the gap above the headline */
+.streetlights-screen--intro {
+  min-height: calc(100svh - 64px - var(--space-6));
+}
+
+.streetlights-screen--lamps {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100svh;
+  padding: var(--space-4) 0;
+  scroll-snap-align: start;
+}
 
 /* ---------- Heading and key ----------
    Same as the street section: heading, then the sub-heading in Neue Haas Grotesk
@@ -52,9 +76,20 @@
   }
 }
 
+/* What the section is about: the same size and grey as the explanations
+   under the opening's figures ("That's across US office space...") */
+.streetlights-body {
+  max-width: 30em;
+  margin: 0 auto var(--space-5);
+  font-size: var(--text-md);
+  line-height: 1.45;
+  text-wrap: balance;
+  color: var(--color-text-muted);
+}
+
 /* "= 1 street light ≈ ...": the sub-heading, like "Shine your light across the street" */
 .streetlights-key {
-  margin: 0 0 var(--space-5);
+  margin: 0;
   font-family: var(--font-body);
   font-size: var(--text-lg);
   font-weight: var(--weight-light);
@@ -140,8 +175,12 @@
 .streetlights-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-6) var(--space-4);
-  margin: 0;
+  gap: var(--space-5) var(--space-4);
+  /* Narrow enough that both rows of lamps fit on the screen with the night
+     buttons: each lamp's drawing is about 0.77 times as tall as it is wide,
+     plus its caption; the rest of the screen is buttons and gaps */
+  width: min(100%, calc((100svh - 340px) * 2.6 + 48px));
+  margin: 0 auto;
   padding: 0;
   list-style: none;
 }
