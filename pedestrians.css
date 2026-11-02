@@ -201,7 +201,16 @@
   border-radius: var(--radius-soft);
   background: none;
   color: var(--color-black);
+  /* Softened, like the grey arrows on the buttons (the arrows' own grey
+     would vanish on the grey folder, so the × is see-through instead) */
+  opacity: 0.5;
   cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.folder-close:hover,
+.folder-close:focus-visible {
+  opacity: 1;
 }
 
 .folder-close svg {
