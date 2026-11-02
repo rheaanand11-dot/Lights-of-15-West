@@ -140,9 +140,9 @@
   // the page has loaded and its fonts are in (so you see it happen, not a
   // half-drawn page), and again whenever the title comes back into view.
   // The first time, it waits for the opening ray of light to reach the title
-  // (about 3 seconds, see "The opening, in order" in history.css).
+  // (about 1.5 seconds, see "The opening, in order" in history.css).
   // The flicker itself is in history.css.
-  const RAY_ARRIVES_MS = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 3000;
+  const RAY_ARRIVES_MS = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1500;
   const flicker = root.querySelector('.history-title-flicker');
   const intro = root.querySelector('.history-step--intro');
   function flickerOn() {
