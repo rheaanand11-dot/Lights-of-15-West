@@ -25,7 +25,7 @@
 #streetlights .is-monday, #streetlights.is-monday { --sl-1: var(--day-monday-1); --sl-2: var(--day-monday-2); --sl-3: var(--day-monday-3); }
 
 /* ---------- Heading and key ----------
-   Same as the street section: heading, then the sub-heading in Helvetica
+   Same as the street section: heading, then the sub-heading in Neue Haas Grotesk
    Light Oblique, with the same gaps between them */
 
 .streetlights-heading {
