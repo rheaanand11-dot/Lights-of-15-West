@@ -93,7 +93,7 @@
   color: var(--color-black);
   font-family: var(--font-mono);
   font-size: var(--text-lg);
-  font-weight: var(--weight-roman);
+  font-weight: var(--weight-mono);
   letter-spacing: 0.04em;
 }
 
@@ -177,6 +177,7 @@ path.sl-lamp { fill: url(#sl-lamp); }
 .sl-meters,
 .sl-meters-glow {
   font-family: var(--font-mono);
+  font-weight: var(--weight-mono);
   font-size: 22px;
   letter-spacing: 0.04em;
 }
