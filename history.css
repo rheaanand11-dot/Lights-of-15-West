@@ -79,7 +79,11 @@
   position: relative;
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(2.4rem, 8.6vw, 6.4rem);
+  /* Always on one line: in Black, the title is about 12.65 times as wide as
+     its font size, so the font size is the space across the page divided by
+     12.9 (a little room to spare) */
+  font-size: calc((min(100vw, var(--wide-width)) - 2 * var(--gutter)) / 12.9);
+  white-space: nowrap;
   font-weight: var(--weight-black);
   line-height: 0.92;
   letter-spacing: -0.01em;
@@ -121,7 +125,7 @@
    none ends with a lonely word or two. */
 .history-lede {
   max-width: 46em;
-  margin: var(--space-4) 0 0;
+  margin: var(--space-6) 0 0; /* well clear of the title */
   font-size: clamp(1.05rem, 2.1vw, 1.4rem);
   line-height: 1.35;
   color: var(--color-lime);
@@ -130,6 +134,12 @@
 .history-lede span {
   display: block;
   text-wrap: balance;
+}
+
+/* "Who keeps the street lit now?" stands apart from the lines above, in italic */
+.history-lede .history-lede-question {
+  margin-top: var(--space-4);
+  font-style: italic;
 }
 
 .history-scroll-hint {
@@ -319,11 +329,11 @@
 
   /* ----- The opening, in order -----
      0.0s  just black
-     1.0s  a ray of light comes in from the top-right corner of the screen,
+     0.3s  a ray of light comes in from the top-right corner of the screen,
            soft and glowing, blending into the dark, and spreads toward the title
-     2.6s  where the light lands, the title appears and starts to glow
-     4.2s  the subtitle lines appear, one at a time
-     7.4s  "Scroll" appears
+     1.2s  where the light lands, the title appears and starts to glow
+     1.5s  the subtitle lines ease in, one at a time, then "Scroll"
+     2.6s  "FALLS" flickers for 2 seconds (history.js)
      It plays once, when the page opens. */
   .history-step--intro > * {
     transition-duration: 0.25s;
@@ -352,7 +362,7 @@
     mask-composite: intersect;
     overflow: hidden; /* keeps the blurred light inside the screen */
     opacity: 0;
-    animation: ray-comes-in 2.8s cubic-bezier(0.3, 0.1, 0.3, 1) 1s both;
+    animation: ray-comes-in 1.4s cubic-bezier(0.3, 0.1, 0.3, 1) 0.3s both;
   }
 
   /* The light: a soft wedge of warm white-yellow from the corner, brightest
@@ -407,7 +417,7 @@
     background: radial-gradient(ellipse 50% 45% at 50% 50%,
       rgba(255, 240, 200, 0.1) 0%, rgba(255, 240, 200, 0.035) 45%, transparent 72%);
     opacity: 0;
-    animation: glow-appears 1.6s ease-out 2.4s both;
+    animation: glow-appears 1s ease-out 1.1s both;
   }
 
   @keyframes glow-appears {
@@ -431,7 +441,7 @@
     mask-repeat: no-repeat;
     -webkit-mask-position: 0 100%;
     mask-position: 0 100%;
-    animation: light-falls 1.8s ease-in-out 2.6s both;
+    animation: light-falls 1s ease-in-out 1.2s both;
   }
 
   @keyframes light-falls {
@@ -442,11 +452,17 @@
   }
 
   /* Subtitle lines, one at a time */
+  /* The lines under the title wait until the title has appeared
+     (history.js then adds is-told), then ease in one after another,
+     0.2 seconds apart; "FALLS" flickers after them */
   .history-lede span {
     opacity: 0;
     transform: translateY(8px);
-    animation: line-appears 0.7s ease both; /* "both": stays hidden until its turn */
-    animation-delay: calc(4.2s + var(--i) * 0.6s);
+  }
+
+  .history-step--intro.is-told .history-lede span {
+    animation: line-appears 0.4s ease-out both; /* "both": stays hidden until its turn */
+    animation-delay: calc(var(--i) * 0.2s);
   }
 
   @keyframes line-appears {
@@ -454,9 +470,14 @@
     to { opacity: 1; transform: none; }
   }
 
-  .history-scroll-hint {
+  /* Hidden until the lines have played (stronger than the "show the step"
+     rule above, which would otherwise show it straight away) */
+  .history-step--intro:not(.is-told) .history-scroll-hint {
     opacity: 0;
-    animation: line-appears 0.7s ease 7.4s both;
+  }
+
+  .history-step--intro.is-told .history-scroll-hint {
+    animation: line-appears 0.4s ease-out 1s both; /* just after the last line */
   }
 
   .office {

@@ -66,6 +66,7 @@
 
   /* Text */
   --color-text: #f2efe8;
+  --color-white: #ffffff;          /* pure white: the street-light page's intro text */
   --color-text-muted: #8f8d99;
   --color-accent: var(--color-yellow);
 
@@ -89,12 +90,14 @@
   --weight-bold: 700;    /* 75 Bold: section headings */
   --weight-black: 900;   /* 95 Black: the "Where the light falls" title */
   --weight-mono: 400;    /* Degular Mono Regular: data labels and numbers */
+  --weight-mono-semibold: 600; /* Degular Mono Semibold: the night buttons */
 
   /* Type sizes */
   --text-sm: 0.875rem;
   --text-md: 1rem;
   --text-lg: 1.25rem;
   --text-xl: clamp(2rem, 6vw, 4rem);
+  --text-lede: clamp(1.05rem, 2.1vw, 1.4rem); /* the lines under the opening title */
 
   /* Spacing scale */
   --space-1: 4px;
@@ -104,6 +107,9 @@
   --space-5: 40px;
   --space-6: 64px;
   --space-7: 120px;
+
+  /* Corners: the soft rectangles of the buttons */
+  --radius-soft: 10px;
 
   /* Layout */
   --content-width: 720px;
@@ -144,7 +150,9 @@ img, svg { max-width: 100%; display: block; }
 .page-link-row {
   display: flex;
   justify-content: center;
-  padding: var(--space-6) var(--gutter) var(--space-5);
+  /* Below it, the same gap as between separate sections before Sources
+     (--section-gap is measured on the page by windows.js) */
+  padding: var(--space-6) var(--gutter) var(--section-gap, 320px);
 }
 
 .page-link-row--top {
@@ -158,8 +166,9 @@ img, svg { max-width: 100%; display: block; }
   align-items: center;
   gap: var(--space-1);
   padding: var(--space-3) var(--space-5);
-  border: 1px solid var(--color-building-edge);
-  border-radius: 999px;
+  /* A soft rectangle with a grey outline, the same grey as its arrow */
+  border: 1px solid var(--color-text-muted);
+  border-radius: var(--radius-soft);
   color: var(--color-text);
   text-align: center;
   text-decoration: none;
@@ -170,6 +179,22 @@ img, svg { max-width: 100%; display: block; }
   padding: var(--space-2) var(--space-4);
 }
 
+/* "Next to the street lights" fades and grows in as it scrolls onto the
+   screen, and back out as it leaves, like the section headings
+   (windows.js adds is-visible) */
+@media (prefers-reduced-motion: no-preference) {
+  .page-link-row:not(.page-link-row--top) .page-link {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.8s ease, transform 0.8s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .page-link-row:not(.page-link-row--top) .page-link.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .page-link:hover,
 .page-link:focus-visible {
   border-color: var(--color-chartreuse);
@@ -177,7 +202,27 @@ img, svg { max-width: 100%; display: block; }
 }
 
 .page-link-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
   font-size: var(--text-lg);
+}
+
+/* The bold arrow in the page links (an inline drawing in the HTML) */
+.page-link-arrow {
+  width: 1.1em;
+  height: 1.1em;
+  fill: none;
+  stroke: var(--color-text-muted);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.2s ease;
+}
+
+.page-link:hover .page-link-arrow,
+.page-link:focus-visible .page-link-arrow {
+  stroke: currentColor;
 }
 
 .page-link-row--top .page-link-title {
