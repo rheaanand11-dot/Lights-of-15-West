@@ -50,20 +50,22 @@
 }
 
 /* "Back to top": a small soft-rectangle button in the page links' style
-   (grey outline, bold arrow), always in the bottom-right corner of the
-   window, so it can be clicked from anywhere on the page */
+   (grey outline, bold arrow), part of the page (not pinned), centered at the
+   very bottom, under the lamps screen */
+.streetlights-top-row {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-4) 0 var(--space-6);
+}
+
 .streetlights-top {
-  position: fixed;
-  right: var(--gutter);
-  bottom: var(--space-4);
-  z-index: 10;
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
   padding: var(--space-1) var(--space-2);
   border: 1px solid var(--color-text-muted);
   border-radius: var(--radius-soft);
-  background: var(--color-night); /* so lamps scrolling behind it don't show through */
+  background: none;
   color: var(--color-text);
   font: inherit;
   font-size: var(--text-sm);
