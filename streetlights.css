@@ -8,11 +8,10 @@
 #streetlights {
   max-width: var(--wide-width);
   margin: 0 auto;
-  /* The same gap above the heading as between "The right light, not the
-     brightest" and the "Lit Windows by Building" heading (the legend above
-     already ends in --space-5), and the same again below, before Sources */
+  /* Above the heading, the same gap as between the opening title and the
+     lines under it (64px) below "Back to the buildings"; a big gap below */
   --section-gap: calc(var(--space-7) + var(--space-6) + var(--space-3));
-  padding: var(--section-gap) var(--gutter);
+  padding: var(--space-6) var(--gutter) var(--section-gap);
   text-align: center;
 }
 
