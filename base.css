@@ -67,7 +67,7 @@
   /* Text */
   --color-text: #f2efe8;
   --color-white: #ffffff;          /* pure white: the street-light page's intro text */
-  --color-folder: #8c8c8c;         /* an opened (or hovered) quote folder */
+  --color-folder: #696969;         /* an opened (or hovered) quote folder */
   --color-text-muted: #8f8d99;
   --color-accent: var(--color-yellow);
 
