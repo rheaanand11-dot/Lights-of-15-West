@@ -37,7 +37,12 @@ html:has(#streetlights) {
 .streetlights-screen--intro {
   /* The same, roomy gap between the headline, the text and the key */
   --intro-gap: calc(var(--space-6) + var(--space-3));
+  /* The headline, text and key sit in the middle of the first screen */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   min-height: calc(100svh - 64px - var(--space-6));
+  padding-bottom: calc(64px + var(--space-6)); /* balances the back button above, so it's truly centered */
 }
 
 .streetlights-screen--lamps {
@@ -78,15 +83,15 @@ html:has(#streetlights) {
   }
 }
 
-/* What the section is about: the same size and grey as the explanations
-   under the opening's figures ("That's across US office space...") */
+/* What the section is about: the same size as the explanations under the
+   opening's figures, in white */
 .streetlights-body {
   max-width: 30em;
   margin: 0 auto var(--intro-gap);
   font-size: var(--text-md);
   line-height: 1.45;
   text-wrap: balance;
-  color: var(--color-text-muted);
+  color: var(--color-white);
 }
 
 /* "= 1 street light ≈ ...": the sub-heading, like "Shine your light across the street" */
