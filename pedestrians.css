@@ -142,12 +142,13 @@
 .folder.is-open .folder-stripe {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
+  box-shadow: 0 2px 0 var(--folder-bg); /* covers the hairline where it meets the panel */
 }
 
 .folder-number {
   font-family: var(--font-mono);
   font-weight: var(--weight-mono-semibold);
-  font-size: var(--text-sm);
+  font-size: calc(var(--text-sm) * 1.2);
   letter-spacing: 0.06em;
   color: var(--number);
   transition: color 0.25s ease;
@@ -175,7 +176,8 @@
 .folder-quote {
   max-width: 34em;
   margin: 0;
-  padding: var(--space-4) var(--space-7) var(--space-6) var(--space-6);
+  /* Starts right under the stripe, so an open folder stays compact */
+  padding: 0 var(--space-6) var(--space-5);
   font-family: var(--font-mono);
   font-weight: var(--weight-mono);
   font-size: var(--text-lg);
@@ -183,10 +185,13 @@
   color: var(--color-black);
 }
 
+/* Close (×): in the stripe of the open folder, on the side across from
+   the number */
 .folder-close {
   position: absolute;
-  top: var(--space-2);
+  top: calc(var(--tab-h) + (var(--stripe) - 40px) / 2);
   right: var(--space-3);
+  z-index: 2;
   display: grid;
   place-items: center;
   width: 40px;
@@ -208,6 +213,17 @@
   stroke-linecap: round;
 }
 
+/* Left tabs have their number on the left, so the × goes right; right
+   tabs have their number on the right, so the × goes left */
+.folder--right .folder-close {
+  right: auto;
+  left: var(--space-3);
+}
+
+.folder:not(.is-open) .folder-close {
+  visibility: hidden;
+}
+
 .folder-close:focus-visible {
   outline: 2px solid var(--color-black);
   outline-offset: 2px;
@@ -215,7 +231,7 @@
 
 @media (max-width: 640px) {
   .folder-quote {
-    padding: var(--space-3) var(--space-6) var(--space-5) var(--space-4);
+    padding: 0 var(--space-4) var(--space-4);
     font-size: var(--text-md);
   }
 }

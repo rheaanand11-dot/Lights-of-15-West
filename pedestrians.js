@@ -51,10 +51,10 @@
           </svg>
           <span class="folder-stripe"><span class="folder-number">${n}</span></span>
         </button>
+        <button type="button" class="folder-close" aria-label="Close quote ${n}">${CLOSE}</button>
         <div class="folder-panel" id="quote-${n}">
           <div class="folder-panel-inner">
             <p class="folder-quote">“${quote}”</p>
-            <button type="button" class="folder-close" aria-label="Close quote ${n}">${CLOSE}</button>
           </div>
         </div>
       </li>`;
