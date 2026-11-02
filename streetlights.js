@@ -5,7 +5,7 @@
 // a row of 12 pavement squares, one per street light (25 m each): the more
 // lights, the wider the triangle. Buttons switch between the four nights we
 // counted, each in its own gradient; the night's lamps sit four to a row and
-// switch on one at a time as you scroll.
+// switch on one after another, in reading order, when they scroll into view.
 
 (function () {
   // The nights we counted (see lights.json), each with its gradient in base.css
@@ -25,7 +25,6 @@
   const WINDOWS_PER_LIGHT = 10; // 1 street light ≈ 10 lit windows
   const METERS_PER_LIGHT = 25; // ≈ 25 m of lit street
   const SQUARES = 12; // pavement squares under each lamp: one per street light
-  const PER_ROW = 4; // lamps per row on a laptop (fewer on smaller screens, see streetlights.css)
 
   // Where things sit in each drawing (its viewBox is 420 x 330). The lamp is
   // Anna's "street lamp 2.svg", shrunk to LAMP.scale and placed at LAMP.x/y.
@@ -102,26 +101,26 @@
         .filter((o) => o.day === night.day && o.time === night.time && NAMES[o.building])
         .map((o) => ({ id: o.building, lit: o.lit }))
         .sort((a, b) => b.lit - a.lit);
-      grid.innerHTML = buildings.map((b, i) => card(b, i % PER_ROW)).join('');
+      grid.innerHTML = buildings.map((b, i) => card(b, i)).join('');
       onScroll(); // lamps already on screen switch on straight away
     }
     buttons.forEach((b) => b.addEventListener('click', () => {
       show(NIGHTS.find((n) => n.id === b.dataset.night));
     }));
 
-    // As you scroll, each lamp switches on when it comes into view; lamps side
-    // by side switch on one after another. Lamps that scroll fully off the
-    // screen switch off again, so coming back lights them up anew.
+    // When the lamps come into view they all switch on, one after another in
+    // reading order (the timing is in streetlights.css). Once they've all
+    // scrolled fully off the screen they switch off, so coming back lights
+    // them up anew.
     const heading = root.querySelector('.streetlights-heading');
     function onScroll() {
       const h = window.innerHeight;
       const box = heading.getBoundingClientRect();
       heading.classList.toggle('is-visible', box.top < h * 0.88 && box.bottom > h * 0.12);
-      grid.querySelectorAll('.streetlight').forEach((el) => {
-        const b = el.getBoundingClientRect();
-        if (b.top < h * 0.8 && b.bottom > 0) el.classList.add('is-on');
-        else if (b.top > h || b.bottom < 0) el.classList.remove('is-on');
-      });
+      const g = grid.getBoundingClientRect();
+      const lamps = grid.querySelectorAll('.streetlight');
+      if (g.top < h * 0.8 && g.bottom > 0) lamps.forEach((el) => el.classList.add('is-on'));
+      else if (g.top > h || g.bottom < 0) lamps.forEach((el) => el.classList.remove('is-on'));
     }
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
@@ -130,7 +129,7 @@
 
   // One building: the lamp, its triangle of light, the row of pavement
   // squares (lit ones highlighted), the meters of lit street, and a caption
-  // (n = its place in the row, so lamps side by side switch on one after another)
+  // (n = its place in the order, so the lamps switch on one after another)
   function card(b, n) {
     const streetLights = Math.max(1, Math.min(SQUARES, Math.round(b.lit / WINDOWS_PER_LIGHT)));
     const meters = Math.round((b.lit / WINDOWS_PER_LIGHT) * METERS_PER_LIGHT);

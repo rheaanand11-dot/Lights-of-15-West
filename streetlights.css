@@ -84,7 +84,7 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: var(--space-3);
-  margin: 0 0 var(--space-7);
+  margin: 0 0 var(--space-5); /* the same gap as between the key and the buttons */
 }
 
 .streetlights-night {
@@ -152,8 +152,6 @@
 
 @media (max-width: 560px) {
   .streetlights-grid { grid-template-columns: 1fr; }
-  /* Stacked, so each lamp switches on by itself as it scrolls in */
-  .streetlight { --n: 0 !important; }
 }
 
 .streetlight svg {
@@ -210,8 +208,9 @@ path.sl-lamp { fill: url(#sl-lamp); }
 }
 
 /* ---------- Switching the lamps on ----------
-   streetlights.js adds is-on to each lamp as it scrolls into view (and again
-   when a night is picked). Lamps side by side switch on one after another (--n). */
+   When the lamps scroll into view (and when a night is picked),
+   streetlights.js switches them all on, and they light up in reading order,
+   one after another, 0.5 seconds apart (--n = 0, 1, 2 ...). */
 
 @media (prefers-reduced-motion: no-preference) {
   .streetlight {
