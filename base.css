@@ -67,6 +67,7 @@
   /* Text */
   --color-text: #f2efe8;
   --color-white: #ffffff;          /* pure white: the street-light page's intro text */
+  --color-folder: #8c8c8c;         /* an opened (or hovered) quote folder */
   --color-text-muted: #8f8d99;
   --color-accent: var(--color-yellow);
 
@@ -107,6 +108,10 @@
   --space-5: 40px;
   --space-6: 64px;
   --space-7: 120px;
+
+  /* The gap between separate visualizations (on the main page windows.js
+     measures it from the title screen; elsewhere this stands in) */
+  --space-section: 320px;
 
   /* Corners: the soft rectangles of the buttons */
   --radius-soft: 10px;
