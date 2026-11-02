@@ -60,14 +60,28 @@
       </li>`;
   }
 
-  // Opening and closing: one folder open at a time
+  // Opening and closing: one folder open at a time. Opening one closes the
+  // one that was open; if that one is higher up the page, closing it would
+  // pull everything up and make the new folder look like it opens upward.
+  // So while the folders move, the page scrolls along to keep the clicked
+  // folder's stripe still: every folder opens downward.
   const folders = [...root.querySelectorAll('.folder')];
+  const MOVE_MS = 500; // a little longer than the open/close in pedestrians.css
   function setOpen(target) {
+    const anchor = target || folders.find((f) => f.classList.contains('is-open'));
+    const startTop = anchor ? anchor.getBoundingClientRect().top : 0;
     folders.forEach((f) => {
       const open = f === target;
       f.classList.toggle('is-open', open);
       f.querySelector('.folder-toggle').setAttribute('aria-expanded', open);
     });
+    if (!anchor) return;
+    const start = performance.now();
+    (function keepStill(now) {
+      const drift = anchor.getBoundingClientRect().top - startTop;
+      if (Math.abs(drift) > 0.5) window.scrollBy(0, drift);
+      if (now - start < MOVE_MS) requestAnimationFrame(keepStill);
+    })(start);
   }
   folders.forEach((f) => {
     f.querySelector('.folder-toggle').addEventListener('click', () => {
