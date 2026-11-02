@@ -146,8 +146,8 @@ html:has(#streetlights) {
 
 .streetlights-night {
   padding: var(--space-2) var(--space-4);
-  /* Soft rectangles with a light outline, like the page links */
-  border: 1px solid var(--color-text);
+  /* Soft rectangles with a grey outline, like the page links */
+  border: 1px solid var(--color-text-muted);
   border-radius: var(--radius-soft);
   background: transparent;
   color: var(--color-text);
