@@ -69,14 +69,18 @@
   --color-text-muted: #8f8d99;
   --color-accent: var(--color-yellow);
 
-  /* Fonts: Neue Haas Grotesque for text, from Adobe Fonts (link in
-     index.html and streetlights.html): the Display cut for headings, the Text
-     cut for reading. Until it loads, or if it can't, Helvetica Neue stands in.
+  /* Fonts: Neue Haas Grotesk Display Pro for all text, from Adobe Fonts (link
+     in index.html and streetlights.html). Weights used: Black (900) for the
+     "Where the light falls" title, Bold (700) for headings, Medium (500) for
+     the story cards, Roman (400) for body text, Light Italic (300 italic) for
+     the sub-headings. "Neue Haas Grotesk Display Pro" is its name when it's
+     installed on a computer (Adobe Creative Cloud). Until it loads, or if it
+     can't, Helvetica Neue stands in.
      Degular Mono, also from Adobe Fonts, labels data and statistics, as in the
      Figma and Illustrator designs: the pie chart numbers, the story card's
      "time · Floor · room", the light readout and the small hints. */
-  --font-display: "neue-haas-grotesque-display", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-body: "neue-haas-grotesque-text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-display: "neue-haas-grotesk-display", "Neue Haas Grotesk Display Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-body: var(--font-display);
   --font-mono: "degular-mono", ui-monospace, Menlo, monospace;
 
   /* Type sizes */
