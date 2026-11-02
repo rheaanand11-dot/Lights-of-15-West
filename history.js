@@ -149,7 +149,12 @@
     flicker.classList.remove('is-flickering');
     void flicker.offsetWidth; // let the browser notice, so the flicker restarts
     flicker.classList.add('is-flickering');
+    // With reduced motion there's no flicker to wait for: show the lines now
+    if (!RAY_ARRIVES_MS) intro.classList.add('is-told');
   }
+  // Once "FALLS" stops flickering (the first time), the lines under the title
+  // ease in (history.css). They stay shown after that.
+  flicker.addEventListener('animationend', () => intro.classList.add('is-told'));
   const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
   const pageLoaded = new Promise((done) => {
     if (document.readyState === 'complete') done();

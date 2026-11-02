@@ -452,11 +452,17 @@
   }
 
   /* Subtitle lines, one at a time */
+  /* The lines under the title wait until "FALLS" has finished flickering
+     (history.js then adds is-told), then ease in one after another,
+     0.2 seconds apart */
   .history-lede span {
     opacity: 0;
     transform: translateY(8px);
-    animation: line-appears 0.7s ease both; /* "both": stays hidden until its turn */
-    animation-delay: calc(4.2s + var(--i) * 0.6s);
+  }
+
+  .history-step--intro.is-told .history-lede span {
+    animation: line-appears 0.4s ease-out both; /* "both": stays hidden until its turn */
+    animation-delay: calc(var(--i) * 0.2s);
   }
 
   @keyframes line-appears {
@@ -466,7 +472,10 @@
 
   .history-scroll-hint {
     opacity: 0;
-    animation: line-appears 0.7s ease 6.8s both; /* just after the last line */
+  }
+
+  .history-step--intro.is-told .history-scroll-hint {
+    animation: line-appears 0.4s ease-out 1s both; /* just after the last line */
   }
 
   .office {
