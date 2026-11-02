@@ -5,7 +5,7 @@
 // a row of 12 pavement squares, one per street light (25 m each): the more
 // lights, the wider the triangle. Buttons switch between the four nights we
 // counted, each in its own gradient; the night's lamps sit four to a row and
-// switch on one after another, in reading order, when they scroll into view.
+// all switch on together when they scroll into view.
 
 (function () {
   // The nights we counted (see lights.json), each with its gradient in base.css
@@ -28,6 +28,8 @@
     body: 'Unlike streetlights, lit windows don’t have a clearly defined range of illumination. ' +
       'But what if their collective glow could be experienced as a walk down a lit street at night?',
   };
+  // The bold arrow of the page links (see .page-link-arrow in base.css), pointing up
+  const ARROW_UP = '<svg class="page-link-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V5M5.5 11.5L12 5l6.5 6.5"/></svg>';
   const WINDOWS_PER_LIGHT = 10; // 1 street light ≈ 10 lit windows
   const METERS_PER_LIGHT = 25; // ≈ 25 m of lit street
   const SQUARES = 12; // pavement squares under each lamp: one per street light
@@ -85,6 +87,7 @@
       </svg>
       <!-- Second screen: the night buttons and every lamp, all on one screen -->
       <div class="streetlights-screen streetlights-screen--lamps">
+      <div class="streetlights-lamps-group">
       <div class="streetlights-nights" role="group" aria-label="Night">
         ${NIGHTS.map((n) => `
           <button type="button" class="streetlights-night streetlights-night--${n.id}" data-night="${n.id}" aria-pressed="false">${n.label}</button>`).join('')}
@@ -100,6 +103,13 @@
         </defs>
       </svg>
       <ul class="streetlights-grid"></ul>
+      </div>
+      <!-- Back up to the headline, in the same style as the page links -->
+      <div class="streetlights-top-row">
+        <button type="button" class="page-link streetlights-top">
+          <span class="page-link-title">Back to top ${ARROW_UP}</span>
+        </button>
+      </div>
       </div>`;
 
     const grid = root.querySelector('.streetlights-grid');
@@ -121,9 +131,12 @@
     buttons.forEach((b) => b.addEventListener('click', () => {
       show(NIGHTS.find((n) => n.id === b.dataset.night));
     }));
+    root.querySelector('.streetlights-top').addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
 
-    // When the lamps come into view they all switch on, one after another in
-    // reading order (the timing is in streetlights.css). Once they've all
+    // When the lamps come into view they all switch on at the same time
+    // (the timing is in streetlights.css). Once they've all
     // scrolled fully off the screen they switch off, so coming back lights
     // them up anew.
     const heading = root.querySelector('.streetlights-heading');
