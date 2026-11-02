@@ -136,41 +136,44 @@
     window.addEventListener('resize', aim);
   }
 
-  // The title's last word ("falls") flickers like a light switching on: once
-  // the page has loaded and its fonts are in (so you see it happen, not a
-  // half-drawn page), and again whenever the title comes back into view.
-  // The first time, it waits for the opening ray of light to reach the title
-  // (about 1.5 seconds, see "The opening, in order" in history.css).
-  // The flicker itself is in history.css.
-  const RAY_ARRIVES_MS = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1500;
+  // The title screen plays in this order (see also "The opening, in order"
+  // in history.css), once the page has loaded and its fonts are in, so you
+  // see it happen rather than a half-drawn page:
+  //   1. the ray of light reaches the title and it appears (about 1.5s)
+  //   2. the lines under it ease in, one after another (is-told, history.css)
+  //   3. then the title's last word ("falls") flickers like a light switching on
+  // "Falls" flickers again whenever the title comes back into view.
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const RAY_ARRIVES_MS = reduceMotion ? 0 : 1500;
+  const LINES_MS = reduceMotion ? 0 : 1100; // 4 lines, 0.2s apart, each 0.4s
   const flicker = root.querySelector('.history-title-flicker');
   const intro = root.querySelector('.history-step--intro');
   function flickerOn() {
     flicker.classList.remove('is-flickering');
     void flicker.offsetWidth; // let the browser notice, so the flicker restarts
     flicker.classList.add('is-flickering');
-    // With reduced motion there's no flicker to wait for: show the lines now
-    if (!RAY_ARRIVES_MS) intro.classList.add('is-told');
   }
-  // Once "FALLS" stops flickering (the first time), the lines under the title
-  // ease in (history.css). They stay shown after that.
-  flicker.addEventListener('animationend', () => intro.classList.add('is-told'));
+  const wait = (ms) => new Promise((done) => setTimeout(done, ms));
   const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
   const pageLoaded = new Promise((done) => {
     if (document.readyState === 'complete') done();
     else window.addEventListener('load', done);
   });
-  const rayArrived = new Promise((done) => setTimeout(done, RAY_ARRIVES_MS));
-  Promise.all([fontsReady, pageLoaded, rayArrived]).then(() => {
-    if (intro.classList.contains('is-visible')) flickerOn();
-    // From then on, flicker each time the title scrolls back into view
-    new MutationObserver(() => {
-      const visible = intro.classList.contains('is-visible');
-      if (visible && !intro.dataset.wasVisible) flickerOn();
-      intro.dataset.wasVisible = visible ? 'yes' : '';
-    }).observe(intro, { attributes: true, attributeFilter: ['class'] });
-    intro.dataset.wasVisible = intro.classList.contains('is-visible') ? 'yes' : '';
-  });
+  Promise.all([fontsReady, pageLoaded, wait(RAY_ARRIVES_MS)])
+    .then(() => {
+      intro.classList.add('is-told'); // the lines ease in, and stay shown after
+      return wait(LINES_MS);
+    })
+    .then(() => {
+      if (intro.classList.contains('is-visible')) flickerOn();
+      // From then on, flicker each time the title scrolls back into view
+      new MutationObserver(() => {
+        const visible = intro.classList.contains('is-visible');
+        if (visible && !intro.dataset.wasVisible) flickerOn();
+        intro.dataset.wasVisible = visible ? 'yes' : '';
+      }).observe(intro, { attributes: true, attributeFilter: ['class'] });
+      intro.dataset.wasVisible = intro.classList.contains('is-visible') ? 'yes' : '';
+    });
 
   function titleWithFlicker(title) {
     const words = title.split(' ');

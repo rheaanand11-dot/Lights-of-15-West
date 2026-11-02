@@ -332,8 +332,8 @@
      0.3s  a ray of light comes in from the top-right corner of the screen,
            soft and glowing, blending into the dark, and spreads toward the title
      1.2s  where the light lands, the title appears and starts to glow
-     1.5s  "FALLS" flickers for 2 seconds (history.js)
-     3.5s  the subtitle lines ease in, one at a time, then "Scroll"
+     1.5s  the subtitle lines ease in, one at a time, then "Scroll"
+     2.6s  "FALLS" flickers for 2 seconds (history.js)
      It plays once, when the page opens. */
   .history-step--intro > * {
     transition-duration: 0.25s;
@@ -452,9 +452,9 @@
   }
 
   /* Subtitle lines, one at a time */
-  /* The lines under the title wait until "FALLS" has finished flickering
+  /* The lines under the title wait until the title has appeared
      (history.js then adds is-told), then ease in one after another,
-     0.2 seconds apart */
+     0.2 seconds apart; "FALLS" flickers after them */
   .history-lede span {
     opacity: 0;
     transform: translateY(8px);
