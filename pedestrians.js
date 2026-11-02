@@ -9,7 +9,7 @@
   const TEXT = {
     heading: 'How Do Lights Make Pedestrians Feel at Night?',
     body: 'People’s thoughts of how lit up windows of 15 West affect their perception ' +
-      'of safety when the surrounding buildings go dark',
+      'of safety when the surrounding buildings go dark.',
   };
   // As written in the Figma frame
   const QUOTES = [

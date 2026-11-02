@@ -9,8 +9,8 @@
   padding: var(--space-section) var(--gutter) 0; /* the top is fine-tuned by pedestrians.js */
 }
 
-/* ---------- Heading (centered) and text (set in a little, as in the
-   Figma frame) ---------- */
+/* ---------- Heading and text, centered, with the same gap above and
+   below the text ---------- */
 
 .pedestrians-heading {
   max-width: 20ch;
@@ -40,14 +40,12 @@
 
 .pedestrians-body {
   max-width: 30em;
-  margin: 0 0 calc(var(--space-6) + var(--space-3)) 16%;
+  margin: 0 auto calc(var(--space-6) + var(--space-3)); /* centered under the headline */
+  text-align: center;
+  text-wrap: balance;
   font-size: var(--text-lede);
   line-height: 1.35;
   color: var(--color-white);
-}
-
-@media (max-width: 640px) {
-  .pedestrians-body { margin-left: 0; }
 }
 
 /* ---------- Folders ---------- */
