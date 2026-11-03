@@ -35,7 +35,7 @@
     },
     rightLight: {
       title: 'The right light, not the brightest',
-      text: 'Brighter isn’t safer. Lights that are too bright cause glare: they dazzle your eyes and make everything around them harder to see.',
+      text: 'Brighter isn’t safer. Lights that are too bright or poorly aimed cause glare: they dazzle your eyes and make everything around them harder to see.',
     },
     sources: [
       'CBRE, U.S. Office Figures Q2 2026',
