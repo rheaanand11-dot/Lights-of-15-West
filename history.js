@@ -21,7 +21,7 @@
     },
     crime: {
       caption: 'Better lighting is linked to less crime',
-      text: 'Each pie is a place’s crime before its lighting improved; the lit slice is how much went away. Across 13 studies it fell by about a fifth (Welsh & Farrington), and at New York City public housing, outdoor crime at night fell by about a third (Chalfin et al.).',
+      text: 'Each pie is crime before the lights improved.',
       // One pie each, smallest drop first. The lit slice is the crime that went away.
       pies: [
         { share: 14, label: 'Lowest drop found in the studies' },
