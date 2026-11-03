@@ -21,7 +21,7 @@
     },
     crime: {
       caption: 'Better lighting is linked to less crime',
-      text: 'Each pie is crime before the lights improved.',
+      text: 'The lit slice is the crime that went away.',
       // One pie each, smallest drop first. The lit slice is the crime that went away.
       pies: [
         { share: 14, label: 'Lowest drop found in the studies' },
