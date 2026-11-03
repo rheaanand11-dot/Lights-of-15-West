@@ -7,12 +7,13 @@
   const HISTORY = {
     title: 'Where the light falls',
     lede: [
-      'Downtown goes dark after work.',
-      'Jane Jacobs called lit windows “eyes upon the street”, a quiet kind of watching.',
-      'Research links light to lower crime, but darkness only moves elsewhere.',
+      'Downtown Providence goes dark after work.',
+      'The Wall Street Journal reported, “It’s dead down here now.”',
+      '15 West’s windows are the eyes on Westminster Street. (Jane Jacobs)',
+      'A Providence City Council resolution approved May 17, 1982 asked to replace downtown street lamps.',
     ],
     // Set apart below the lines above, in italic
-    question: 'Who keeps the street lit now?',
+    closing: 'Now the offices are dark, and students are the ones lighting the street.',
     // Each figure: a headline, then a short plain-language explanation
     offices: {
       title: 'About 1 in 5 offices is empty',
@@ -59,7 +60,7 @@
       </div>
       <p class="history-lede">
         ${HISTORY.lede.map((line, i) => `<span style="--i: ${i}">${line}</span>`).join('')}
-        <span class="history-lede-question" style="--i: ${HISTORY.lede.length}">${HISTORY.question}</span>
+        <span class="history-lede-question" style="--i: ${HISTORY.lede.length}">${HISTORY.closing}</span>
       </p>
       <p class="history-scroll-hint" aria-hidden="true">Scroll &darr;</p>
     </div>
@@ -145,7 +146,7 @@
   // "Falls" flickers again whenever the title comes back into view.
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const RAY_ARRIVES_MS = reduceMotion ? 0 : 1500;
-  const LINES_MS = reduceMotion ? 0 : 1100; // 4 lines, 0.2s apart, each 0.4s
+  const LINES_MS = reduceMotion ? 0 : 1300; // 5 lines, 0.2s apart, each 0.4s
   const flicker = root.querySelector('.history-title-flicker');
   const intro = root.querySelector('.history-step--intro');
   function flickerOn() {
