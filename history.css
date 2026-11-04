@@ -227,9 +227,9 @@
   overflow: hidden; /* keeps the grain inside the circle */
 }
 
-/* Film grain over the lit slice, like the street lamps' light and the quote
-   folders. "Overlay" lightens and darkens the colors without dulling them,
-   and leaves the dark part of the pie dark. */
+/* Film grain over the lit slice only, like the street lamps' light and the
+   quote folders. "Overlay" lightens and darkens the colors without dulling
+   them. The mask is the slice's own shape, so the dark part has no grain. */
 .pie::after {
   content: "";
   position: absolute;
@@ -237,6 +237,8 @@
   background-image: var(--grain);
   mix-blend-mode: overlay;
   opacity: 0.9;
+  -webkit-mask-image: conic-gradient(var(--color-black) calc(var(--fill) * 1%), transparent 0);
+  mask-image: conic-gradient(var(--color-black) calc(var(--fill) * 1%), transparent 0);
   pointer-events: none;
 }
 
