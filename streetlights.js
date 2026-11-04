@@ -24,7 +24,7 @@
   };
   // The words on the first screen
   const TEXT = {
-    heading: 'Every ten windows light the street like one streetlamp',
+    heading: 'Every 10 illuminated windows become 1 streetlamp',
     body: 'Unlike streetlights, lit windows don’t have a clearly defined range of illumination. ' +
       'But what if their collective glow could be experienced as a walk down a lit street at night?',
   };
