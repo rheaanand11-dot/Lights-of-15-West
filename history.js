@@ -37,12 +37,16 @@
       title: 'The right light, not the brightest',
       text: 'Brighter isn’t safer. Lights that are too bright or poorly aimed cause glare: they dazzle your eyes and make everything around them harder to see.',
     },
+    // One bullet each; url = where the source opens (in a new tab)
     sources: [
-      'CBRE, U.S. Office Figures Q2 2026',
-      'Welsh & Farrington, “Effects of Improved Street Lighting on Crime,” Campbell Systematic Reviews, 2008',
-      'Chalfin, Hansen, Lerner & Parker, “Reducing Crime Through Environmental Design,” Journal of Quantitative Criminology, 2022',
-      'Jacobs, The Death and Life of Great American Cities, 1961',
-      'DarkSky International, “Light Pollution: Safety,” darksky.org',
+      { text: 'CBRE, U.S. Office Figures Q2 2026' },
+      { text: 'Welsh & Farrington, “Effects of Improved Street Lighting on Crime,” Campbell Systematic Reviews, 2008',
+        url: 'https://onlinelibrary.wiley.com/doi/full/10.4073/csr.2008.13' },
+      { text: 'Chalfin, Hansen, Lerner & Parker, “Reducing Crime Through Environmental Design,” Journal of Quantitative Criminology, 2022',
+        url: 'https://www.jstor.org/stable/48809454?seq=1' },
+      { text: 'Jacobs, The Death and Life of Great American Cities, 1961',
+        url: 'https://urbanpolicy.net/wp-content/uploads/2015/06/Jacobs_1961_01_Contents-Introduction.pdf' },
+      { text: 'DarkSky International, “Light Pollution: Safety,” darksky.org' },
     ],
   };
 
@@ -106,8 +110,15 @@
   // Sources go at the very bottom of the page, not here
   const sources = document.getElementById('sources');
   if (sources) {
-    sources.innerHTML =
-      `<p class="history-sources"><strong>Sources:</strong> ${HISTORY.sources.join(' · ')}</p>`;
+    sources.innerHTML = `
+      <div class="history-sources">
+        <p><strong>Sources</strong></p>
+        <ul>
+          ${HISTORY.sources.map((s) => `<li>${s.url
+            ? `<a href="${s.url}" target="_blank" rel="noopener">${s.text}</a>`
+            : s.text}</li>`).join('')}
+        </ul>
+      </div>`;
   }
 
   drawBlocks(root.querySelector('.blocks'));

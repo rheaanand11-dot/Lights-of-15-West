@@ -223,6 +223,21 @@
   background: conic-gradient(var(--color-orange) 0%, var(--color-yellow) calc(var(--fill) * 1%),
     transparent 0);
   box-shadow: 0 0 40px 2px color-mix(in srgb, var(--color-orange) 25%, transparent);
+  position: relative;
+  overflow: hidden; /* keeps the grain inside the circle */
+}
+
+/* Film grain over the lit slice, like the street lamps' light and the quote
+   folders. "Overlay" lightens and darkens the colors without dulling them,
+   and leaves the dark part of the pie dark. */
+.pie::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--grain);
+  mix-blend-mode: overlay;
+  opacity: 0.9;
+  pointer-events: none;
 }
 
 .pie-number {
@@ -297,15 +312,12 @@
    ring and a bigger warm glow, and the readout lights up in the same warm
    white */
 .is-right-light .light-panel {
-  opacity: 1; /* fully lit, not dimmed like the steps around it */
+  /* A little stronger than the plain light at the same level, but clearly
+     softer than 100% */
+  opacity: calc(var(--light) + 0.12);
   background: var(--color-warm-white);
-  box-shadow:
-    0 0 0 3px var(--color-warm-white),
-    0 0 90px 28px color-mix(in srgb, var(--color-warm-white) 45%, transparent);
-}
-
-.is-right-light .light-frame {
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-warm-white) 70%, transparent);
+  /* A soft glow that stays close, inside the frame's edge */
+  box-shadow: 0 0 18px 2px color-mix(in srgb, var(--color-warm-white) 45%, transparent);
 }
 
 .is-right-light .light-readout {
@@ -346,11 +358,40 @@
 
 .history-sources {
   max-width: 90ch;
-  margin: 0;
   padding: var(--space-4) 0 var(--space-7); /* room below, so the page doesn't end abruptly */
   font-size: 0.75rem;
   line-height: 1.5;
   color: var(--color-text-muted);
+}
+
+.history-sources p {
+  margin: 0 0 var(--space-1);
+}
+
+/* One bullet per source */
+.history-sources ul {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.history-sources li + li {
+  margin-top: 0.25em;
+}
+
+/* Links keep the grey of the text (not blue), underlined so they read as
+   links, and light up on hover */
+.history-sources a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+  text-underline-offset: 0.2em;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+
+.history-sources a:hover,
+.history-sources a:focus-visible {
+  color: var(--color-text);
+  text-decoration-color: currentColor;
 }
 
 /* ---------- Fading steps in and out ---------- */
