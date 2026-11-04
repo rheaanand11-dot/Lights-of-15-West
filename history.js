@@ -23,7 +23,7 @@
     },
     crime: {
       caption: 'Better lighting is linked to less crime',
-      text: 'The lit slice is the crime that went away.',
+      text: 'These studies are from other cities. On Westminster Street after dark, much of the light comes from windows like 15 West’s.',
       // One pie each, smallest drop first. The lit slice is the crime that went away.
       pies: [
         { share: 14, label: 'Lowest drop found in the studies' },
