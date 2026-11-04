@@ -673,22 +673,83 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   opacity: 0;
 }
 
-/* Windows start as thin outlines, like a drawing */
+/* Windows start as thin outlines, like a drawing. They're drawn with an
+   outline (not a 1px shadow, which loses some of its edges on windows this
+   small), which fades out as the building is built. */
+#windows .window:not(.window--wall) {
+  outline: 1px solid transparent;
+  outline-offset: -1px;
+}
+
 #windows:not(.is-built) .window:not(.window--wall) {
-  opacity: 0;
   background: transparent;
-  box-shadow: inset 0 0 0 1px var(--color-pale-yellow);
+  outline-color: var(--color-pale-yellow);
+}
+
+#windows .window:focus-visible {
+  outline: 2px solid var(--color-yellow);
+  outline-offset: 3px;
 }
 
 #windows:not(.is-built) .window::before { opacity: 0; }
 .window::before { transition: opacity 1.2s ease; }
 
-/* --d is each window's place in the drawing order, set by windows.js */
 #windows.is-windowing .window:not(.window--wall) {
+  transition-property: background-color, outline-color;
+  transition-duration: 1.2s;
+}
+
+/* 15 West's windows appear one by one (--d is each window's place in the
+   drawing order, set by windows.js) */
+#windows:not(.is-built) .facade--main .window:not(.window--wall) { opacity: 0; }
+
+#windows.is-windowing .facade--main .window:not(.window--wall) {
   opacity: 1;
-  transition-property: opacity, background-color, box-shadow;
+  transition-property: opacity, background-color, outline-color;
   transition-duration: 0.25s, 1.2s, 1.2s;
   transition-delay: calc(var(--d) * 1ms), 0s, 0s;
+}
+
+/* The buildings around it have far more windows (over 2,000), too many to
+   fade in one by one smoothly. Instead a cover over each window grid slides
+   away upward, revealing the windows floor by floor from the bottom, in the
+   same time as 15 West (--windowing-ms, set by windows.js). */
+.facade--neighbor .facade-grid::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--color-night); /* the page behind, before the walls fill in */
+  transform-origin: top;
+  pointer-events: none;
+}
+
+#windows.is-windowing .facade--neighbor .facade-grid::after {
+  animation: windows-rise var(--windowing-ms, 1500ms) linear both;
+}
+
+#windows.is-built .facade--neighbor .facade-grid::after { display: none; }
+
+/* When the walls fill in, the neighbors' windows don't each fade from
+   outline to dark (again too many to do smoothly): the whole window grid
+   fades in at once, with the walls */
+#windows.is-windowing .facade--neighbor .window:not(.window--wall) { transition: none; }
+
+#windows.is-built .facade--neighbor .facade-grid {
+  animation: windows-fill-in 1.2s ease both;
+}
+
+@keyframes windows-fill-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes windows-rise {
+  from { transform: scaleY(1); }
+  to { transform: scaleY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .facade--neighbor .facade-grid::after { display: none; }
 }
 
 /* ---------- The story card ---------- */

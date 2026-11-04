@@ -377,8 +377,10 @@
         return;
       }
       root.classList.add('is-outlining');
-      setTimeout(() => root.classList.add('is-windowing'), OUTLINE_MS);
       const lastWindow = FACADE.floors * FACADE.rooms * WINDOW_STEP_MS;
+      // The buildings around 15 West reveal their windows in the same time
+      root.style.setProperty('--windowing-ms', lastWindow + 'ms');
+      setTimeout(() => root.classList.add('is-windowing'), OUTLINE_MS);
       setTimeout(() => {
         root.classList.add('is-built');
         built = true;
