@@ -289,8 +289,9 @@
           panel.style.setProperty('--light', progress.toFixed(3));
           const percent = Math.round(progress * 100);
           readout.textContent = percent;
-          // 60-75% is the right light: the screen turns warm white
-          panel.classList.toggle('is-right', percent >= 60 && percent <= 75);
+          // 60-75% is the right light: the screen turns warm white and is
+          // highlighted (history.css)
+          step.classList.toggle('is-right-light', percent >= 60 && percent <= 75);
         }
       });
     }

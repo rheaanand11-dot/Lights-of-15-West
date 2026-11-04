@@ -274,6 +274,7 @@
   width: min(86%, 440px);
   padding: 12px;
   background: linear-gradient(to bottom, #1c1c1c, #a3a3a3);
+  transition: box-shadow 0.4s ease;
 }
 
 /* --light goes from 0 to 1 as you scroll (set by history.js) */
@@ -283,15 +284,28 @@
   background: #fff;
   opacity: var(--light);
   box-shadow: 0 0 calc(var(--light) * 70px) calc(var(--light) * 14px) rgba(255, 255, 255, 0.3);
-  transition: background-color 0.4s ease, box-shadow 0.4s ease;
+  transition: background-color 0.4s ease, box-shadow 0.4s ease, opacity 0.3s ease;
 }
 
-/* 60-75% is the right light: the screen turns warm white (history.js adds
-   is-right in that range) */
-.light-panel.is-right {
+/* 60-75% is the right light (history.js adds is-right-light to the step in
+   that range): the screen turns warm white and is highlighted, with a warm
+   ring and a bigger warm glow, and the readout lights up in the same warm
+   white */
+.is-right-light .light-panel {
+  opacity: 1; /* fully lit, not dimmed like the steps around it */
   background: var(--color-warm-white);
-  box-shadow: 0 0 calc(var(--light) * 70px) calc(var(--light) * 14px)
-    color-mix(in srgb, var(--color-warm-white) 35%, transparent);
+  box-shadow:
+    0 0 0 3px var(--color-warm-white),
+    0 0 90px 28px color-mix(in srgb, var(--color-warm-white) 45%, transparent);
+}
+
+.is-right-light .light-frame {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-warm-white) 70%, transparent);
+}
+
+.is-right-light .light-readout {
+  color: var(--color-warm-white);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--color-warm-white) 70%, transparent);
 }
 
 .light-readout {
@@ -302,6 +316,7 @@
   letter-spacing: 0.06em;
   color: var(--color-text-muted);
   font-variant-numeric: tabular-nums;
+  transition: color 0.4s ease, text-shadow 0.4s ease;
 }
 
 /* The plain-language explanation under each figure's headline */
