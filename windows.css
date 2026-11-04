@@ -384,14 +384,25 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
 
 /* ---------- Zoom ----------
    Pinching on a trackpad zooms the street in around the cursor
-   (windows.js). Zoomed in, the buildings aren't cropped to the street's
-   frame: they spread out to the left, right and up, over the text above
-   (the page's edges still stop sideways scrolling, base.css). Only the
-   bottom is cut at the street, so the switch and count stay clear. */
+   (windows.js). Zoomed in, the heading, hint, switch and count fade away,
+   and the buildings fill the whole buildings section: from its top to its
+   bottom (--zoom-above and --zoom-below, measured by windows.js) and out to
+   the page's edges (which still stop sideways scrolling, base.css). */
 .skyline.is-scaled {
   z-index: 2;
   overflow: visible;
-  clip-path: inset(-100vh -100vw 0 -100vw);
+  clip-path: inset(calc(-1 * var(--zoom-above, 0px)) -100vw calc(-1 * var(--zoom-below, 0px)) -100vw);
+}
+
+#windows.is-zoomed-in .windows-heading,
+#windows.is-zoomed-in .facade-hint,
+#windows.is-zoomed-in .skyline-controls {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.skyline-controls {
+  transition: opacity 0.5s ease;
 }
 
 /* ---------- The neighbors ----------
