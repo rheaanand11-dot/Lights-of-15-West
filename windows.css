@@ -141,6 +141,23 @@
   transform: none;
 }
 
+/* Zoomed in, there's room on the sides, so the outermost buildings (Turks
+   Head Building and Merchants Bank) get their name centered over them like
+   the rest, instead of lined up with the screen's edge */
+#windows.is-zoomed-in .facade-label--start,
+#windows.is-zoomed-in .facade-label--end {
+  left: 50%;
+  right: auto;
+  align-items: center;
+  transform: translate(-50%, 6px);
+  transform-origin: 0 100%;
+}
+
+#windows.is-zoomed-in.is-built .facade--neighbor:hover .facade-label,
+#windows.is-zoomed-in.is-built .facade.is-labeled .facade-label {
+  transform: translate(-50%, 0);
+}
+
 /* windows.js scales this row up to zoom in; the street's frame crops it */
 .skyline-row {
   transform-origin: 0 0;
