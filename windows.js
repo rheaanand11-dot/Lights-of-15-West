@@ -103,7 +103,7 @@
               <rect x="0" y="0" width="100%" height="100%" pathLength="1"/>
             </svg>
             <div class="facade-cornice"></div>
-            <div class="facade-grid"></div>
+            <div class="facade-windows"><div class="facade-grid"></div></div>
             <div class="facade-base"></div>
             <div class="facade-light" aria-hidden="true"></div>
             <div class="facade-label" aria-hidden="true">
@@ -195,6 +195,25 @@
     }
     // Street-level arches
     for (let i = 0; i < 10; i++) base.appendChild(document.createElement('span'));
+    addSketch(grid);
+
+    // A line-drawing copy of a building's windows, laid over the real ones
+    // while the building draws itself in: plain outlines, nothing else (no
+    // glass, frames or glow), so they always draw crisply. When the building
+    // is built, the drawing fades out as the finished windows fade in
+    // underneath: one smooth crossfade for the whole grid.
+    function addSketch(realGrid) {
+      const sketch = document.createElement('div');
+      sketch.className = 'facade-grid facade-grid--sketch';
+      sketch.setAttribute('aria-hidden', 'true');
+      [...realGrid.children].forEach((w) => {
+        const s = document.createElement('span');
+        s.className = w.classList.contains('window--wall') ? 'window window--wall' : 'window';
+        s.style.setProperty('--d', w.style.getPropertyValue('--d'));
+        sketch.appendChild(s);
+      });
+      realGrid.after(sketch);
+    }
 
     // The neighbors, on either side of 15 West
     const skyline = root.querySelector('.skyline');
@@ -293,15 +312,7 @@
       }
       const arches = el.querySelector('.facade-base');
       for (let i = 0; i < b.arches; i++) arches.appendChild(document.createElement('span'));
-
-      // A line-drawing copy of the windows, laid over the real ones while the
-      // building draws itself in. When it's built, the drawing fades out as
-      // the finished windows fade in underneath (a smooth crossfade, done to
-      // the whole grid at once instead of to each of its many windows).
-      const sketch = g.cloneNode(true);
-      sketch.className = 'facade-grid facade-grid--sketch';
-      sketch.setAttribute('aria-hidden', 'true');
-      g.after(sketch);
+      addSketch(g);
       return el;
     }
 
