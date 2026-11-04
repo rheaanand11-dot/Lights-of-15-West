@@ -71,8 +71,14 @@
   display: flex;
   justify-content: center;
   width: 100%;
-  padding-top: 4.5rem; /* room for building names above the tallest towers */
-  overflow: hidden; /* on phones the outer buildings get cropped, never scrolled */
+  /* Just enough room for a building's name above the tallest towers, so the
+     street sits close under the hint (the name, 58px with its gap, reaches
+     a little into the gap above the street) */
+  padding-top: 2.25rem;
+  /* On phones the outer buildings get cropped at the sides, never scrolled;
+     up top nothing is cut, so the names always show in full */
+  overflow-x: clip;
+  overflow-y: visible;
 }
 
 /* Names of the buildings around 15 West: hidden until you hover over one
