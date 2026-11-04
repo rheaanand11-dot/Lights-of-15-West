@@ -384,8 +384,15 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
 
 /* ---------- Zoom ----------
    Pinching on a trackpad zooms the street in around the cursor
-   (windows.js). The street's frame crops the zoomed view. */
-.skyline.is-scaled { clip-path: inset(0); }
+   (windows.js). Zoomed in, the buildings aren't cropped to the street's
+   frame: they spread out to the left, right and up, over the text above
+   (the page's edges still stop sideways scrolling, base.css). Only the
+   bottom is cut at the street, so the switch and count stay clear. */
+.skyline.is-scaled {
+  z-index: 2;
+  overflow: visible;
+  clip-path: inset(-100vh -100vw 0 -100vw);
+}
 
 /* ---------- The neighbors ----------
    Same parts as 15 West, but darker walls, plainer windows and dimmer light */
