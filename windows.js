@@ -39,7 +39,7 @@
   };
   const LIGHT_RADIUS = 110; // size of the flashlight, in pixels (matches .facade-light in windows.css)
   const MAX_ZOOM = 4; // how close you can zoom in on the street (4 = 400%)
-  const PINCH_SPEED = 0.01; // how much one trackpad pinch step zooms
+  const PINCH_SPEED = 0.015; // how much one trackpad pinch step zooms
   const MOUSE_SLOP = 14; // how near the cursor has to be to a story window to open it, in pixels
   const OUTLINE_MS = 1600; // how long the outline takes to draw
   const WINDOW_STEP_MS = 7; // gap between one window appearing and the next
@@ -515,9 +515,9 @@
       requestAnimationFrame(stepZoom);
     }
     function stepZoom() {
-      // Share of the remaining distance covered each frame: small, so the
-      // zoom follows your fingers slowly and smoothly
-      const ease = reduceMotion ? 1 : 0.12;
+      // Share of the remaining distance covered each frame: fairly small, so
+      // the zoom follows your fingers smoothly (0.3 was too jumpy, 0.12 too slow)
+      const ease = reduceMotion ? 1 : 0.2;
       zoom.scale += (zoom.target - zoom.scale) * ease;
       // While pinching, the focus follows the scale, so the spot under the
       // cursor stays put
