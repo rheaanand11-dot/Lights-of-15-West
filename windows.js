@@ -150,46 +150,6 @@
     window.addEventListener('resize', fadeHeading);
     fadeHeading();
 
-    // Space above the heading. This is a new visualization, so it gets the
-    // bigger gap between separate parts of the page: the same as between the
-    // title screen ("Scroll ↓") and the first figure (the five offices).
-    // Steps inside the opening keep their own, smaller gaps.
-    // Both gaps change with the screen's height, because the title screen and
-    // the opening's steps are sized to the screen, so this measures the title
-    // screen's gap and matches it, whichever step comes last.
-    const MIN_GAP = 130; // never closer than the steps inside the opening
-
-    // Where a step's text or picture starts and ends (leaving out the sticky
-    // wrapper and the title screen's light ray, which fill the whole step)
-    function contentOf(step) {
-      const parts = [...step.querySelectorAll(':scope > *, .history-sticky > *')]
-        .filter((el) => !el.classList.contains('history-sticky') && !el.classList.contains('history-ray'));
-      if (!parts.length) return null;
-      const boxes = parts.map((el) => el.getBoundingClientRect());
-      return { top: Math.min(...boxes.map((b) => b.top)), bottom: Math.max(...boxes.map((b) => b.bottom)) };
-    }
-
-    function spaceAboveHeading() {
-      const steps = document.querySelectorAll('.history-step');
-      if (steps.length < 2) return;
-      const first = contentOf(steps[0]);
-      const second = contentOf(steps[1]);
-      const last = steps[steps.length - 1];
-      const lastContent = contentOf(last);
-      if (!first || !second || !lastContent) return;
-      const gap = Math.max(MIN_GAP, second.top - first.bottom);
-      // Shared with base.css, which leaves the same gap before Sources
-      document.documentElement.style.setProperty('--section-gap', Math.round(gap) + 'px');
-      const below = last.getBoundingClientRect().bottom - lastContent.bottom;
-      const space = gap - below;
-      // On tall screens the step already leaves more than enough empty space
-      // under the caption, so this section tucks up into it instead
-      root.style.paddingTop = Math.max(16, space) + 'px';
-      root.style.marginTop = Math.min(0, space - 16) + 'px';
-    }
-    window.addEventListener('resize', spaceAboveHeading);
-    spaceAboveHeading();
-
     const facade = root.querySelector('.facade--main');
     const grid = facade.querySelector('.facade-grid');
     const base = facade.querySelector('.facade-base');

@@ -9,7 +9,6 @@
   gap: var(--space-4);
   min-height: 100vh;
   min-height: 100svh;
-  /* Little room on top: the "right light" step above already ends in space */
   padding: var(--space-3) var(--gutter) var(--space-5);
 }
 

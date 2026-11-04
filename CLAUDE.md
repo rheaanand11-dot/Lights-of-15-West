@@ -57,7 +57,8 @@ that way.
 
 | File | What it is | Owner |
 |---|---|---|
-| `index.html` | Page shell: one empty container per section | Shared |
+| `index.html` | Home page: the opening, then a link to the buildings | Shared |
+| `buildings.html` | Second page: 15 West and its street, then a link to the street lights | Shared |
 | `base.css` | Colors, fonts, spacing, grain as CSS variables | Shared |
 | `lights.json` | Lit-window counts per building | Shared |
 | `stories.json` | Stories behind lit 15 West windows | Shared |
@@ -67,7 +68,7 @@ that way.
 | `windows.css` | Styles for the facade and story card | **Person A** |
 | `story.js` | Intro, narrative text, legend, credits | **Person B** |
 | `story.css` | Styles for the story sections | **Person B** |
-| `streetlights.html` | Second page for the street-light section (linked from the bottom of `index.html`) | Shared |
+| `streetlights.html` | Third page for the street-light section (linked from the bottom of `buildings.html`) | Shared |
 | `streetlights.js` | "Buildings' Windows Light in Street Light Equivalent" section | **Anna** |
 | `streetlights.css` | Styles for the street-light section | **Anna** |
 | `pedestrians.js` | "How Do Lights Make Pedestrians Feel at Night?" quote folders (on the street-light page) | **Anna** |
@@ -79,7 +80,7 @@ Person A = [NAME A], Person B = [NAME B]. Replace these with real names.
 
 1. **Never edit files owned by the other person.** If a change is needed there,
    stop and tell the user what to ask their teammate for.
-2. **Shared files** (`index.html`, `base.css`, `lights.json`, `stories.json`): only small, focused
+2. **Shared files** (`index.html`, `buildings.html`, `base.css`, `lights.json`, `stories.json`): only small, focused
    changes, committed on their own with a clear message, so the teammate can
    review them. Tell the user to give their teammate a heads up.
 3. **Work on your own branch**, never directly on `main`. Name branches
@@ -112,7 +113,7 @@ show placeholder text for windows without a story.
 
 ## Running it locally
 
-The page loads the data files, so browsers block it if you just double-click
+The pages load the data files, so browsers block them if you just double-click
 `index.html`. From this folder run:
 
 ```bash

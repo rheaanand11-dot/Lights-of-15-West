@@ -226,10 +226,15 @@
   function followScroll(steps) {
     const panel = root.querySelector('.light-panel');
     const readout = root.querySelector('.light-readout span');
+    const nextLink = document.querySelector('.page-link-row .page-link');
     let frame = null;
 
     function update() {
       const middle = window.innerHeight / 2;
+      // "Next to the buildings" fades in as it scrolls onto the screen
+      const link = nextLink.getBoundingClientRect();
+      nextLink.classList.toggle('is-visible',
+        link.top < window.innerHeight * 0.88 && link.bottom > window.innerHeight * 0.12);
       steps.forEach((step) => {
         const box = step.getBoundingClientRect();
         step.classList.toggle('is-visible', box.top < middle && box.bottom > middle);
