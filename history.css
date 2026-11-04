@@ -63,6 +63,11 @@
   position: relative;
 }
 
+.history-scroll-hint .page-link-arrow {
+  width: 1em;
+  height: 1em;
+}
+
 .history-ray,
 .history-glow {
   display: none; /* only shown when the opening animation plays (below) */
@@ -143,6 +148,10 @@
 }
 
 .history-scroll-hint {
+  /* "Scroll" and the bold arrow of the page links (base.css), on one line */
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
   margin: var(--space-6) 0 0;
   font-family: var(--font-mono);
   font-weight: var(--weight-mono);
@@ -274,6 +283,15 @@
   background: #fff;
   opacity: var(--light);
   box-shadow: 0 0 calc(var(--light) * 70px) calc(var(--light) * 14px) rgba(255, 255, 255, 0.3);
+  transition: background-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* 60-75% is the right light: the screen turns warm white (history.js adds
+   is-right in that range) */
+.light-panel.is-right {
+  background: var(--color-warm-white);
+  box-shadow: 0 0 calc(var(--light) * 70px) calc(var(--light) * 14px)
+    color-mix(in srgb, var(--color-warm-white) 35%, transparent);
 }
 
 .light-readout {
