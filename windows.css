@@ -80,7 +80,7 @@
    switch under the street, so it has none on top. Name in Neue Haas Grotesque, count in Degular Mono. */
 .facade-label {
   position: absolute;
-  bottom: calc(100% + 10px);
+  bottom: calc(100% + 10px / var(--zoom, 1));
   left: 50%;
   z-index: 4;
   display: flex;
@@ -91,6 +91,11 @@
   pointer-events: none;
   opacity: 0;
   transform: translate(-50%, 6px);
+  /* Zooming in scales the buildings up (--zoom, set by windows.js); the
+     name scales back down from its bottom corner, so it keeps its size and
+     stays centered over the building */
+  scale: calc(1 / var(--zoom, 1));
+  transform-origin: 0 100%;
   transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
@@ -105,6 +110,7 @@
   right: 0;
   align-items: flex-end;
   transform: translate(0, 6px);
+  transform-origin: 100% 100%;
 }
 
 .facade-label-name {
@@ -133,6 +139,23 @@
 #windows.is-built .facade--neighbor:hover .facade-label--end,
 #windows.is-built .facade.is-labeled .facade-label--end {
   transform: none;
+}
+
+/* Zoomed in, there's room on the sides, so the outermost buildings (Turks
+   Head Building and Merchants Bank) get their name centered over them like
+   the rest, instead of lined up with the screen's edge */
+#windows.is-zoomed-in .facade-label--start,
+#windows.is-zoomed-in .facade-label--end {
+  left: 50%;
+  right: auto;
+  align-items: center;
+  transform: translate(-50%, 6px);
+  transform-origin: 0 100%;
+}
+
+#windows.is-zoomed-in.is-built .facade--neighbor:hover .facade-label,
+#windows.is-zoomed-in.is-built .facade.is-labeled .facade-label {
+  transform: translate(-50%, 0);
 }
 
 /* windows.js scales this row up to zoom in; the street's frame crops it */
@@ -378,8 +401,26 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
 
 /* ---------- Zoom ----------
    Pinching on a trackpad zooms the street in around the cursor
-   (windows.js). The street's frame crops the zoomed view. */
-.skyline.is-scaled { clip-path: inset(0); }
+   (windows.js). Zoomed in, the heading, hint, switch and count fade away,
+   and the buildings fill the whole buildings section: from its top to its
+   bottom (--zoom-above and --zoom-below, measured by windows.js) and out to
+   the page's edges (which still stop sideways scrolling, base.css). */
+.skyline.is-scaled {
+  z-index: 2;
+  overflow: visible;
+  clip-path: inset(calc(-1 * var(--zoom-above, 0px)) -100vw calc(-1 * var(--zoom-below, 0px)) -100vw);
+}
+
+#windows.is-zoomed-in .windows-heading,
+#windows.is-zoomed-in .facade-hint,
+#windows.is-zoomed-in .skyline-controls {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.skyline-controls {
+  transition: opacity 0.5s ease;
+}
 
 /* ---------- The neighbors ----------
    Same parts as 15 West, but darker walls, plainer windows and dimmer light */

@@ -261,19 +261,31 @@
       // Windows, top floor first. They draw in at the same pace as 15 West,
       // so every building finishes at the same moment.
       const g = el.querySelector('.facade-grid');
+      // Spare spots (past the window total) are wall: whole empty floors at
+      // the top, then the top floor that's only partly windows, with its
+      // windows centered (the wall split between both ends).
       const slots = b.floors * b.columns;
       const spare = slots - total;
+      const emptyFloors = Math.floor(spare / b.columns);
+      const partWall = spare % b.columns; // wall spots on the partly filled floor
+      const wallLeft = Math.floor(partWall / 2);
       const step = (FACADE.floors * FACADE.rooms * WINDOW_STEP_MS) / slots;
+      let n = 0; // which window this is, counting from the top left
       for (let i = 0; i < slots; i++) {
         const w = document.createElement('span');
-        if (i < spare) {
+        const floor = Math.floor(i / b.columns);
+        const column = i % b.columns;
+        const isWall = floor < emptyFloors || (floor === emptyFloors &&
+          (column < wallLeft || column >= b.columns - (partWall - wallLeft)));
+        if (isWall) {
           w.className = 'window window--wall';
         } else {
           w.className = 'window';
-          const fromBottom = b.floors - 1 - Math.floor(i / b.columns);
-          w.style.setProperty('--d', Math.round((fromBottom * b.columns + (i % b.columns)) * step));
-          if (litWindows.has(i - spare)) w.classList.add('is-lit', 'tone-' + pickTone(pick()));
+          const fromBottom = b.floors - 1 - floor;
+          w.style.setProperty('--d', Math.round((fromBottom * b.columns + column) * step));
+          if (litWindows.has(n)) w.classList.add('is-lit', 'tone-' + pickTone(pick()));
           neighborWindows.push({ el: w, x: 0, y: 0, light: 0 });
+          n++;
         }
         g.appendChild(w);
       }
@@ -452,7 +464,15 @@
     let pinching = false; // Safari: a gesture is under way
     let pinchStart = 1;
     skyline.addEventListener('wheel', (e) => {
-      if (!e.ctrlKey || !built) return;
+      if (!built) return;
+      if (!e.ctrlKey) {
+        // Zoomed in, a two-finger swipe moves the view left, right, up and
+        // down; once it reaches an edge, the page scrolls as usual
+        if (zoom.target <= 1.01 || pinching) return;
+        zoom.anchor = null;
+        if (slideBy(-e.deltaX, -e.deltaY)) e.preventDefault();
+        return;
+      }
       e.preventDefault();
       if (pinching) return;
       pinchTo(zoom.target * Math.exp(-e.deltaY * PINCH_SPEED), pointIn(e));
@@ -525,6 +545,9 @@
       const t = shift();
       skylineRow.style.transform = zoom.scale === 1 ? '' :
         `translate(${t.x}px, ${t.y}px) scale(${zoom.scale})`;
+      // The building names shrink back by the same amount, so they stay
+      // the same size however far in you zoom (windows.css)
+      skylineRow.style.setProperty('--zoom', zoom.scale);
       skyline.classList.toggle('is-scaled', zoom.scale !== 1);
       if (pointer) follow(pointer); // keep the light on whatever is under the cursor
     }
@@ -561,21 +584,39 @@
     skylineRow.addEventListener('pointercancel', endDrag);
 
     // Move the view by (dx, dy) pixels, without sliding past the street's edges
+    // Returns false when the view is already at that edge and can't move
     function slideBy(dx, dy) {
-      if (zoom.scale <= 1) return;
+      if (zoom.scale <= 1) return false;
       const o = rowOrigin();
       const fx = Math.min(o.x + skylineRow.offsetWidth, Math.max(o.x, zoom.fx - dx / (zoom.scale - 1)));
       const fy = Math.min(o.y + skylineRow.offsetHeight, Math.max(o.y, zoom.fy - dy / (zoom.scale - 1)));
+      const moved = Math.abs(fx - zoom.fx) > 0.01 || Math.abs(fy - zoom.fy) > 0.01;
       zoom.fx = zoom.focusX = fx;
       zoom.fy = zoom.focusY = fy;
       applyZoom();
+      return moved;
     }
     function zoomTo(target) {
       zoom.target = target;
       const zoomed = target > 1.01;
       skyline.classList.toggle('is-zoomed', zoomed);
+      // Zoomed in, the heading, hint, switch and count fade away and the
+      // buildings fill the whole section (windows.css)
+      root.classList.toggle('is-zoomed-in', zoomed);
+      fitZoomToSection();
       startZooming();
     }
+
+    // Zoomed in, the buildings may spread over the whole buildings section,
+    // from its top to its bottom, but no further: they stop short of
+    // "Back to safety data" above and the legend below
+    function fitZoomToSection() {
+      const page = root.getBoundingClientRect();
+      const street = skyline.getBoundingClientRect();
+      skyline.style.setProperty('--zoom-above', Math.round(street.top - page.top) + 'px');
+      skyline.style.setProperty('--zoom-below', Math.round(page.bottom - street.bottom) + 'px');
+    }
+    window.addEventListener('resize', fitZoomToSection);
 
     // The 15 West lights switch. It starts on. Off, 15 West goes dark, the glow
     // over the street fades, and the count shows how few windows are left lit.
