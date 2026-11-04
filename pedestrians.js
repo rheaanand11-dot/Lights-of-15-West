@@ -7,7 +7,7 @@
 
 (function () {
   const TEXT = {
-    heading: 'How Do Lights Make Pedestrians Feel at Night?',
+    heading: 'What it feels like to walk past 15 West after dark',
     body: 'People’s thoughts of how lit up windows of 15 West affect their perception ' +
       'of safety when the surrounding buildings go dark.',
   };
