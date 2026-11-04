@@ -129,7 +129,7 @@
    sentence does have to wrap (smaller screens), its lines are balanced so
    none ends with a lonely word or two. */
 .history-lede {
-  max-width: 46em;
+  max-width: 30em; /* an even, comfortable line length for the paragraphs */
   margin: var(--space-6) 0 0; /* well clear of the title */
   font-size: clamp(1.05rem, 2.1vw, 1.4rem);
   line-height: 1.35;
@@ -138,7 +138,12 @@
 
 .history-lede span {
   display: block;
-  text-wrap: balance;
+  text-wrap: pretty; /* no lone word on a paragraph's last line */
+}
+
+/* A little space between the paragraphs */
+.history-lede span + span {
+  margin-top: var(--space-3);
 }
 
 /* The closing line stands apart from the lines above, in italic */
@@ -510,7 +515,7 @@
   }
 
   .history-step--intro.is-told .history-scroll-hint {
-    animation: line-appears 0.4s ease-out 1.6s both; /* just after the last line */
+    animation: line-appears 0.4s ease-out 1s both; /* just after the last line */
   }
 
   .office {
