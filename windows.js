@@ -44,6 +44,7 @@
   const MOUSE_SLOP = 14; // how near the cursor has to be to a story window to open it, in pixels
   const OUTLINE_MS = 1600; // how long the outline takes to draw
   const WINDOW_STEP_MS = 7; // gap between one window appearing and the next
+  const SETTLE_MS = 1800; // how long the line drawing takes to turn into the finished street
   const TOUCH_SLOP = 18; // how near a finger has to land to a window on phones, in pixels
 
   const root = document.getElementById('windows');
@@ -243,7 +244,7 @@
           <rect x="0" y="0" width="100%" height="100%" pathLength="1"/>
         </svg>
         <div class="facade-cornice"></div>
-        <div class="facade-grid"></div>
+        <div class="facade-windows"><div class="facade-grid"></div></div>
         <div class="facade-base"></div>
         <div class="facade-light" aria-hidden="true"></div>
         <div class="facade-label${edge ? ' facade-label--' + edge : ''}" aria-hidden="true">
@@ -292,6 +293,15 @@
       }
       const arches = el.querySelector('.facade-base');
       for (let i = 0; i < b.arches; i++) arches.appendChild(document.createElement('span'));
+
+      // A line-drawing copy of the windows, laid over the real ones while the
+      // building draws itself in. When it's built, the drawing fades out as
+      // the finished windows fade in underneath (a smooth crossfade, done to
+      // the whole grid at once instead of to each of its many windows).
+      const sketch = g.cloneNode(true);
+      sketch.className = 'facade-grid facade-grid--sketch';
+      sketch.setAttribute('aria-hidden', 'true');
+      g.after(sketch);
       return el;
     }
 
@@ -373,6 +383,7 @@
       window.removeEventListener('scroll', checkInView);
       if (reduceMotion) {
         root.classList.add('is-outlining', 'is-windowing', 'is-built');
+        root.querySelectorAll('.facade-grid--sketch').forEach((s) => s.remove());
         built = true;
         return;
       }
@@ -382,10 +393,17 @@
       root.style.setProperty('--windowing-ms', lastWindow + 'ms');
       setTimeout(() => root.classList.add('is-windowing'), OUTLINE_MS);
       setTimeout(() => {
-        root.classList.add('is-built');
+        // The line drawing turns into the finished street: walls, windows and
+        // lights fade in slowly together (is-settling, windows.css)
+        root.classList.add('is-built', 'is-settling');
         built = true;
         measure(); // in case the layout shifted while it drew in
       }, OUTLINE_MS + lastWindow + 300);
+      setTimeout(() => {
+        root.classList.remove('is-settling');
+        // The line drawings have faded out: they're no longer needed
+        root.querySelectorAll('.facade-grid--sketch').forEach((s) => s.remove());
+      }, OUTLINE_MS + lastWindow + 300 + SETTLE_MS);
     }
     function checkInView() {
       const box = facade.getBoundingClientRect();

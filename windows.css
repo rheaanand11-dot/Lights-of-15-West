@@ -196,6 +196,7 @@
 /* Windows and ledges sit above the grain and the pool of light */
 .facade-cornice,
 .facade-grid,
+.facade-windows,
 .facade-base {
   position: relative;
   z-index: 1;
@@ -227,6 +228,11 @@
   background: linear-gradient(to bottom, var(--color-building-edge), var(--color-building-top));
   border-bottom: 2px solid var(--color-building-edge);
 }
+
+/* Around a neighbor's windows: the real grid and its line-drawing copy
+   (windows.js), one on top of the other */
+.facade-windows { display: grid; }
+.facade-windows > .facade-grid { grid-area: 1 / 1; }
 
 .facade-grid {
   display: grid;
@@ -639,7 +645,7 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   height: 100%;
   overflow: visible;
   pointer-events: none;
-  transition: opacity 1.2s ease;
+  transition: opacity 1.8s ease-in-out;
 }
 
 .facade-outline rect {
@@ -657,12 +663,13 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
 
 #windows.is-built .facade-outline { opacity: 0; }
 
-/* Before it's built: no wall, ledges, texture or hint yet */
+/* Before it's built: no wall, ledges, texture or hint yet. They fade in
+   slowly, at the same pace as the rest of the street. */
 .facade-fill,
 .facade-cornice,
 .facade-base,
 .facade-hint {
-  transition: opacity 1.2s ease;
+  transition: opacity 1.8s ease-in-out;
 }
 
 #windows:not(.is-built) .facade-fill,
@@ -692,11 +699,18 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
 }
 
 #windows:not(.is-built) .window::before { opacity: 0; }
-.window::before { transition: opacity 1.2s ease; }
+.window::before { transition: opacity 1.8s ease-in-out; }
 
 #windows.is-windowing .window:not(.window--wall) {
   transition-property: background-color, outline-color;
-  transition-duration: 1.2s;
+  transition-duration: 1.8s;
+  transition-timing-function: ease-in-out;
+}
+
+/* As the street settles, the lit windows glow up slowly (normally they
+   react quickly to the flashlight) */
+#windows.is-settling .window::after {
+  transition: opacity 1.8s ease-in-out;
 }
 
 /* 15 West's windows appear one by one (--d is each window's place in the
@@ -706,15 +720,32 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
 #windows.is-windowing .facade--main .window:not(.window--wall) {
   opacity: 1;
   transition-property: opacity, background-color, outline-color;
-  transition-duration: 0.25s, 1.2s, 1.2s;
+  transition-duration: 0.25s, 1.8s, 1.8s;
+  transition-timing-function: ease, ease-in-out, ease-in-out;
   transition-delay: calc(var(--d) * 1ms), 0s, 0s;
 }
 
 /* The buildings around it have far more windows (over 2,000), too many to
-   fade in one by one smoothly. Instead a cover over each window grid slides
-   away upward, revealing the windows floor by floor from the bottom, in the
-   same time as 15 West (--windowing-ms, set by windows.js). */
-.facade--neighbor .facade-grid::after {
+   fade in one by one smoothly. Each has a line-drawing copy of its windows
+   (.facade-grid--sketch, made by windows.js) over the real ones. */
+
+/* The drawing: every window an outline, no glass, frames or light */
+#windows .facade-grid--sketch .window:not(.window--wall) {
+  opacity: 1;
+  background: transparent;
+  outline-color: var(--color-pale-yellow);
+  transition: none;
+}
+
+.facade-grid--sketch .window::before,
+.facade-grid--sketch .window::after { display: none; }
+
+.facade-grid--sketch { pointer-events: none; }
+
+/* A cover over the drawing slides away upward, revealing its windows floor
+   by floor from the bottom, in the same time as 15 West (--windowing-ms,
+   set by windows.js) */
+.facade-grid--sketch::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -723,33 +754,32 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   pointer-events: none;
 }
 
-#windows.is-windowing .facade--neighbor .facade-grid::after {
+#windows.is-windowing .facade-grid--sketch::after {
   animation: windows-rise var(--windowing-ms, 1500ms) linear both;
 }
 
-#windows.is-built .facade--neighbor .facade-grid::after { display: none; }
-
-/* When the walls fill in, the neighbors' windows don't each fade from
-   outline to dark (again too many to do smoothly): the whole window grid
-   fades in at once, with the walls */
-#windows.is-windowing .facade--neighbor .window:not(.window--wall) { transition: none; }
-
-#windows.is-built .facade--neighbor .facade-grid {
-  animation: windows-fill-in 1.2s ease both;
-}
-
-@keyframes windows-fill-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
+#windows.is-built .facade-grid--sketch::after { display: none; }
 
 @keyframes windows-rise {
   from { transform: scaleY(1); }
   to { transform: scaleY(0); }
 }
 
+/* The finished windows wait, hidden, under the drawing. When it's built,
+   the drawing fades out as they fade in: one smooth crossfade per building. */
+#windows .facade--neighbor .window:not(.window--wall) { transition: none; }
+
+.facade--neighbor .facade-grid {
+  transition: opacity 1.8s ease-in-out;
+}
+
+#windows:not(.is-built) .facade--neighbor .facade-grid:not(.facade-grid--sketch),
+#windows.is-built .facade-grid--sketch {
+  opacity: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .facade--neighbor .facade-grid::after { display: none; }
+  .facade-grid--sketch { display: none; }
 }
 
 /* ---------- The story card ---------- */
