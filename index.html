@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>How an Art School Keeps a City Awake</title>
-  <meta name="description" content="Shine a light across RISD's 15 West at night and look inside the windows that keep downtown Providence awake.">
+  <meta name="description" content="Downtown Providence goes dark after work. Why students are the ones lighting the street.">
 
   <!-- Degular Mono from Adobe Fonts (labels on data and statistics). Loaded
        without holding up the first screen: the page shows straight away and
@@ -15,10 +15,6 @@
 
   <!-- Shared (both people): colors, fonts, spacing -->
   <link rel="stylesheet" href="base.css">
-  <!-- Owned by Person B -->
-  <link rel="stylesheet" href="story.css">
-  <!-- Owned by Person A -->
-  <link rel="stylesheet" href="windows.css">
   <!-- Owner not assigned yet -->
   <link rel="stylesheet" href="history.css">
 </head>
@@ -27,16 +23,10 @@
     <!-- Opening: "Where the Light Falls", the background to the story -->
     <section id="history" aria-label="Where the light falls"></section>
 
-    <!-- Person A: 15 West and its neighbors, flashlight, lights switch, window stories -->
-    <section id="windows" aria-label="15 West and the buildings around it at night"></section>
-
-    <!-- Person B: legend (window lit / window dark) -->
-    <section id="legend" class="story-section"></section>
-
-    <!-- Anna's street-lights section has its own page; this links to it -->
+    <!-- The buildings have their own page; this links to it -->
     <nav class="page-link-row" aria-label="Next page">
-      <a class="page-link" href="streetlights.html">
-        <span class="page-link-title">Next to the street lights <svg class="page-link-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M12.5 5.5L19 12l-6.5 6.5"/></svg></span>
+      <a class="page-link" href="buildings.html">
+        <span class="page-link-title">Next to the buildings <svg class="page-link-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M12.5 5.5L19 12l-6.5 6.5"/></svg></span>
       </a>
     </nav>
   </main>
@@ -45,7 +35,5 @@
   <div id="sources"></div>
 
   <script src="history.js" defer></script>
-  <script src="story.js" defer></script>
-  <script src="windows.js" defer></script>
 </body>
 </html>
