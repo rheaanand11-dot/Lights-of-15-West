@@ -714,14 +714,16 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
 }
 
 /* 15 West's windows appear one by one (--d is each window's place in the
-   drawing order, set by windows.js) */
-#windows:not(.is-built) .facade--main .window:not(.window--wall) { opacity: 0; }
+   drawing order, set by windows.js). Each one is switched on at its moment
+   rather than faded in: a fading window is drawn on its own layer, cut at
+   its edge, which shaves 1px lines off the outline on sharp screens. */
+#windows:not(.is-built) .facade--main .window:not(.window--wall) { visibility: hidden; }
 
 #windows.is-windowing .facade--main .window:not(.window--wall) {
-  opacity: 1;
-  transition-property: opacity, background-color, outline-color;
-  transition-duration: 0.25s, 1.8s, 1.8s;
-  transition-timing-function: ease, ease-in-out, ease-in-out;
+  visibility: visible;
+  transition-property: visibility, background-color, outline-color;
+  transition-duration: 0s, 1.8s, 1.8s;
+  transition-timing-function: linear, ease-in-out, ease-in-out;
   transition-delay: calc(var(--d) * 1ms), 0s, 0s;
 }
 
