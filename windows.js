@@ -40,6 +40,7 @@
   const LIGHT_RADIUS = 110; // size of the flashlight, in pixels (matches .facade-light in windows.css)
   const MAX_ZOOM = 4; // how close you can zoom in on the street (4 = 400%)
   const PINCH_SPEED = 0.015; // how much one trackpad pinch step zooms
+  const ZOOM_OUT_BOOST = 1.8; // zooming back out goes this much faster than zooming in
   const MOUSE_SLOP = 14; // how near the cursor has to be to a story window to open it, in pixels
   const OUTLINE_MS = 1600; // how long the outline takes to draw
   const WINDOW_STEP_MS = 7; // gap between one window appearing and the next
@@ -475,7 +476,9 @@
       }
       e.preventDefault();
       if (pinching) return;
-      pinchTo(zoom.target * Math.exp(-e.deltaY * PINCH_SPEED), pointIn(e));
+      // Fingers together (zooming out) moves faster than fingers apart
+      const speed = e.deltaY > 0 ? PINCH_SPEED * ZOOM_OUT_BOOST : PINCH_SPEED;
+      pinchTo(zoom.target * Math.exp(-e.deltaY * speed), pointIn(e));
     }, { passive: false });
     skyline.addEventListener('gesturestart', (e) => {
       e.preventDefault();
@@ -484,7 +487,9 @@
     });
     skyline.addEventListener('gesturechange', (e) => {
       e.preventDefault();
-      if (built) pinchTo(pinchStart * e.scale, pointIn(e));
+      // (Safari) fingers together zoom out faster, like above
+      const scale = e.scale < 1 ? Math.pow(e.scale, ZOOM_OUT_BOOST) : e.scale;
+      if (built) pinchTo(pinchStart * scale, pointIn(e));
     });
     skyline.addEventListener('gestureend', (e) => {
       e.preventDefault();
@@ -495,6 +500,8 @@
     // frame) where it is
     function pinchTo(target, p) {
       zoom.anchor = { screen: p, street: toStreet(p.x, p.y) };
+      // Almost back to normal: go all the way, instead of creeping the last bit
+      if (target < 1.15 && target < zoom.target) target = 1;
       zoomTo(Math.min(MAX_ZOOM, Math.max(1, target)));
     }
     // Where the focus has to be, at this scale, for the anchored spot to stay
@@ -516,8 +523,9 @@
     }
     function stepZoom() {
       // Share of the remaining distance covered each frame: fairly small, so
-      // the zoom follows your fingers smoothly (0.3 was too jumpy, 0.12 too slow)
-      const ease = reduceMotion ? 1 : 0.2;
+      // the zoom follows your fingers smoothly (0.3 was too jumpy, 0.12 too
+      // slow). Zooming back out catches up quicker.
+      const ease = reduceMotion ? 1 : zoom.target < zoom.scale ? 0.32 : 0.2;
       zoom.scale += (zoom.target - zoom.scale) * ease;
       // While pinching, the focus follows the scale, so the spot under the
       // cursor stays put
