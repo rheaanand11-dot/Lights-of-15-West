@@ -31,7 +31,7 @@
     },
     displacement: {
       title: 'Darkness leaves gaps',
-      text: 'People are less likely to break the law where they can be seen. When some streets glow and others don’t, the risk gathers in the dark gaps between them.',
+      text: 'People are less likely to break the law where they can be seen. The dark gaps are where risk stays.',
     },
     rightLight: {
       title: 'The right light, not the brightest',
