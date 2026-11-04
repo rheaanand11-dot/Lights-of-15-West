@@ -9,8 +9,10 @@
     lede: [
       'Downtown Providence goes dark after work.',
       'The Wall Street Journal reported, “It’s dead down here now.”',
-      '15 West’s windows are the eyes on Westminster Street. (Jane Jacobs)',
-      'A Providence City Council resolution approved May 17, 1982 asked to replace downtown street lamps.',
+      '15 West’s windows are the eyes on Westminster Street.',
+      '(Jane Jacobs, “eyes on the street”)',
+      'A Providence City Council resolution approved May 17, 1982 asked to replace downtown street lamps',
+      'for the safety of their employees who walk there.',
     ],
     // Set apart below the lines above, in italic
     closing: 'Now the offices are dark, and students are the ones lighting the street.',
@@ -146,7 +148,7 @@
   // "Falls" flickers again whenever the title comes back into view.
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const RAY_ARRIVES_MS = reduceMotion ? 0 : 1500;
-  const LINES_MS = reduceMotion ? 0 : 1300; // 5 lines, 0.2s apart, each 0.4s
+  const LINES_MS = reduceMotion ? 0 : 1700; // 7 lines, 0.2s apart, each 0.4s
   const flicker = root.querySelector('.history-title-flicker');
   const intro = root.querySelector('.history-step--intro');
   function flickerOn() {

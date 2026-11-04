@@ -477,7 +477,7 @@
   }
 
   .history-step--intro.is-told .history-scroll-hint {
-    animation: line-appears 0.4s ease-out 1.2s both; /* just after the last line */
+    animation: line-appears 0.4s ease-out 1.6s both; /* just after the last line */
   }
 
   .office {
