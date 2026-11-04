@@ -1,7 +1,7 @@
 /* streetlights.css — owned by Anna.
    "Buildings' Windows Light in Street Light Equivalent": a lamp per building
    whose triangle of light falls on a row of pavement squares, one per street
-   light, in the gradient of the night picked with the buttons. The lamps sit
+   light, in the yellow of a lit 15 West window. The lamps sit
    four to a row and switch on one at a time as you scroll. Colors come
    from base.css. Spacing and type match the street section (windows.css). */
 
@@ -14,10 +14,15 @@
   text-align: center;
 }
 
-/* The light's gradient: --sl-1 at the bulb, --sl-3 on the street. Every
-   night uses the same orange (Sunday's), so only the numbers change from
-   night to night. */
-#streetlights { --sl-1: var(--day-sunday-1); --sl-2: var(--day-sunday-2); --sl-3: var(--day-sunday-3); }
+/* The light's gradient: --sl-1 at the bulb, --sl-3 on the street. It's the
+   light of a lit window on 15 West (whitish to yellow, the same colors as
+   the windows in base.css), every night the same, so only the numbers
+   change from night to night. */
+#streetlights {
+  --sl-1: var(--color-window-on-top);
+  --sl-2: color-mix(in srgb, var(--color-window-on-top), var(--color-window-on));
+  --sl-3: var(--color-window-on);
+}
 
 /* ---------- Two screens ----------
    Like two frames in Figma: the first screen has the headline, the text and
@@ -48,12 +53,12 @@
 
 /* "Back to top": a small soft-rectangle button in the page links' style
    (grey outline, bold arrow), part of the page (not pinned), centered at the
-   very bottom, under the lamps screen */
+   very bottom. Above it, the big gap between separate visualizations, the
+   same as above "Next to the street lights" on the buildings page. */
 .streetlights-top-row {
-  --top-gap: calc(var(--space-6) + var(--space-3)); /* about 80px, like the first screen's gaps */
   display: flex;
   justify-content: center;
-  padding: var(--top-gap) 0 var(--space-4);
+  padding: var(--space-section) 0 var(--space-4);
 }
 
 .streetlights-top {
@@ -138,7 +143,7 @@
   color: var(--color-text-muted);
 }
 
-/* The square stands for one lit pavement square, in tonight's color */
+/* The square stands for one lit pavement square, in the light's yellow */
 .streetlights-key-swatch {
   display: inline-block;
   width: 0.8em;
@@ -153,6 +158,11 @@
 /* "Scroll ↓" under the key, the same gap below it as between the other
    lines, in the opening's style */
 .streetlights-scroll-hint {
+  /* "Scroll" and the bold arrow of the page links (base.css), on one line */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
   margin: var(--intro-gap) 0 0;
   font-family: var(--font-mono);
   font-weight: var(--weight-mono);
@@ -161,8 +171,13 @@
   color: var(--color-text-muted);
 }
 
+.streetlights-scroll-hint .page-link-arrow {
+  width: 1em;
+  height: 1em;
+}
+
 /* ---------- Night buttons ----------
-   One per night. Only the picked night wears the orange gradient; the others are
+   One per night. Only the picked night wears the light's gradient; the others are
    plain outlines until picked. */
 
 .streetlights-nights {
@@ -204,6 +219,7 @@
   color: var(--color-black);
 }
 
+/* The picked night wears the light's gradient, whitish to window yellow */
 .streetlights-night[aria-pressed="true"] { background-image: linear-gradient(90deg, var(--sl-1), var(--sl-3)); }
 
 /* ---------- The lamps ---------- */
@@ -256,7 +272,7 @@ path.sl-lamp { fill: url(#sl-lamp); }
 
 .sl-bulb { fill: var(--color-bulb); }
 
-/* The bulb glows like the lit-window count in the street section */
+/* The yellow bulb glows like the lit-window count in the street section */
 .sl-bulb-glow {
   fill: var(--color-bulb);
   opacity: 0.9;
