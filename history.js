@@ -39,14 +39,16 @@
     },
     // One bullet each; url = where the source opens (in a new tab)
     sources: [
-      { text: 'CBRE, U.S. Office Figures Q2 2026' },
+      { text: 'CBRE, U.S. Office Figures Q2 2026',
+        url: 'https://www.cbre.com/insights/figures/q3-2026-us-office-market-report' },
       { text: 'Welsh & Farrington, “Effects of Improved Street Lighting on Crime,” Campbell Systematic Reviews, 2008',
         url: 'https://onlinelibrary.wiley.com/doi/full/10.4073/csr.2008.13' },
       { text: 'Chalfin, Hansen, Lerner & Parker, “Reducing Crime Through Environmental Design,” Journal of Quantitative Criminology, 2022',
         url: 'https://www.jstor.org/stable/48809454?seq=1' },
       { text: 'Jacobs, The Death and Life of Great American Cities, 1961',
         url: 'https://urbanpolicy.net/wp-content/uploads/2015/06/Jacobs_1961_01_Contents-Introduction.pdf' },
-      { text: 'DarkSky International, “Light Pollution: Safety,” darksky.org' },
+      { text: 'DarkSky International, “Light Pollution: Safety”',
+        url: 'https://darksky.org' },
     ],
   };
 
