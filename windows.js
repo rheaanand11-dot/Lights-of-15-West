@@ -38,7 +38,8 @@
     ],
   };
   const LIGHT_RADIUS = 110; // size of the flashlight, in pixels (matches .facade-light in windows.css)
-  const HOVER_ZOOM = 2.8; // how close the street zooms in around the cursor (2.8 = 280%)
+  const MAX_ZOOM = 4; // how close you can zoom in on the street (4 = 400%)
+  const PINCH_SPEED = 0.01; // how much one trackpad pinch step zooms
   const MOUSE_SLOP = 14; // how near the cursor has to be to a story window to open it, in pixels
   const OUTLINE_MS = 1600; // how long the outline takes to draw
   const WINDOW_STEP_MS = 7; // gap between one window appearing and the next
@@ -126,29 +127,27 @@
           <p class="story-card-meta"></p>
         </div>
         <div class="story-card-nav">
-          <button type="button" class="story-card-prev" aria-label="Earlier story">&larr;</button>
+          <button type="button" class="story-card-prev" aria-label="Earlier story"><svg class="page-link-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12H5M11.5 5.5L5 12l6.5 6.5"/></svg></button>
           <span class="story-card-count" aria-live="polite"></span>
-          <button type="button" class="story-card-next" aria-label="Later story">&rarr;</button>
+          <button type="button" class="story-card-next" aria-label="Later story"><svg class="page-link-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M12.5 5.5L19 12l-6.5 6.5"/></svg></button>
         </div>
       </dialog>`;
 
     // The heading fades and grows in as it scrolls onto the screen, and fades
     // back out as it leaves, like the crime rings in the opening section.
-    // The "Next to the street lights" button at the bottom does the same
-    // (its look is in base.css).
     const heading = root.querySelector('.windows-heading');
-    const nextLink = document.querySelector('.page-link-row:not(.page-link-row--top) .page-link');
     function fadeHeading() {
       const h = window.innerHeight;
-      [heading, nextLink].forEach((el) => {
-        if (!el) return;
-        const box = el.getBoundingClientRect();
-        el.classList.toggle('is-visible', box.top < h * 0.88 && box.bottom > h * 0.12);
-      });
+      const box = heading.getBoundingClientRect();
+      heading.classList.toggle('is-visible', box.top < h * 0.88 && box.bottom > h * 0.12);
     }
     window.addEventListener('scroll', fadeHeading, { passive: true });
     window.addEventListener('resize', fadeHeading);
     fadeHeading();
+
+    // Space above the heading: this section has its own page
+    // (buildings.html), so the gap under "Back to safety data" is set in
+    // windows.css, the same as on the street-lights page.
 
     const facade = root.querySelector('.facade--main');
     const grid = facade.querySelector('.facade-grid');
@@ -204,11 +203,12 @@
     NEIGHBORS.right.forEach((b, i, all) =>
       skylineRow.appendChild(buildNeighbor(b, i === all.length - 1 ? 'end' : '')));
 
-    // Building names stay hidden until you hover over a building (or tap it on
-    // a phone). Only one name shows at a time.
+    // The names of the buildings around 15 West stay hidden until you hover
+    // over one (or tap it on a phone). Only one name shows at a time.
+    // (15 West's name is by the switch under the street, so it has none on top.)
     skylineRow.addEventListener('pointerdown', (e) => {
       if (e.pointerType !== 'touch') return;
-      const tapped = e.target.closest('.facade');
+      const tapped = e.target.closest('.facade--neighbor');
       skylineRow.querySelectorAll('.facade.is-labeled').forEach((f) => {
         if (f !== tapped) f.classList.remove('is-labeled');
       });
@@ -289,16 +289,19 @@
       ({ el, pool: el.querySelector('.facade-light'), x: 0, y: 0 }));
     const cursorRing = root.querySelector('.skyline-cursor');
 
-    // Zooming in. The buildings (.skyline-row) are scaled up inside the street's
+    // Zooming in. Only when you ask for it: pinch two fingers apart on a
+    // trackpad to zoom in toward the cursor, and pinch them together to zoom
+    // back out. The buildings (.skyline-row) are scaled up inside the street's
     // frame, which crops them. "scale" is how far in we are (1 = normal) and
     // "focus" is the spot we zoom toward. Zooming glides a little every frame,
-    // so it's gradual. Once zoomed in, the view stays still until you drag it
-    // (mouse or finger) to look somewhere else.
+    // so it's slow and gradual. Once zoomed in, the view stays still until you
+    // drag it (mouse or finger) to look somewhere else.
     //
     // Two kinds of position are used below: "screen" = where something shows
     // inside the street's frame right now, and "street" = where it would be
     // without any zoom. Window positions and the flashlight use street positions.
-    const zoom = { scale: 1, target: 1, fx: 0, fy: 0, focusX: null, focusY: null, moving: false };
+    // "anchor" = the street spot that stays under the cursor while pinching
+    const zoom = { scale: 1, target: 1, fx: 0, fy: 0, focusX: null, focusY: null, anchor: null, moving: false };
     function rowOrigin() {
       return { x: skylineRow.offsetLeft, y: skylineRow.offsetTop };
     }
@@ -413,11 +416,9 @@
       return { x: e.clientX - box.left, y: e.clientY - box.top };
     }
 
-    // Mouse: the light follows the cursor anywhere over the buildings, and the
-    // street zooms in around it like a magnifying glass, so you can see right
-    // into the windows. Moving the cursor moves the view; leaving the street
-    // zooms back out. The 15 West story window under (or right next to) the
-    // cursor is remembered, and the cursor ring shows it.
+    // Mouse: the light follows the cursor anywhere over the buildings. The
+    // 15 West story window under (or right next to) the cursor is remembered,
+    // and the cursor ring shows it.
     let frame = null;
     let storyUnderCursor = null;
     let pointer = null; // where the mouse is in the street's frame, while it's over the buildings
@@ -430,8 +431,6 @@
     skylineRow.addEventListener('pointermove', (e) => {
       if (!built || e.pointerType === 'touch') return;
       pointer = pointIn(e);
-      lookAt(pointer);
-      if (zoom.target !== HOVER_ZOOM) zoomTo(HOVER_ZOOM);
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
         if (pointer) follow(pointer); // the cursor may have left the street meanwhile
@@ -444,20 +443,50 @@
       darken();
       storyUnderCursor = null;
       skyline.classList.remove('is-on-story');
-      zoomTo(1);
     });
 
-    // Point the zoom at a spot in the street's frame
-    function lookAt(p) {
-      zoom.focusX = p.x;
-      zoom.focusY = p.y;
-      if (zoom.scale === 1 && zoom.target === 1) {
-        // Not zoomed: nothing moves, so just remember the spot
-        zoom.fx = p.x;
-        zoom.fy = p.y;
-        return;
-      }
-      startZooming();
+    // Trackpad pinch. Chrome, Firefox and Edge report a pinch as a scroll with
+    // the Ctrl key held; Safari has its own "gesture" events. Either way the
+    // page itself doesn't zoom: only the street does. A normal two-finger
+    // scroll still scrolls the page.
+    let pinching = false; // Safari: a gesture is under way
+    let pinchStart = 1;
+    skyline.addEventListener('wheel', (e) => {
+      if (!e.ctrlKey || !built) return;
+      e.preventDefault();
+      if (pinching) return;
+      pinchTo(zoom.target * Math.exp(-e.deltaY * PINCH_SPEED), pointIn(e));
+    }, { passive: false });
+    skyline.addEventListener('gesturestart', (e) => {
+      e.preventDefault();
+      pinching = true;
+      pinchStart = zoom.target;
+    });
+    skyline.addEventListener('gesturechange', (e) => {
+      e.preventDefault();
+      if (built) pinchTo(pinchStart * e.scale, pointIn(e));
+    });
+    skyline.addEventListener('gestureend', (e) => {
+      e.preventDefault();
+      pinching = false;
+    });
+
+    // Zoom to "target", keeping the spot under the cursor (p, in the street's
+    // frame) where it is
+    function pinchTo(target, p) {
+      zoom.anchor = { screen: p, street: toStreet(p.x, p.y) };
+      zoomTo(Math.min(MAX_ZOOM, Math.max(1, target)));
+    }
+    // Where the focus has to be, at this scale, for the anchored spot to stay
+    // under the cursor (kept inside the street's edges)
+    function anchoredFocus(scale) {
+      const o = rowOrigin();
+      const { screen: q, street: a } = zoom.anchor;
+      const k = scale - 1;
+      return {
+        x: Math.min(o.x + skylineRow.offsetWidth, Math.max(o.x, o.x + (scale * (a.x - o.x) - (q.x - o.x)) / k)),
+        y: Math.min(o.y + skylineRow.offsetHeight, Math.max(o.y, o.y + (scale * (a.y - o.y) - (q.y - o.y)) / k)),
+      };
     }
     // Glide the zoom a little toward its target every frame until it gets there
     function startZooming() {
@@ -466,12 +495,19 @@
       requestAnimationFrame(stepZoom);
     }
     function stepZoom() {
-      // Share of the remaining distance covered each frame: zooming in and out
-      // both take about 0.2 seconds, for the button and the trackpad alike
-      const ease = reduceMotion ? 1 : 0.3;
+      // Share of the remaining distance covered each frame: small, so the
+      // zoom follows your fingers slowly and smoothly
+      const ease = reduceMotion ? 1 : 0.12;
+      zoom.scale += (zoom.target - zoom.scale) * ease;
+      // While pinching, the focus follows the scale, so the spot under the
+      // cursor stays put
+      if (zoom.anchor && zoom.scale > 1.001) {
+        const f = anchoredFocus(zoom.scale);
+        zoom.fx = zoom.focusX = f.x;
+        zoom.fy = zoom.focusY = f.y;
+      }
       const fx = zoom.focusX ?? zoom.fx;
       const fy = zoom.focusY ?? zoom.fy;
-      zoom.scale += (zoom.target - zoom.scale) * ease;
       zoom.fx += (fx - zoom.fx) * ease;
       zoom.fy += (fy - zoom.fy) * ease;
       const done = Math.abs(zoom.target - zoom.scale) < 0.002 &&
@@ -505,6 +541,7 @@
     });
     skylineRow.addEventListener('pointermove', (e) => {
       if (!drag) return;
+      zoom.anchor = null; // dragging moves the view; pinching anchors again
       const dx = e.clientX - drag.x;
       const dy = e.clientY - drag.y;
       drag.x = e.clientX;

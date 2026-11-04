@@ -9,10 +9,12 @@
   gap: var(--space-4);
   min-height: 100vh;
   min-height: 100svh;
-  padding: var(--space-3) var(--gutter) var(--space-5);
+  /* On its own page (buildings.html): under "Back to safety data", the same
+     gap as on the street-lights page */
+  padding: var(--space-6) var(--gutter) var(--space-5);
 }
 
-/* "Lit Windows by Building..." heading, Neue Haas Grotesque Bold in chartreuse */
+/* Section heading, Neue Haas Grotesque Bold in chartreuse */
 .windows-heading {
   max-width: 22ch;
   margin: 0 0 var(--space-4);
@@ -73,8 +75,9 @@
   overflow: hidden; /* on phones the outer buildings get cropped, never scrolled */
 }
 
-/* Building names: hidden until you hover over a building (or tap it on a
-   phone, which adds .is-labeled). Name in Neue Haas Grotesque, count in Degular Mono. */
+/* Names of the buildings around 15 West: hidden until you hover over one
+   (or tap it on a phone, which adds .is-labeled). 15 West's name is by the
+   switch under the street, so it has none on top. Name in Neue Haas Grotesque, count in Degular Mono. */
 .facade-label {
   position: absolute;
   bottom: calc(100% + 10px);
@@ -117,15 +120,17 @@
   color: var(--color-text-muted);
 }
 
-#windows.is-built .facade:hover .facade-label,
+.facade--main .facade-label { display: none; }
+
+#windows.is-built .facade--neighbor:hover .facade-label,
 #windows.is-built .facade.is-labeled .facade-label {
   opacity: 1;
   transform: translate(-50%, 0);
 }
 
-#windows.is-built .facade:hover .facade-label--start,
+#windows.is-built .facade--neighbor:hover .facade-label--start,
 #windows.is-built .facade.is-labeled .facade-label--start,
-#windows.is-built .facade:hover .facade-label--end,
+#windows.is-built .facade--neighbor:hover .facade-label--end,
 #windows.is-built .facade.is-labeled .facade-label--end {
   transform: none;
 }
@@ -371,9 +376,9 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   background: rgba(255, 224, 0, 0.25);
 }
 
-/* ---------- Zoom on hover ----------
-   With a mouse, the street zooms in around the cursor like a magnifying
-   glass (windows.js). The street's frame crops the zoomed view. */
+/* ---------- Zoom ----------
+   Pinching on a trackpad zooms the street in around the cursor
+   (windows.js). The street's frame crops the zoomed view. */
 .skyline.is-scaled { clip-path: inset(0); }
 
 /* ---------- The neighbors ----------
@@ -659,8 +664,7 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   display: flex;
   flex-direction: column;
   justify-content: center;
-  /* leaves room under the card for the ← 4 / 29 → row */
-  width: min(86vw, 440px, calc((86svh - 64px) * 0.7));
+  width: min(86vw, 440px, calc(86svh * 0.7));
   aspect-ratio: 7 / 10;
   padding: 10% 11% 22%;
   overflow: hidden;
@@ -702,36 +706,58 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   text-align: center;
 }
 
-/* Under the card: ← 4 / 29 → to step through every story, in order of the
-   night. (Arrow keys, a swipe, or a sideways trackpad swipe do the same.) */
+/* At the bottom of the card: ← 4 / 29 → to step through every story, in
+   order of the night. (Arrow keys, a swipe, or a sideways trackpad swipe do
+   the same.) The arrows are the bold grey ones from the page links
+   (base.css); the count is in the card's dark text color. It sits over the
+   card rather than in it, so it stays still while the cards slide past. */
 .story-card-nav {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 7%;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-4);
-  margin-top: var(--space-3);
+  color: var(--color-black);
+}
+
+/* The purple and blue cards are dark at the bottom: a white count there */
+.story-card-panel--purple ~ .story-card-nav,
+.story-card-panel--blue ~ .story-card-nav {
+  color: var(--color-white);
 }
 
 .story-card-nav button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 44px;
   height: 44px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 0;
+  border: 1px solid color-mix(in srgb, currentColor 60%, transparent);
   border-radius: 50%;
   background: transparent;
-  color: var(--color-text);
+  color: var(--color-text-muted); /* grey, like the page links' arrows */
   font-size: 1.2rem;
   line-height: 1;
   cursor: pointer;
   transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
+.story-card-nav .page-link-arrow {
+  stroke: currentColor;
+}
+
 .story-card-nav button:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.5);
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  border-color: currentColor;
 }
 
 .story-card-nav button:focus-visible {
-  outline: 2px solid var(--color-yellow);
+  outline: 2px solid currentColor;
   outline-offset: 2px;
 }
 
@@ -743,7 +769,7 @@ button.window { cursor: none; } /* the pinpoint cursor shows where you'll click 
   letter-spacing: 0.06em;
   text-align: center;
   font-variant-numeric: tabular-nums;
-  color: var(--color-text-muted);
+  color: inherit;
 }
 
 /* The ray of light that shines from the window into the card as it opens.

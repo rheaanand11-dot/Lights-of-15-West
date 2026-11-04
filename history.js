@@ -64,7 +64,7 @@
         ${HISTORY.lede.map((line, i) => `<span style="--i: ${i}">${line}</span>`).join('')}
         <span class="history-lede-question" style="--i: ${HISTORY.lede.length}">${HISTORY.closing}</span>
       </p>
-      <p class="history-scroll-hint" aria-hidden="true">Scroll &darr;</p>
+      <p class="history-scroll-hint" aria-hidden="true">Scroll <svg class="page-link-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v15M5.5 12.5L12 19l6.5-6.5"/></svg></p>
     </div>
 
     <figure class="history-step fig-offices">
@@ -115,6 +115,48 @@
   drawBlocks(root.querySelector('.blocks'));
   followScroll(root.querySelectorAll('.history-step'));
   aimRay();
+  spaceBeforeNext();
+
+  // "Next to the buildings" sits under the last figure with the bigger gap
+  // between separate parts of the page: the same as between the title screen
+  // ("Scroll ↓") and the first figure (the five offices). Both change with the
+  // screen's height, because the steps are sized to the screen, so this
+  // measures the title screen's gap and matches it. The same gap is left
+  // before Sources (--section-gap, used in base.css).
+  function spaceBeforeNext() {
+    const row = document.querySelector('.page-link-row:not(.page-link-row--top)');
+    if (!row) return;
+    const MIN_GAP = 130; // never closer than the steps inside the opening
+
+    // Where a step's text or picture starts and ends (leaving out the sticky
+    // wrapper and the title screen's light ray, which fill the whole step)
+    function contentOf(step) {
+      const parts = [...step.querySelectorAll(':scope > *, .history-sticky > *')]
+        .filter((el) => !el.classList.contains('history-sticky') && !el.classList.contains('history-ray'));
+      if (!parts.length) return null;
+      const boxes = parts.map((el) => el.getBoundingClientRect());
+      return { top: Math.min(...boxes.map((b) => b.top)), bottom: Math.max(...boxes.map((b) => b.bottom)) };
+    }
+
+    function measure() {
+      const steps = root.querySelectorAll('.history-step');
+      if (steps.length < 2) return;
+      const first = contentOf(steps[0]);
+      const second = contentOf(steps[1]);
+      const last = steps[steps.length - 1];
+      const lastContent = contentOf(last);
+      if (!first || !second || !lastContent) return;
+      const gap = Math.max(MIN_GAP, second.top - first.bottom);
+      document.documentElement.style.setProperty('--section-gap', Math.round(gap) + 'px');
+      // The last step may already leave empty space under its caption
+      const below = last.getBoundingClientRect().bottom - lastContent.bottom;
+      row.style.paddingTop = Math.max(16, gap - below) + 'px';
+      row.style.marginTop = Math.min(0, gap - below - 16) + 'px';
+    }
+
+    window.addEventListener('resize', measure);
+    measure();
+  }
 
   // The opening ray of light comes from just past the top-right corner of the
   // screen and lands on the title. Work out the angle from that corner to the
@@ -245,7 +287,10 @@
           const travel = box.height - window.innerHeight;
           const progress = Math.min(1, Math.max(0, -box.top / (travel * 0.85)));
           panel.style.setProperty('--light', progress.toFixed(3));
-          readout.textContent = Math.round(progress * 100);
+          const percent = Math.round(progress * 100);
+          readout.textContent = percent;
+          // 60-75% is the right light: the screen turns warm white
+          panel.classList.toggle('is-right', percent >= 60 && percent <= 75);
         }
       });
     }

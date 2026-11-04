@@ -4,7 +4,7 @@
 // of lit street). Each building gets a lamp whose triangle of light falls on
 // a row of 12 pavement squares, one per street light (25 m each): the more
 // lights, the wider the triangle. Buttons switch between the four nights we
-// counted, all in the same orange; the night's lamps sit four to a row and
+// counted (the picked one in the light's yellow); the lamps sit four to a row and
 // all switch on together when they scroll into view.
 
 (function () {
@@ -60,12 +60,13 @@
           <span class="streetlights-key-swatch" aria-hidden="true"></span>
           = 1&nbsp;street light ≈ 10&nbsp;lit windows ≈ 25&nbsp;m of lit street
         </p>
-        <p class="streetlights-scroll-hint" aria-hidden="true">Scroll &darr;</p>
+        <p class="streetlights-scroll-hint" aria-hidden="true">Scroll <svg class="page-link-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v15M5.5 12.5L12 19l6.5-6.5"/></svg></p>
       </div>
       <svg class="streetlights-defs" aria-hidden="true" focusable="false">
         <defs>
-          <!-- The lamp's static shading, from "street lamp 2.svg" -->
-          <linearGradient id="sl-lamp" gradientUnits="userSpaceOnUse" x1="111.65" y1="582" x2="604.29" y2="582">
+          <!-- The lamp's static shading, from "street lamp 2.svg" (in the
+               drawing's own coordinates, see card() below) -->
+          <linearGradient id="sl-lamp" gradientUnits="userSpaceOnUse" x1="252.07" y1="617.97" x2="744.71" y2="617.97">
             <stop offset="0.22" class="sl-lamp-light"/>
             <stop offset="0.56" class="sl-lamp"/>
             <stop offset="0.97" class="sl-lamp-dark"/>
@@ -74,7 +75,9 @@
           <filter id="sl-grain" x="-5%" y="-5%" width="110%" height="110%">
             <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="soft"/>
             <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" result="noise"/>
-            <feColorMatrix in="noise" type="saturate" values="0" result="grain"/>
+            <!-- Grey grain that's fully solid, so it only lightens and darkens
+                 the light and the black behind never shows through -->
+            <feColorMatrix in="noise" type="matrix" values="0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0 0 0 0 1" result="grain"/>
             <feComposite in="soft" in2="grain" operator="arithmetic" k1="1.1" k2="0.5" k3="0" k4="0"/>
           </filter>
           <!-- A soft halo for the bulb, the lit squares and the meters -->
@@ -92,7 +95,8 @@
       </div>
       <svg class="streetlights-defs" aria-hidden="true" focusable="false">
         <defs>
-          <!-- The light: the orange gradient, from the bulb down to the street -->
+          <!-- The light: whitish at the bulb to yellow on the street, like a
+               lit window on 15 West -->
           <linearGradient id="sl-beam" gradientUnits="userSpaceOnUse" x1="0" y1="${BULB.y}" x2="0" y2="${GROUND}">
             <stop offset="0" class="sl-stop-1"/>
             <stop offset="0.5" class="sl-stop-2"/>
@@ -199,9 +203,13 @@
           <text class="sl-meters-glow" x="${metersX}" y="${metersY}" text-anchor="middle" filter="url(#sl-glow)">${meters} m</text>
           <text class="sl-meters" x="${metersX}" y="${metersY}" text-anchor="middle">${meters} m</text>
           <g transform="translate(${LAMP.x} ${LAMP.y}) scale(${LAMP.scale})">
-            <rect class="sl-bulb-glow" x="5.5" y="34.46" width="145.11" height="24.99" rx="1.28" filter="url(#sl-glow)"/>
-            <rect class="sl-bulb" x="5.5" y="34.46" width="145.11" height="24.99" rx="1.28"/>
-            <path class="sl-lamp" d="M450.6,1026.44V27.55c0-7.17-5.86-13.03-13.03-13.03-3.58,0-6.84,1.47-9.2,3.83-3.72,3.72-3.83,8.32-3.83,9.2,0,7.28,0,14.57,0,21.85l-69.42-29.45c-4.88-2.07-10.1-3.24-15.4-3.44l-185.06-7.16c-.5-1.13-.97-2.02-1.18-2.34C149.21.39,142.67.03,141.73,0H14.79C6.66,0,0,8.02,0,17.83s6.66,17.83,14.79,17.83h126.94c5.36,0,10.03-3.51,12.62-8.69l180.93,7.74c7.5.32,14.87,1.97,21.79,4.87l67.45,28.29c-.01,319.52-.01,639.04,0,958.56h-19.59v137.58h69.23v-137.58h-23.57Z"/>
+            <!-- Anna's "street lamp 2.svg", shifted so its lamp head starts at
+                 the top left (BULB and GROUND above are measured from there) -->
+            <g transform="translate(-140.42 -35.96)">
+              <rect class="sl-bulb-glow" x="150.6" y="70.43" width="136.44" height="24.99" rx="5.92" filter="url(#sl-glow)"/>
+              <path class="sl-lamp" d="M591.02,1062.4V63.51c0-7.17-5.86-13.03-13.03-13.03-3.58,0-6.84,1.47-9.2,3.83-3.72,3.72-3.83,8.32-3.83,9.2,0,7.28,0,14.57,0,21.85l-69.42-29.45c-4.88-2.07-10.1-3.24-15.4-3.44l-185.06-7.16c-.5-1.13-.97-2.02-1.18-2.34-4.25-6.61-10.79-6.97-11.73-7h-126.94c-8.13,0-14.79,8.02-14.79,17.83s6.66,17.83,14.79,17.83h126.94c5.36,0,10.03-3.51,12.62-8.69l180.93,7.74c7.5.32,14.87,1.97,21.79,4.87l67.45,28.29c-.01,319.52-.01,639.04,0,958.56h-19.59v137.58h69.23v-137.58h-23.57Z"/>
+              <rect class="sl-bulb" x="150.6" y="70.43" width="136.44" height="24.99" rx="5.92"/>
+            </g>
           </g>
         </svg>
         <p class="streetlight-caption">${name} replaces ${streetLights} ${plural}</p>
