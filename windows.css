@@ -80,7 +80,7 @@
    switch under the street, so it has none on top. Name in Neue Haas Grotesque, count in Degular Mono. */
 .facade-label {
   position: absolute;
-  bottom: calc(100% + 10px);
+  bottom: calc(100% + 10px / var(--zoom, 1));
   left: 50%;
   z-index: 4;
   display: flex;
@@ -91,6 +91,11 @@
   pointer-events: none;
   opacity: 0;
   transform: translate(-50%, 6px);
+  /* Zooming in scales the buildings up (--zoom, set by windows.js); the
+     name scales back down from its bottom corner, so it keeps its size and
+     stays centered over the building */
+  scale: calc(1 / var(--zoom, 1));
+  transform-origin: 0 100%;
   transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
@@ -105,6 +110,7 @@
   right: 0;
   align-items: flex-end;
   transform: translate(0, 6px);
+  transform-origin: 100% 100%;
 }
 
 .facade-label-name {

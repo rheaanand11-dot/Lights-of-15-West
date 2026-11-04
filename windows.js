@@ -261,19 +261,31 @@
       // Windows, top floor first. They draw in at the same pace as 15 West,
       // so every building finishes at the same moment.
       const g = el.querySelector('.facade-grid');
+      // Spare spots (past the window total) are wall: whole empty floors at
+      // the top, then the top floor that's only partly windows, with its
+      // windows centered (the wall split between both ends).
       const slots = b.floors * b.columns;
       const spare = slots - total;
+      const emptyFloors = Math.floor(spare / b.columns);
+      const partWall = spare % b.columns; // wall spots on the partly filled floor
+      const wallLeft = Math.floor(partWall / 2);
       const step = (FACADE.floors * FACADE.rooms * WINDOW_STEP_MS) / slots;
+      let n = 0; // which window this is, counting from the top left
       for (let i = 0; i < slots; i++) {
         const w = document.createElement('span');
-        if (i < spare) {
+        const floor = Math.floor(i / b.columns);
+        const column = i % b.columns;
+        const isWall = floor < emptyFloors || (floor === emptyFloors &&
+          (column < wallLeft || column >= b.columns - (partWall - wallLeft)));
+        if (isWall) {
           w.className = 'window window--wall';
         } else {
           w.className = 'window';
-          const fromBottom = b.floors - 1 - Math.floor(i / b.columns);
-          w.style.setProperty('--d', Math.round((fromBottom * b.columns + (i % b.columns)) * step));
-          if (litWindows.has(i - spare)) w.classList.add('is-lit', 'tone-' + pickTone(pick()));
+          const fromBottom = b.floors - 1 - floor;
+          w.style.setProperty('--d', Math.round((fromBottom * b.columns + column) * step));
+          if (litWindows.has(n)) w.classList.add('is-lit', 'tone-' + pickTone(pick()));
           neighborWindows.push({ el: w, x: 0, y: 0, light: 0 });
+          n++;
         }
         g.appendChild(w);
       }
@@ -525,6 +537,9 @@
       const t = shift();
       skylineRow.style.transform = zoom.scale === 1 ? '' :
         `translate(${t.x}px, ${t.y}px) scale(${zoom.scale})`;
+      // The building names shrink back by the same amount, so they stay
+      // the same size however far in you zoom (windows.css)
+      skylineRow.style.setProperty('--zoom', zoom.scale);
       skyline.classList.toggle('is-scaled', zoom.scale !== 1);
       if (pointer) follow(pointer); // keep the light on whatever is under the cursor
     }
