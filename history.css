@@ -136,7 +136,7 @@
   text-wrap: balance;
 }
 
-/* "Who keeps the street lit now?" stands apart from the lines above, in italic */
+/* The closing line stands apart from the lines above, in italic */
 .history-lede .history-lede-question {
   margin-top: var(--space-4);
   font-style: italic;
@@ -477,7 +477,7 @@
   }
 
   .history-step--intro.is-told .history-scroll-hint {
-    animation: line-appears 0.4s ease-out 1s both; /* just after the last line */
+    animation: line-appears 0.4s ease-out 1.2s both; /* just after the last line */
   }
 
   .office {

@@ -84,7 +84,7 @@
     }
 
     root.innerHTML = `
-      <h2 class="windows-heading">Lit Windows by Building in Downtown Providence at Night</h2>
+      <h2 class="windows-heading">When the offices go dark, 15 West stays on</h2>
       <p class="facade-hint">
         <span class="hint-mouse">Shine your light across the street. Click a flickering window on 15 West to look inside.</span>
         <span class="hint-touch">Tap a building to shine a light. Tap a flickering window on 15 West to look inside.</span>
